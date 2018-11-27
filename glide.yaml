@@ -1,0 +1,15 @@
+package: github.com/edgexfoundry/device-modbus-go
+import:
+- package: github.com/edgexfoundry/device-sdk-go
+  version: delhi
+  subpackages:
+  - pkg/models
+- package: github.com/edgexfoundry/edgex-go
+  version: delhi
+  subpackages:
+  - pkg/models
+  - pkg/clients/logging
+- package: github.com/goburrow/modbus
+  version: =0.1.0
+- package: github.com/tbrandon/mbserver
+  version: 993e1772cc62aabcd5a5b9f7b58b03dd091a86c0
