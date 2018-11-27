@@ -1,0 +1,205 @@
+name: "Test.Device.Modbus.Profile"
+manufacturer: "Cool Automation"
+model: "CoolMasterNet"
+labels:
+- "HVAC"
+- "Air conditioner"
+description: "CoolMasterNet is an unique communication bridge that seamlessly connects advanced VRF / Split Air Conditioning Systems and home automation / Building Management Systems (BMS) controllers."
+
+deviceResources:
+-
+  name: "Switch"
+  description: "On/Off , 0-OFF 1-ON"
+  attributes:
+    { primaryTable: "COILS", startingAddress: "1" }
+  properties:
+    value:
+      { type: "BOOL", readWrite: "RW", size: "1", scale: "1", minimum: "0", maximum: "1", defaultValue: "0"}
+    units:
+      { type: "String", readWrite: "R", defaultValue: "On/Off"}
+
+-
+  name: "OperationMode"
+  description: "0-Cool 1-Heat 2-Auto 3-Dry 4-HAUX 5-Fan 6-HH 8-VAM Auto 9-VAM Bypass 10-VAM Heat Exc 11-VAM Normal"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "2" }
+  properties:
+    value:
+      { type: "INT16", readWrite: "RW", size: "1", scale: "1", minimum: "0", maximum: "11", defaultValue: "0"}
+    units:
+      { type: "String", readWrite: "R", defaultValue: "Operation Mode"}
+
+-
+  name: "FanSpeed"
+  description: "0-Low 1-Med 2-High 3-Auto 4-Top 5-Very Lo 7-VAM Super Hi 8-VAM Lo FreshUp 9-VAMHiFreshUp"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "3" }
+  properties:
+    value:
+      { type: "INT32", readWrite: "RW", size: "1", scale: "1", minimum: "0", maximum: "9", defaultValue: "0"}
+    units:
+      { type: "String", readWrite: "R", defaultValue: "Fan Speed"}
+
+-
+  name: "RoomTemperature"
+  description: "Room Temperature x10 °C (Read Only)"
+  attributes:
+    { primaryTable: "INPUT_REGISTERS", startingAddress: "4" }
+  properties:
+    value:
+      { type: "FLOAT32", readWrite: "R", size: "0.1", scale: "1"}
+    units:
+      { type: "String", readWrite: "R", defaultValue: "degrees Celsius"}
+
+-
+  name: "Temperature"
+  description: "Temperature x10 °C"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "5" }
+  properties:
+    value:
+      { type: "FLOAT64", readWrite: "RW", size: "1", scale: "0.1", defaultValue: "21"}
+    units:
+      { type: "String", readWrite: "R", defaultValue: "degrees Celsius"}
+
+
+resources:
+-
+  name: "Switch"
+  set:
+  - { index: "1", operation: "set", object: "Switch", parameter: "Switch", property: "value" ,mappings: { "OFF":"true","ON":"false"}}
+
+-
+  name: "OperationMode"
+  get:
+  - { index: "1", operation: "get", object: "OperationMode", parameter: "OperationMode", property: "value" ,mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
+
+  set:
+  - { index: "1", operation: "set", object: "OperationMode", parameter: "OperationMode", property: "value" ,mappings: { "Cool":"0","Heat":"1","Auto":"2","Dry":"3","HAUX":"4","Fan":"5","HH":"6","VAM Auto":"8","VAM Bypass":"9","VAM Heat":"10","VAM Normal":"11"}}
+
+-
+  name: "FanSpeed"
+  set:
+  - { index: "1", operation: "set", object: "FanSpeed", parameter: "FanSpeed", property: "value" ,mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"}}
+
+-
+  name: "RoomTemperature"
+  get:
+  - { index: "1", operation: "get", object: "RoomTemperature", parameter: "RoomTemperature", property: "value" }
+
+-
+  name: "Temperature"
+  set:
+  - { index: "1", operation: "set", object: "Temperature", parameter: "Temperature", property: "value" }
+
+-
+  name: "GetHVACValues"
+  get:
+  - { index: "1", operation: "get", object: "Switch", parameter: "Switch", property: "value" ,mappings: { "true":"OFF","false":"ON"}}
+  - { index: "2", operation: "get", object: "OperationMode", parameter: "OperationMode", property: "value",mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
+  - { index: "3", operation: "get", object: "FanSpeed", parameter: "FanSpeed", property: "value",mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
+  - { index: "4", operation: "get", object: "RoomTemperature", parameter: "RoomTemperature", property: "value" }
+  - { index: "5", operation: "get", object: "Temperature", parameter: "Temperature", property: "value" }
+
+-
+  name: "SetHVACValues"
+  set:
+  - { index: "1", operation: "set", object: "OperationMode", parameter: "OperationMode", property: "value",mappings: { "Cool":"0","Heat":"1","Auto":"2","Dry":"3","HAUX":"4","Fan":"5","HH":"6","VAM Auto":"8","VAM Bypass":"9","VAM Heat":"10","VAM Normal":"11"} }
+  - { index: "2", operation: "set", object: "FanSpeed", parameter: "FanSpeed", property: "value",mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"} }
+  - { index: "3", operation: "set", object: "Temperature", parameter: "Temperature", property: "value" }
+
+commands:
+-
+  name: "Switch"
+  put:
+    path: "/api/v1/device/{deviceId}/Switch"
+    parameterNames: ["Switch"]
+    responses:
+    -
+      code: "204"
+      description: "Set the Switch"
+      expectedValues: []
+    -
+      code: "503"
+      description: "service unavailable"
+      expectedValues: []
+
+-
+  name: "OperationMode"
+  get:
+    path: "/api/v1/device/{deviceId}/OperationMode"
+    responses:
+    - code: "200"
+      description: "Get the values from the device"
+      expectedValues: ["OperationMode"]
+    - code: "503"
+      description: "service unavailable"
+      expectedValues: []
+  put:
+    path: "/api/v1/device/{deviceId}/OperationMode"
+    parameterNames: ["OperationMode"]
+    responses:
+    -
+      code: "204"
+      description: "Set the OperationMode"
+      expectedValues: []
+    -
+      code: "503"
+      description: "service unavailable"
+      expectedValues: []
+-
+  name: "FanSpeed"
+  put:
+    path: "/api/v1/device/{deviceId}/FanSpeed"
+    parameterNames: ["FanSpeed"]
+    responses:
+    -
+      code: "204"
+      description: "Set the FanSpeed"
+      expectedValues: []
+    -
+      code: "503"
+      description: "service unavailable"
+      expectedValues: []
+-
+  name: "Temperature"
+  put:
+    path: "/api/v1/device/{deviceId}/Temperature"
+    parameterNames: ["Temperature"]
+    responses:
+    -
+      code: "204"
+      description: "Set the Temperature"
+      expectedValues: []
+    -
+      code: "503"
+      description: "service unavailable"
+      expectedValues: []
+
+-
+  name: "GetHVACValues"
+  get:
+    path: "/api/v1/device/{deviceId}/GetHVACValues"
+    responses:
+    -
+      code: "200"
+      description: "Get the values from the device"
+      expectedValues: ["Switch","OperationMode","FanSpeed","RoomTemperature","Temperature"]
+    -
+      code: "503"
+      description: "service unavailable"
+      expectedValues: []
+-
+  name: "SetHVACValues"
+  put:
+    path: "/api/v1/device/{deviceId}/SetHVACValues"
+    parameterNames: ["OperationMode","FanSpeed","Temperature"]
+    responses:
+    -
+      code: "204"
+      description: "Set the HVAC Values"
+      expectedValues: []
+    -
+      code: "503"
+      description: "service unavailable"
+      expectedValues: []
