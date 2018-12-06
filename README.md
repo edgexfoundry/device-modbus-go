@@ -1,5 +1,5 @@
 # Device Modbus Go
-MQTT device service go version. The design is base on [ document](https://github.com/edgexfoundry/edgex-go/blob/master/docs/examples/Ch-ExamplesMQTTDeviceService.rst) .
+Modbus device service go version
 
 ## Requisite
 * core-data
