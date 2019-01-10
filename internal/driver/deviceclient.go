@@ -64,28 +64,28 @@ func createConnectionInfo(addr models.Addressable) (*ConnectionInfo, error) {
 }
 
 func createCommandInfo(object models.DeviceObject) *CommandInfo {
-	var primaryTable, _ = object.Attributes["primaryTable"].(string)
-
-	var startingAddress, _ = strconv.Atoi(object.Attributes["startingAddress"].(string))
-	var startingAddressUint16 = uint16(startingAddress - 1)
+	primaryTable, _ := toString(object.Attributes["primaryTable"])
+	startingAddress, _ := toUint16(object.Attributes["startingAddress"])
+	startingAddress = startingAddress - 1
 
 	var length = calculateAddressLength(primaryTable, object.Properties.Value.Type)
-
 	var valueType = object.Properties.Value.Type
 
-	isByteSwap, keyExisted := object.Attributes["isByteSwap"].(bool)
-	if !keyExisted {
-		isByteSwap = false
+	var isByteSwap = false
+	_, ok := object.Attributes["isByteSwap"]
+	if ok {
+		isByteSwap, _ = toBool(object.Attributes["isByteSwap"])
 	}
 
-	isWordSwap, keyExisted := object.Attributes["isWordSwap"].(bool)
-	if !keyExisted {
-		isWordSwap = false
+	var isWordSwap = false
+	_, ok = object.Attributes["isWordSwap"]
+	if ok {
+		isWordSwap, _ = toBool(object.Attributes["isWordSwap"])
 	}
 
 	return &CommandInfo{
 		PrimaryTable:    primaryTable,
-		StartingAddress: startingAddressUint16,
+		StartingAddress: startingAddress,
 		ValueType:       valueType,
 		Length:          length,
 		IsByteSwap:      isByteSwap,

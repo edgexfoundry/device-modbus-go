@@ -30,8 +30,14 @@ func (*Driver) DisconnectDevice(address *models.Addressable) error {
 
 func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest) ([]*sdkModel.CommandValue, error) {
 	var responses = make([]*sdkModel.CommandValue, len(reqs))
-	var err error
 	var deviceClient DeviceClient
+
+	// Check request's attribute to avoid interface cast error
+	err := checkAttributes(reqs)
+	if err != nil {
+		driver.Logger.Info(fmt.Sprintf("CommandRequest's attribute are invalid. err:%v \n", err))
+		return responses, err
+	}
 
 	// create device client and open connection
 	connectionInfo, err := createConnectionInfo(*addr)
@@ -94,7 +100,13 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 
 func (d *Driver) HandleWriteCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
 	var deviceClient DeviceClient
-	var err error
+
+	// Check request's attribute to avoid interface cast error
+	err := checkAttributes(reqs)
+	if err != nil {
+		driver.Logger.Info(fmt.Sprintf("CommandRequest's attribute are invalid. err:%v \n", err))
+		return err
+	}
 
 	// create device client and open connection
 	connectionInfo, err := createConnectionInfo(*addr)
