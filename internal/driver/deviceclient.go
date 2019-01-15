@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
@@ -65,11 +66,13 @@ func createConnectionInfo(addr models.Addressable) (*ConnectionInfo, error) {
 
 func createCommandInfo(object models.DeviceObject) *CommandInfo {
 	primaryTable, _ := toString(object.Attributes["primaryTable"])
+	primaryTable = strings.ToUpper(primaryTable)
+
 	startingAddress, _ := toUint16(object.Attributes["startingAddress"])
 	startingAddress = startingAddress - 1
 
-	var length = calculateAddressLength(primaryTable, object.Properties.Value.Type)
-	var valueType = object.Properties.Value.Type
+	valueType := strings.ToUpper(object.Properties.Value.Type)
+	length := calculateAddressLength(primaryTable, valueType)
 
 	var isByteSwap = false
 	_, ok := object.Attributes["isByteSwap"]
