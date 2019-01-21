@@ -87,11 +87,11 @@ Parameters = "[{\"OperationMode\": \"Auto\"},{\"FanSpeed\": \"Med\"},{\"Temperat
 Schedule = "10sec-schedule"
   [ScheduleEvents.Addressable]
   HTTPMethod = "Put"
-  Path = "/api/v1/device/name/Modbus TCP test device/SetHVACValues"
+  Path = "/api/v1/device/name/Modbus TCP test device/HVACValues"
 
 [[ScheduleEvents]]
 Name = "Set the Switch"
-Parameters = "[{\"Switch\": \"ON\"}]"
+Parameters = "[{\"SwitchA\": \"ON\"},{\"SwitchB\": \"ON\"}]"
 Schedule = "10sec-schedule"
   [ScheduleEvents.Addressable]
   HTTPMethod = "Put"
@@ -102,9 +102,9 @@ Name = "5sec-schedule"
 Frequency = "PT5S"
 
 [[ScheduleEvents]]
-Name = "Read OperationMode"
+Name = "Read Values"
 Schedule = "5sec-schedule"
   [ScheduleEvents.Addressable]
   HTTPMethod = "GET"
-  Path = "/api/v1/device/name/Modbus TCP test device/OperationMode"
+  Path = "/api/v1/device/name/Modbus TCP test device/Values"
 
