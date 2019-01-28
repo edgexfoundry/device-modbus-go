@@ -20,15 +20,36 @@ var once sync.Once
 var driver *Driver
 
 type Driver struct {
-	Logger  logger.LoggingClient
-	AsyncCh chan<- *sdkModel.AsyncValues
+	Logger     logger.LoggingClient
+	AsyncCh    chan<- *sdkModel.AsyncValues
+	addressMap sync.Map
 }
 
 func (*Driver) DisconnectDevice(address *models.Addressable) error {
 	panic("implement me")
 }
 
+// lockAddress mark address is unavailable because real device handle one request at a time
+func (d *Driver) lockAddress(address *models.Addressable) {
+	lock, ok := d.addressMap.Load(address.Address)
+	if !ok {
+		lock = make(chan bool, 1)
+		d.addressMap.Store(address.Address, lock)
+	}
+
+	lock.(chan bool) <- true
+}
+
+// unlockAddress remove token after command finish
+func (d *Driver) unlockAddress(address *models.Addressable) {
+	lock, _ := d.addressMap.Load(address.Address)
+	<-lock.(chan bool)
+}
+
 func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest) ([]*sdkModel.CommandValue, error) {
+	d.lockAddress(addr)
+	defer d.unlockAddress(addr)
+
 	var responses = make([]*sdkModel.CommandValue, len(reqs))
 	var deviceClient DeviceClient
 
@@ -99,6 +120,9 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 }
 
 func (d *Driver) HandleWriteCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
+	d.lockAddress(addr)
+	defer d.unlockAddress(addr)
+
 	var deviceClient DeviceClient
 
 	// Check request's attribute to avoid interface cast error
