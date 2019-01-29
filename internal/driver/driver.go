@@ -22,7 +22,8 @@ var driver *Driver
 type Driver struct {
 	Logger     logger.LoggingClient
 	AsyncCh    chan<- *sdkModel.AsyncValues
-	addressMap sync.Map
+	mutex      sync.Mutex
+	addressMap map[string]chan bool
 }
 
 func (*Driver) DisconnectDevice(address *models.Addressable) error {
@@ -31,19 +32,22 @@ func (*Driver) DisconnectDevice(address *models.Addressable) error {
 
 // lockAddress mark address is unavailable because real device handle one request at a time
 func (d *Driver) lockAddress(address *models.Addressable) {
-	lock, ok := d.addressMap.Load(address.Address)
+	d.mutex.Lock()
+	lock, ok := d.addressMap[address.Address]
 	if !ok {
 		lock = make(chan bool, 1)
-		d.addressMap.Store(address.Address, lock)
+		d.addressMap[address.Address] = lock
 	}
-
-	lock.(chan bool) <- true
+	d.mutex.Unlock()
+	lock <- true
 }
 
 // unlockAddress remove token after command finish
 func (d *Driver) unlockAddress(address *models.Addressable) {
-	lock, _ := d.addressMap.Load(address.Address)
-	<-lock.(chan bool)
+	d.mutex.Lock()
+	lock := d.addressMap[address.Address]
+	d.mutex.Unlock()
+	<-lock
 }
 
 func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest) ([]*sdkModel.CommandValue, error) {
@@ -184,6 +188,7 @@ func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkMod
 func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.AsyncValues) error {
 	d.Logger = lc
 	d.AsyncCh = asyncCh
+	d.addressMap = make(map[string]chan bool)
 	return nil
 }
 
