@@ -12,8 +12,8 @@ import (
 	"time"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/clients/logging"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	logger "github.com/edgexfoundry/go-mod-core-contracts/clients/logging"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
 func init() {
@@ -47,7 +47,7 @@ func TestWordSwap32BitDataBytes(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_INT16(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    INPUT_REGISTERS,
 			"startingAddress": "10",
@@ -76,7 +76,7 @@ func TestTransformDateBytesToResult_INT16(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_INT32(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    INPUT_REGISTERS,
 			"startingAddress": "10",
@@ -104,7 +104,7 @@ func TestTransformDateBytesToResult_INT32(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_INT64(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -132,7 +132,7 @@ func TestTransformDateBytesToResult_INT64(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_UINT16(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -161,7 +161,7 @@ func TestTransformDateBytesToResult_UINT16(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_UINT32(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -189,7 +189,7 @@ func TestTransformDateBytesToResult_UINT32(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_UINT64(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -217,7 +217,7 @@ func TestTransformDateBytesToResult_UINT64(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_FLOAT32(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -245,7 +245,7 @@ func TestTransformDateBytesToResult_FLOAT32(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_FLOAT64(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -273,7 +273,7 @@ func TestTransformDateBytesToResult_FLOAT64(t *testing.T) {
 }
 
 func TestTransformDateBytesToResult_BOOL(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    DISCRETES_INPUT,
 			"startingAddress": "10",
@@ -301,7 +301,7 @@ func TestTransformDateBytesToResult_BOOL(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -328,7 +328,7 @@ func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -355,7 +355,7 @@ func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -382,7 +382,7 @@ func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -409,7 +409,7 @@ func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -436,7 +436,7 @@ func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -463,7 +463,7 @@ func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -490,7 +490,7 @@ func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    HOLDING_REGISTERS,
 			"startingAddress": "10",
@@ -517,7 +517,7 @@ func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
-	deviceObject := models.DeviceObject{
+	deviceObject := models.DeviceResource{
 		Attributes: map[string]interface{}{
 			"primaryTable":    COILS,
 			"startingAddress": "10",

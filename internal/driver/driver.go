@@ -12,8 +12,8 @@ import (
 	"sync"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/clients/logging"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	logger "github.com/edgexfoundry/go-mod-core-contracts/clients/logging"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
 var once sync.Once
@@ -89,7 +89,7 @@ func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.Co
 	for i, req := range reqs {
 		res, err := d.handleReadCommandRequest(deviceClient, req)
 		if err != nil {
-			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceObject.Name, err))
+			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResource.Name, err))
 			return responses, err
 		}
 
@@ -104,7 +104,7 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	var result = &sdkModel.CommandValue{}
 	var err error
 
-	commandInfo := createCommandInfo(req.DeviceObject)
+	commandInfo := createCommandInfo(req.DeviceResource)
 
 	response, err = deviceClient.GetValue(commandInfo)
 	if err != nil {
@@ -117,7 +117,7 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	if err != nil {
 		return result, err
 	} else {
-		driver.Logger.Info(fmt.Sprintf("Read command finished. Cmd:%v, %v \n", req.DeviceObject.Name, result))
+		driver.Logger.Info(fmt.Sprintf("Read command finished. Cmd:%v, %v \n", req.DeviceResource.Name, result))
 	}
 
 	return result, nil
@@ -169,7 +169,7 @@ func (d *Driver) HandleWriteCommands(addr *models.Addressable, reqs []sdkModel.C
 func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
 	var err error
 
-	commandInfo := createCommandInfo(req.DeviceObject)
+	commandInfo := createCommandInfo(req.DeviceResource)
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, param)
 	if err != nil {
@@ -181,7 +181,7 @@ func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkMod
 		return fmt.Errorf("handle write command request failed, err: %v", err)
 	}
 
-	driver.Logger.Info(fmt.Sprintf("Write command finished. Cmd:%v \n", req.DeviceObject.Name))
+	driver.Logger.Info(fmt.Sprintf("Write command finished. Cmd:%v \n", req.DeviceResource.Name))
 	return nil
 }
 

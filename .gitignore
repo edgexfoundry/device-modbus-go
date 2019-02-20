@@ -17,3 +17,4 @@
 vendor/
 cmd/device-modbus
 glide.lock
+go.sum
