@@ -2,13 +2,14 @@ package driver
 
 import (
 	"fmt"
+
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
 )
 
 func checkAttributes(reqs []sdkModel.CommandRequest) error {
 	var err error = nil
 	for _, req := range reqs {
-		attributes := req.DeviceObject.Attributes
+		attributes := req.DeviceResource.Attributes
 
 		_, err = toString(attributes["primaryTable"])
 		if err != nil {

@@ -15,7 +15,7 @@ import (
 	"time"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
 // DeviceClient is a interface for modbus client lib to implementation
@@ -64,7 +64,7 @@ func createConnectionInfo(addr models.Addressable) (*ConnectionInfo, error) {
 	}, nil
 }
 
-func createCommandInfo(object models.DeviceObject) *CommandInfo {
+func createCommandInfo(object models.DeviceResource) *CommandInfo {
 	primaryTable, _ := toString(object.Attributes["primaryTable"])
 	primaryTable = strings.ToUpper(primaryTable)
 

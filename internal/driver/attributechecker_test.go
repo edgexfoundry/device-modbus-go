@@ -4,13 +4,13 @@ import (
 	"testing"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/edgex-go/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
 func TestCheckAttributes(t *testing.T) {
 	requests := []sdkModel.CommandRequest{
 		{
-			DeviceObject: models.DeviceObject{
+			DeviceResource: models.DeviceResource{
 				Attributes: map[string]interface{}{
 					"primaryTable":    "HOLDING_REGISTERS",
 					"startingAddress": 1001,
@@ -18,7 +18,7 @@ func TestCheckAttributes(t *testing.T) {
 			},
 		},
 		{
-			DeviceObject: models.DeviceObject{
+			DeviceResource: models.DeviceResource{
 				Attributes: map[string]interface{}{
 					"primaryTable":    "HOLDING_REGISTERS",
 					"startingAddress": "1002",
@@ -36,14 +36,14 @@ func TestCheckAttributes(t *testing.T) {
 func TestCheckAttributes_fail(t *testing.T) {
 	requests := []sdkModel.CommandRequest{
 		{
-			DeviceObject: models.DeviceObject{
+			DeviceResource: models.DeviceResource{
 				Attributes: map[string]interface{}{
 					"startingAddress": 1001,
 					"isByteSwap":      "true"},
 			},
 		},
 		{
-			DeviceObject: models.DeviceObject{
+			DeviceResource: models.DeviceResource{
 				Attributes: map[string]interface{}{
 					"startingAddress": "1002",
 					"isByteSwap":      "true"},

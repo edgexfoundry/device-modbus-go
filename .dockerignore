@@ -1,0 +1,4 @@
+# Ignoring the go.sum file. There are checksum issues with
+# different versions of Golang. Remove once all Go versions
+# are in sync
+go.sum
