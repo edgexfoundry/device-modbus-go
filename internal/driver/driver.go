@@ -20,45 +20,68 @@ var once sync.Once
 var driver *Driver
 
 type Driver struct {
-	Logger     logger.LoggingClient
-	AsyncCh    chan<- *sdkModel.AsyncValues
-	mutex      sync.Mutex
-	addressMap map[string]chan bool
+	Logger              logger.LoggingClient
+	AsyncCh             chan<- *sdkModel.AsyncValues
+	mutex               sync.Mutex
+	addressMap          map[string]chan bool
+	workingAddressCount map[string]int
 }
+
+var concurrentCommandLimit = 100
 
 func (*Driver) DisconnectDevice(address *models.Addressable) error {
 	panic("implement me")
 }
 
 // lockAddress mark address is unavailable because real device handle one request at a time
-func (d *Driver) lockAddress(address *models.Addressable) {
+func (d *Driver) lockAddress(address *models.Addressable) error {
 	d.mutex.Lock()
 	lock, ok := d.addressMap[address.Address]
 	if !ok {
 		lock = make(chan bool, 1)
 		d.addressMap[address.Address] = lock
 	}
+
+	// workingAddressCount used to check high-frequency command execution to avoid goroutine block
+	count, ok := d.workingAddressCount[address.Address]
+	if !ok {
+		d.workingAddressCount[address.Address] = 1
+	} else if count >= concurrentCommandLimit {
+		d.mutex.Unlock()
+		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
+		d.Logger.Warn(errorMessage)
+		return fmt.Errorf(errorMessage)
+	} else {
+		d.workingAddressCount[address.Address] = d.workingAddressCount[address.Address] + 1
+	}
+
 	d.mutex.Unlock()
 	lock <- true
+
+	return nil
 }
 
 // unlockAddress remove token after command finish
 func (d *Driver) unlockAddress(address *models.Addressable) {
 	d.mutex.Lock()
 	lock := d.addressMap[address.Address]
+	d.workingAddressCount[address.Address] = d.workingAddressCount[address.Address] - 1
 	d.mutex.Unlock()
 	<-lock
 }
 
-func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest) ([]*sdkModel.CommandValue, error) {
-	d.lockAddress(addr)
+func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
+	err = d.lockAddress(addr)
+	if err != nil {
+		return responses, err
+	}
 	defer d.unlockAddress(addr)
 
-	var responses = make([]*sdkModel.CommandValue, len(reqs))
+	responses = make([]*sdkModel.CommandValue, len(reqs))
 	var deviceClient DeviceClient
 
 	// Check request's attribute to avoid interface cast error
-	err := checkAttributes(reqs)
+	err = checkAttributes(reqs)
 	if err != nil {
 		driver.Logger.Info(fmt.Sprintf("CommandRequest's attribute are invalid. err:%v \n", err))
 		return responses, err
@@ -124,13 +147,16 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 }
 
 func (d *Driver) HandleWriteCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
-	d.lockAddress(addr)
+	err := d.lockAddress(addr)
+	if err != nil {
+		return err
+	}
 	defer d.unlockAddress(addr)
 
 	var deviceClient DeviceClient
 
 	// Check request's attribute to avoid interface cast error
-	err := checkAttributes(reqs)
+	err = checkAttributes(reqs)
 	if err != nil {
 		driver.Logger.Info(fmt.Sprintf("CommandRequest's attribute are invalid. err:%v \n", err))
 		return err
@@ -189,6 +215,7 @@ func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.As
 	d.Logger = lc
 	d.AsyncCh = asyncCh
 	d.addressMap = make(map[string]chan bool)
+	d.workingAddressCount = make(map[string]int)
 	return nil
 }
 
