@@ -8,6 +8,8 @@ package driver
 
 import (
 	"bytes"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -540,5 +542,70 @@ func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
 
 	if err != nil || !bytes.Equal(dataBytes, expected) {
 		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+}
+
+func TestCreateConnectionInfoWithUnitID255(t *testing.T) {
+	address := "/dev/USB0tty,19200,8,1,0"
+	port := 502
+	protocol := "RTU"
+	unitID := uint8(255)
+	addressable := models.Addressable{
+		Address:  address,
+		Port:     port,
+		Protocol: protocol,
+		Path:     fmt.Sprintf("%v", unitID),
+	}
+
+	connectionIfo, err := createConnectionInfo(addressable)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionIfo. Error: %v", err)
+	}
+	if connectionIfo.Address != address || connectionIfo.Port != port ||
+		connectionIfo.Protocol != protocol || connectionIfo.UnitID != unitID {
+		t.Fatalf("Unexpect test result. \n %v should match to %v ", connectionIfo, addressable)
+	}
+}
+
+func TestCreateConnectionInfoWithUnitID0(t *testing.T) {
+	address := "/dev/USB0tty,19200,8,1,0"
+	port := 502
+	protocol := "RTU"
+	unitID := uint8(0)
+	addressable := models.Addressable{
+		Address:  address,
+		Port:     port,
+		Protocol: protocol,
+		Path:     fmt.Sprintf("%v", unitID),
+	}
+
+	connectionIfo, err := createConnectionInfo(addressable)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionIfo. Error: %v", err)
+	}
+	if connectionIfo.Address != address || connectionIfo.Port != port ||
+		connectionIfo.Protocol != protocol || connectionIfo.UnitID != unitID {
+		t.Fatalf("Unexpect test result. \n %v should match to %v ", connectionIfo, addressable)
+	}
+}
+
+func TestCreateConnectionInfoWithUnitIdOutOfRange(t *testing.T) {
+	address := "/dev/USB0tty,19200,8,1,0"
+	port := 502
+	protocol := "RTU"
+	unitID := 256
+	addressable := models.Addressable{
+		Address:  address,
+		Port:     port,
+		Protocol: protocol,
+		Path:     fmt.Sprintf("%v", unitID),
+	}
+
+	_, err := createConnectionInfo(addressable)
+
+	if !strings.Contains(err.Error(), "value out of range") {
+		t.Fatalf("Unexpect test result, unitID %v should out of ranage. \n Error: %v", unitID, err)
 	}
 }

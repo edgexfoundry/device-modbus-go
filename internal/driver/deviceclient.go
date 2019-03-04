@@ -50,10 +50,10 @@ func createConnectionInfo(addr models.Addressable) (*ConnectionInfo, error) {
 	var address = addr.Address
 	var port = addr.Port
 	var protocol = addr.Protocol
-	var unitID, err = strconv.ParseInt(addr.Path, 0, 8)
+	var unitID, err = strconv.ParseUint(addr.Path, 0, 8)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("path value out of range(0–255). Error: %v", err)
 	}
 
 	return &ConnectionInfo{
