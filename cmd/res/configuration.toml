@@ -50,4 +50,4 @@ FailWaitTime = 10
 [Logging]
 EnableRemote = false
 File = "./device-Modbus.log"
-LogLevel = 'INFO'
+Level = 'DEBUG'
