@@ -10,11 +10,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
-	"time"
 
 	MODBUS "github.com/goburrow/modbus"
-	"strconv"
 )
 
 // ModbusClient is used for connecting the device and read/write value
@@ -128,13 +127,13 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	if isModbusTcp {
 		tcpClientHandler = MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
 		tcpClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		tcpClientHandler.Timeout = 10 * time.Second
+		tcpClientHandler.IdleTimeout = 0
 		tcpClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	} else {
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		rtuClientHandler = MODBUS.NewRTUClientHandler(serialParams[0])
 		rtuClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		rtuClientHandler.Timeout = 10 * time.Second
+		rtuClientHandler.IdleTimeout = 0
 		rtuClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
 		baudRate, err := strconv.Atoi(serialParams[1])
