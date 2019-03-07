@@ -17,6 +17,13 @@ FailLimit = 3
 FailWaitTime = 10
 Type = "consul"
 
+[Logging]
+EnableRemote = false
+File = "./device-Modbus.log"
+
+[Writable]
+LogLevel = "INFO"
+
 [Clients]
   [Clients.Data]
   Name = "edgex-core-data"
@@ -47,10 +54,3 @@ Type = "consul"
   RemoveCmd = ""
   RemoveCmdArgs = ""
   ProfilesDir = ""
-
-[Logging]
-EnableRemote = false
-File = "./device-Modbus.log"
-
-[Writable]
-LogLevel = 'INFO'

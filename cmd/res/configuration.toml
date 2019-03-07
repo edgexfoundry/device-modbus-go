@@ -15,6 +15,14 @@ Port = 8500
 CheckInterval = "10s"
 FailLimit = 3
 FailWaitTime = 10
+Type = "consul"
+
+[Logging]
+EnableRemote = false
+File = "./device-Modbus.log"
+
+[Writable]
+LogLevel = "INFO"
 
 [Clients]
   [Clients.Data]
@@ -46,8 +54,4 @@ FailWaitTime = 10
   RemoveCmd = ""
   RemoveCmdArgs = ""
   ProfilesDir = ""
-
-[Logging]
-EnableRemote = false
-File = "./device-Modbus.log"
-Level = 'DEBUG'
+  
