@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2019 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	logger "github.com/edgexfoundry/go-mod-core-contracts/clients/logging"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/logging"
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
@@ -29,30 +29,31 @@ type Driver struct {
 
 var concurrentCommandLimit = 100
 
-func (*Driver) DisconnectDevice(address *models.Addressable) error {
-	panic("implement me")
+func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
+	d.Logger.Warn("Driver's DisconnectDevice function didn't implement")
+	return nil
 }
 
 // lockAddress mark address is unavailable because real device handle one request at a time
-func (d *Driver) lockAddress(address *models.Addressable) error {
+func (d *Driver) lockAddress(address string) error {
 	d.mutex.Lock()
-	lock, ok := d.addressMap[address.Address]
+	lock, ok := d.addressMap[address]
 	if !ok {
 		lock = make(chan bool, 1)
-		d.addressMap[address.Address] = lock
+		d.addressMap[address] = lock
 	}
 
 	// workingAddressCount used to check high-frequency command execution to avoid goroutine block
-	count, ok := d.workingAddressCount[address.Address]
+	count, ok := d.workingAddressCount[address]
 	if !ok {
-		d.workingAddressCount[address.Address] = 1
+		d.workingAddressCount[address] = 1
 	} else if count >= concurrentCommandLimit {
 		d.mutex.Unlock()
 		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
 		d.Logger.Warn(errorMessage)
 		return fmt.Errorf(errorMessage)
 	} else {
-		d.workingAddressCount[address.Address] = d.workingAddressCount[address.Address] + 1
+		d.workingAddressCount[address] = d.workingAddressCount[address] + 1
 	}
 
 	d.mutex.Unlock()
@@ -62,20 +63,26 @@ func (d *Driver) lockAddress(address *models.Addressable) error {
 }
 
 // unlockAddress remove token after command finish
-func (d *Driver) unlockAddress(address *models.Addressable) {
+func (d *Driver) unlockAddress(address string) {
 	d.mutex.Lock()
-	lock := d.addressMap[address.Address]
-	d.workingAddressCount[address.Address] = d.workingAddressCount[address.Address] - 1
+	lock := d.addressMap[address]
+	d.workingAddressCount[address] = d.workingAddressCount[address] - 1
 	d.mutex.Unlock()
 	<-lock
 }
 
-func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
-	err = d.lockAddress(addr)
+func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
+	connectionInfo, err := createConnectionInfo(protocols)
+	if err != nil {
+		driver.Logger.Error(fmt.Sprintf("Fail to create read command connection info. err:%v \n", err))
+		return responses, err
+	}
+
+	err = d.lockAddress(connectionInfo.Address)
 	if err != nil {
 		return responses, err
 	}
-	defer d.unlockAddress(addr)
+	defer d.unlockAddress(connectionInfo.Address)
 
 	responses = make([]*sdkModel.CommandValue, len(reqs))
 	var deviceClient DeviceClient
@@ -88,12 +95,6 @@ func (d *Driver) HandleReadCommands(addr *models.Addressable, reqs []sdkModel.Co
 	}
 
 	// create device client and open connection
-	connectionInfo, err := createConnectionInfo(*addr)
-	if err != nil {
-		driver.Logger.Info(fmt.Sprintf("Read command createConnectionInfo failed. err:%v \n", err))
-		return responses, err
-	}
-
 	deviceClient, err = NewDeviceClient(connectionInfo)
 	if err != nil {
 		driver.Logger.Info(fmt.Sprintf("Read command NewDeviceClient failed. err:%v \n", err))
@@ -146,12 +147,18 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	return result, nil
 }
 
-func (d *Driver) HandleWriteCommands(addr *models.Addressable, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
-	err := d.lockAddress(addr)
+func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
+	connectionInfo, err := createConnectionInfo(protocols)
+	if err != nil {
+		driver.Logger.Error(fmt.Sprintf("Fail to create write command connection info. err:%v \n", err))
+		return err
+	}
+
+	err = d.lockAddress(connectionInfo.Address)
 	if err != nil {
 		return err
 	}
-	defer d.unlockAddress(addr)
+	defer d.unlockAddress(connectionInfo.Address)
 
 	var deviceClient DeviceClient
 
@@ -163,11 +170,6 @@ func (d *Driver) HandleWriteCommands(addr *models.Addressable, reqs []sdkModel.C
 	}
 
 	// create device client and open connection
-	connectionInfo, err := createConnectionInfo(*addr)
-	if err != nil {
-		return err
-	}
-
 	deviceClient, err = NewDeviceClient(connectionInfo)
 	if err != nil {
 		return err
@@ -219,8 +221,9 @@ func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.As
 	return nil
 }
 
-func (*Driver) Stop(force bool) error {
-	panic("implement me")
+func (d *Driver) Stop(force bool) error {
+	d.Logger.Warn("Driver's stop function didn't implement")
+	return nil
 }
 
 func NewProtocolDriver() sdkModel.ProtocolDriver {

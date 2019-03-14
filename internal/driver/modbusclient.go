@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2019 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	MODBUS "github.com/goburrow/modbus"
@@ -118,13 +117,12 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client := new(ModbusClient)
 	var err error
-	isModbusTcp := false
 	var tcpClientHandler = new(MODBUS.TCPClientHandler)
 	var rtuClientHandler = new(MODBUS.RTUClientHandler)
-	if strings.Contains(connectionInfo.Protocol, "TCP") || strings.Contains(connectionInfo.Protocol, "HTTP") {
-		isModbusTcp = true
+	if connectionInfo.Protocol == ProtocolTCP {
+		client.IsModbusTcp = true
 	}
-	if isModbusTcp {
+	if client.IsModbusTcp {
 		tcpClientHandler = MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
 		tcpClientHandler.SlaveId = byte(connectionInfo.UnitID)
 		tcpClientHandler.IdleTimeout = 0
@@ -134,38 +132,13 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		rtuClientHandler = MODBUS.NewRTUClientHandler(serialParams[0])
 		rtuClientHandler.SlaveId = byte(connectionInfo.UnitID)
 		rtuClientHandler.IdleTimeout = 0
+		rtuClientHandler.BaudRate = connectionInfo.BaudRate
+		rtuClientHandler.DataBits = connectionInfo.DataBits
+		rtuClientHandler.StopBits = connectionInfo.StopBits
+		rtuClientHandler.Parity = connectionInfo.Parity
 		rtuClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
-
-		baudRate, err := strconv.Atoi(serialParams[1])
-		if err != nil {
-			return client, err
-		}
-		rtuClientHandler.BaudRate = baudRate
-
-		dataBits, err := strconv.Atoi(serialParams[2])
-		if err != nil {
-			return client, err
-		}
-		rtuClientHandler.DataBits = dataBits
-
-		stopBits, err := strconv.Atoi(serialParams[3])
-		if err != nil {
-			return client, err
-		}
-		rtuClientHandler.StopBits = stopBits
-
-		// Parity: N - None(0), O - Odd(1), E - Even(2)  default E
-		parity := "E"
-		if serialParams[4] == "0" {
-			parity = "N"
-		} else if serialParams[4] == "1" {
-			parity = "O"
-		}
-		rtuClientHandler.Parity = parity
-
 	}
 
-	client.IsModbusTcp = isModbusTcp
 	client.TCPClientHandler = *tcpClientHandler
 	client.RTUClientHandler = *rtuClientHandler
 	return client, err

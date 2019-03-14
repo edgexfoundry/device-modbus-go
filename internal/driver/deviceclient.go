@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2019 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +10,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 	"time"
 
@@ -27,14 +26,6 @@ type DeviceClient interface {
 	CloseConnection() error
 }
 
-// ConnectionInfo is device connection info
-type ConnectionInfo struct {
-	Address  string
-	Port     int
-	Protocol string
-	UnitID   uint8
-}
-
 // ConnectionInfo is command info
 type CommandInfo struct {
 	PrimaryTable    string
@@ -44,24 +35,6 @@ type CommandInfo struct {
 	Length     uint16
 	IsByteSwap bool
 	IsWordSwap bool
-}
-
-func createConnectionInfo(addr models.Addressable) (*ConnectionInfo, error) {
-	var address = addr.Address
-	var port = addr.Port
-	var protocol = addr.Protocol
-	var unitID, err = strconv.ParseUint(addr.Path, 0, 8)
-
-	if err != nil {
-		return nil, fmt.Errorf("path value out of range(0–255). Error: %v", err)
-	}
-
-	return &ConnectionInfo{
-		Address:  address,
-		Port:     port,
-		Protocol: protocol,
-		UnitID:   byte(unitID),
-	}, nil
 }
 
 func createCommandInfo(object models.DeviceResource) *CommandInfo {
