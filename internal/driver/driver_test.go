@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/logging"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 )
 
 func init() {
