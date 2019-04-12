@@ -59,3 +59,6 @@ https://github.com/edgexfoundry/edgex-go/blob/master/LICENSE
 
 edgexfoundry/device-sdk-go (Apache) - https://github.com/edgexfoundry/device-sdk-go
 https://github.com/edgexfoundry/device-sdk-go/blob/master/LICENSE-2.0.txt
+
+google/uuid (BSD-3) - https://github.com/google/uuid
+https://github.com/google/uuid/blob/master/LICENSE
