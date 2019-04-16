@@ -63,6 +63,10 @@ Level = "DEBUG"
        Address = "0.0.0.0"
        Port = "1502"
        UnitID = "1"
+  [[DeviceList.AutoEvents]]
+    Frequency = "20s"
+    OnChange = false
+    Resource = "HVACValues"
 
 [[DeviceList]]
   Name = "Modbus RTU test device"

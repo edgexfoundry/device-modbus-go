@@ -74,7 +74,7 @@ deviceResources:
       { type: "String", readWrite: "R", defaultValue: "degrees Celsius"}
 
 
-resources:
+deviceCommands:
 -
   name: "Switch"
   get:
@@ -107,7 +107,7 @@ resources:
   - { index: "2", operation: "set", object: "FanSpeed", parameter: "FanSpeed", property: "value",mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"} }
   - { index: "3", operation: "set", object: "Temperature", parameter: "Temperature", property: "value" }
 
-commands:
+coreCommands:
 -
   name: "Switch"
   get:
