@@ -25,8 +25,6 @@ test:
 clean:
 	rm -f $(MICROSERVICES)
 
-prepare:
-
 docker: $(DOCKERS)
 
 docker_device_modbus_go:
