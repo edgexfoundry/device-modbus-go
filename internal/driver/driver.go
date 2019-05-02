@@ -113,7 +113,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	for i, req := range reqs {
 		res, err := d.handleReadCommandRequest(deviceClient, req)
 		if err != nil {
-			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResource.Name, err))
+			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err))
 			return responses, err
 		}
 
@@ -128,7 +128,7 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	var result = &sdkModel.CommandValue{}
 	var err error
 
-	commandInfo := createCommandInfo(req.DeviceResource)
+	commandInfo := createCommandInfo(&req)
 
 	response, err = deviceClient.GetValue(commandInfo)
 	if err != nil {
@@ -136,12 +136,12 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	}
 
 	//stringResult := TransformDateBytesToString(response, commandInfo)
-	result, err = TransformDateBytesToResult(&req.RO, response, commandInfo)
+	result, err = TransformDateBytesToResult(&req, response, commandInfo)
 
 	if err != nil {
 		return result, err
 	} else {
-		driver.Logger.Info(fmt.Sprintf("Read command finished. Cmd:%v, %v \n", req.DeviceResource.Name, result))
+		driver.Logger.Info(fmt.Sprintf("Read command finished. Cmd:%v, %v \n", req.DeviceResourceName, result))
 	}
 
 	return result, nil
@@ -197,7 +197,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
 	var err error
 
-	commandInfo := createCommandInfo(req.DeviceResource)
+	commandInfo := createCommandInfo(&req)
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, param)
 	if err != nil {
@@ -209,7 +209,7 @@ func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkMod
 		return fmt.Errorf("handle write command request failed, err: %v", err)
 	}
 
-	driver.Logger.Info(fmt.Sprintf("Write command finished. Cmd:%v \n", req.DeviceResource.Name))
+	driver.Logger.Info(fmt.Sprintf("Write command finished. Cmd:%v \n", req.DeviceResourceName))
 	return nil
 }
 
