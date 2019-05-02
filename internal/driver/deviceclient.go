@@ -14,7 +14,6 @@ import (
 	"time"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
 // DeviceClient is a interface for modbus client lib to implementation
@@ -30,46 +29,45 @@ type DeviceClient interface {
 type CommandInfo struct {
 	PrimaryTable    string
 	StartingAddress uint16
-	ValueType       string
+	ValueType       sdkModel.ValueType
 	// how many register need to read
 	Length     uint16
 	IsByteSwap bool
 	IsWordSwap bool
 }
 
-func createCommandInfo(object models.DeviceResource) *CommandInfo {
-	primaryTable, _ := toString(object.Attributes["primaryTable"])
+func createCommandInfo(req *sdkModel.CommandRequest) *CommandInfo {
+	primaryTable, _ := req.Attributes["primaryTable"]
 	primaryTable = strings.ToUpper(primaryTable)
 
-	startingAddress, _ := toUint16(object.Attributes["startingAddress"])
+	startingAddress, _ := toUint16(req.Attributes["startingAddress"])
 	startingAddress = startingAddress - 1
 
-	valueType := strings.ToUpper(object.Properties.Value.Type)
-	length := calculateAddressLength(primaryTable, valueType)
+	length := calculateAddressLength(primaryTable, req.Type)
 
 	var isByteSwap = false
-	_, ok := object.Attributes["isByteSwap"]
+	_, ok := req.Attributes["isByteSwap"]
 	if ok {
-		isByteSwap, _ = toBool(object.Attributes["isByteSwap"])
+		isByteSwap, _ = toBool(req.Attributes["isByteSwap"])
 	}
 
 	var isWordSwap = false
-	_, ok = object.Attributes["isWordSwap"]
+	_, ok = req.Attributes["isWordSwap"]
 	if ok {
-		isWordSwap, _ = toBool(object.Attributes["isWordSwap"])
+		isWordSwap, _ = toBool(req.Attributes["isWordSwap"])
 	}
 
 	return &CommandInfo{
 		PrimaryTable:    primaryTable,
 		StartingAddress: startingAddress,
-		ValueType:       valueType,
+		ValueType:       req.Type,
 		Length:          length,
 		IsByteSwap:      isByteSwap,
 		IsWordSwap:      isWordSwap,
 	}
 }
 
-func calculateAddressLength(primaryTable string, valueType string) uint16 {
+func calculateAddressLength(primaryTable string, valueType sdkModel.ValueType) uint16 {
 	var primaryTableBit = PrimaryTableBitCountMap[primaryTable]
 	var valueTypeBitCount = ValueTypeBitCountMap[valueType]
 
@@ -81,57 +79,57 @@ func calculateAddressLength(primaryTable string, valueType string) uint16 {
 	return length
 }
 
-func TransformDateBytesToResult(ro *models.ResourceOperation, dataBytes []byte, commandInfo *CommandInfo) (*sdkModel.CommandValue, error) {
+func TransformDateBytesToResult(req *sdkModel.CommandRequest, dataBytes []byte, commandInfo *CommandInfo) (*sdkModel.CommandValue, error) {
 	var result = &sdkModel.CommandValue{}
 	var stringResult string
 	var err error
 	var resTime = time.Now().UnixNano() / int64(time.Millisecond)
 
 	switch commandInfo.ValueType {
-	case UINT16:
+	case sdkModel.Uint16:
 		var res = binary.BigEndian.Uint16(dataBytes)
-		result, err = sdkModel.NewUint16Value(ro, resTime, res)
+		result, err = sdkModel.NewUint16Value(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
-	case UINT32:
+	case sdkModel.Uint32:
 		var res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
-		result, err = sdkModel.NewUint32Value(ro, resTime, res)
+		result, err = sdkModel.NewUint32Value(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
-	case UINT64:
+	case sdkModel.Uint64:
 		var res = binary.BigEndian.Uint64(dataBytes)
-		result, err = sdkModel.NewUint64Value(ro, resTime, res)
+		result, err = sdkModel.NewUint64Value(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
 
-	case INT16:
+	case sdkModel.Int16:
 		var res = int16(binary.BigEndian.Uint16(dataBytes))
-		result, err = sdkModel.NewInt16Value(ro, resTime, res)
+		result, err = sdkModel.NewInt16Value(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
-	case INT32:
+	case sdkModel.Int32:
 		var res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
-		result, err = sdkModel.NewInt32Value(ro, resTime, res)
+		result, err = sdkModel.NewInt32Value(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
-	case INT64:
+	case sdkModel.Int64:
 		var res = int64(binary.BigEndian.Uint64(dataBytes))
-		result, err = sdkModel.NewInt64Value(ro, resTime, res)
+		result, err = sdkModel.NewInt64Value(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
 
-	case FLOAT32:
+	case sdkModel.Float32:
 		var res = binary.BigEndian.Uint32(dataBytes)
 		var floatResult = math.Float32frombits(res)
-		result, err = sdkModel.NewFloat32Value(ro, resTime, floatResult)
+		result, err = sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, floatResult)
 		stringResult = fmt.Sprint(floatResult)
-	case FLOAT64:
+	case sdkModel.Float64:
 		var res = binary.BigEndian.Uint64(dataBytes)
 		var floatResult = math.Float64frombits(res)
-		result, err = sdkModel.NewFloat64Value(ro, resTime, floatResult)
+		result, err = sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, floatResult)
 		stringResult = fmt.Sprint(floatResult)
 
-	case BOOL:
+	case sdkModel.Bool:
 		var res = false
 		// to find the 1st bit of the dataBytes by mask it with 2^0 = 1 (00000001)
 		if (dataBytes[0] & 1) > 0 {
 			res = true
 		}
-		result, err = sdkModel.NewBoolValue(ro, resTime, res)
+		result, err = sdkModel.NewBoolValue(req.DeviceResourceName, resTime, res)
 		stringResult = fmt.Sprint(res)
 
 	default:
@@ -150,11 +148,11 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {
-		err = fmt.Errorf("none supported value type : %s \n", commandInfo.ValueType)
+		err = fmt.Errorf("none supported value type : %v \n", commandInfo.ValueType)
 		return dataBytes, err
 	}
 
-	if commandInfo.ValueType == UINT32 || commandInfo.ValueType == INT32 {
+	if commandInfo.ValueType == sdkModel.Uint32 || commandInfo.ValueType == sdkModel.Int32 {
 		dataBytes = swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)
 	}
 
