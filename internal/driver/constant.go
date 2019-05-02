@@ -6,6 +6,8 @@
 
 package driver
 
+import sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
+
 const (
 	BOOL = "BOOL"
 
@@ -33,17 +35,17 @@ var PrimaryTableBitCountMap = map[string]uint16{
 	HOLDING_REGISTERS: 16,
 }
 
-var ValueTypeBitCountMap = map[string]uint16{
-	INT16: 16,
-	INT32: 32,
-	INT64: 64,
+var ValueTypeBitCountMap = map[sdkModel.ValueType]uint16{
+	sdkModel.Int16: 16,
+	sdkModel.Int32: 32,
+	sdkModel.Int64: 64,
 
-	UINT16: 16,
-	UINT32: 32,
-	UINT64: 64,
+	sdkModel.Uint16: 16,
+	sdkModel.Uint32: 32,
+	sdkModel.Uint64: 64,
 
-	FLOAT32: 32,
-	FLOAT64: 64,
+	sdkModel.Float32: 32,
+	sdkModel.Float64: 64,
 
-	BOOL: 1,
+	sdkModel.Bool: 1,
 }

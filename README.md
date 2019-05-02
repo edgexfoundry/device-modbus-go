@@ -14,30 +14,36 @@ Define devices info for device-sdk to auto upload device profile and create devi
 **Modbus TCP**
 ```toml
 [[DeviceList]]
-  Name = "Damocles device"
-  Profile = "CoolMasterNet Connected Device"
-  Description = "Damocles2 is a product for monitoring and controlling digital inputs and outputs over a LAN."
-  labels = [ "power-meter","Modbus TCP" ]
-  [DeviceList.Addressable]
-    name = "HVAC-Gateway address"
-    Protocol = "TCP"
-    Address = "127.0.0.1"
-    Port = 1502
-    Path = "1"
+  Name = "Modbus TCP test device"
+  Profile = "Test.Device.Modbus.Profile"
+  Description = "This device is a product for monitoring and controlling digital inputs and outputs over a LAN."
+  labels = [ "Air conditioner","modbus TCP" ]
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.modbus-tcp]
+       Address = "0.0.0.0"
+       Port = "1502"
+       UnitID = "1"
+  [[DeviceList.AutoEvents]]
+    Frequency = "20s"
+    OnChange = false
+    Resource = "HVACValues"
 ```
 
 **Modbus RTU**
 ```toml
 [[DeviceList]]
-  Name = "Damocles device"
-  Profile = "CoolMasterNet Connected Device"
-  Description = "Damocles2 is a product for monitoring and controlling digital inputs and outputs over a LAN."
-  labels = [ "power-meter","Modbus RTU" ]
-  [DeviceList.Addressable]
-    name = "HVAC-Gateway address"
-    Protocol = "RTU"
-    Address = "/tmp/slave,19200,8,1,0"
-    Path = "1"
+  Name = "Modbus RTU test device"
+  Profile = "Test.Device.Modbus.Profile"
+  Description = "This device is a product for monitoring and controlling digital inputs and outputs over a LAN."
+  labels = [ "Air conditioner","modbus RTU" ]
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.modbus-rtu]
+       Address = "/tmp/slave"
+       BaudRate = "19200"
+       DataBits = "8"
+       StopBits = "1"
+       Parity = "N"
+       UnitID = "1"
 ```
 
 ## Installation and Execution
