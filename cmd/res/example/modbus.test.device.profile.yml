@@ -58,7 +58,7 @@ deviceResources:
     { primaryTable: "INPUT_REGISTERS", startingAddress: "4" }
   properties:
     value:
-      { type: "FLOAT32", readWrite: "R", scale: "1"}
+      { type: "FLOAT32", readWrite: "R", scale: "1", floatEncoding: "Base64"}
     units:
       { type: "String", readWrite: "R", defaultValue: "degrees Celsius"}
 
@@ -69,7 +69,7 @@ deviceResources:
     { primaryTable: "HOLDING_REGISTERS", startingAddress: "5" }
   properties:
     value:
-      { type: "FLOAT64", readWrite: "RW", scale: "0.1"}
+      { type: "FLOAT64", readWrite: "RW", scale: "0.1", floatEncoding: "eNotation"}
     units:
       { type: "String", readWrite: "R", defaultValue: "degrees Celsius"}
 
