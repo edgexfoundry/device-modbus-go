@@ -13,11 +13,10 @@ import (
 )
 
 const (
-	version     string = device_modbus.Version
 	serviceName string = "edgex-device-modbus"
 )
 
 func main() {
 	sd := driver.NewProtocolDriver()
-	startup.Bootstrap(serviceName, version, sd)
+	startup.Bootstrap(serviceName, device_modbus.Version, sd)
 }
