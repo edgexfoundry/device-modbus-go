@@ -18,3 +18,11 @@ vendor/
 cmd/device-modbus
 glide.lock
 go.sum
+
+# snap files
+*.snap
+*.assert
+prime/
+stage/
+parts/
+squashfs-root/

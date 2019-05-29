@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+# get the values of $SNAP_DATA and $SNAP using the current symlink instead of
+# the default behavior which has the revision hard-coded, which breaks after
+# a refresh
+SNAP_DATA_CURRENT=${SNAP_DATA/%$SNAP_REVISION/current}
+SNAP_CURRENT=${SNAP/%$SNAP_REVISION/current}
+
+# install all the config files from $SNAP/config/SERVICE/res/configuration.toml 
+# into $SNAP_DATA/config
+mkdir -p "$SNAP_DATA/config"
+if [ ! -f "$SNAP_DATA/config/device-modbus/res/configuration.toml" ]; then
+    mkdir -p "$SNAP_DATA/config/device-modbus/res"
+    cp "$SNAP/config/device-modbus/res/configuration.toml" "$SNAP_DATA/config/device-modbus/res/configuration.toml"
+    # do replacement of the $SNAP, $SNAP_DATA, $SNAP_COMMON environment variables in the config files
+    sed -i -e "s@\$SNAP_COMMON@$SNAP_COMMON@g" \
+        -e "s@\$SNAP_DATA@$SNAP_DATA_CURRENT@g" \
+        -e "s@\$SNAP@$SNAP_CURRENT@g" \
+        "$SNAP_DATA/config/device-modbus/res/configuration.toml"
+fi
+
+# disable device-modbus initially because it specific requires configuration 
+# with a device profile that will be specific to each installation
+snapctl stop --disable "$SNAP_NAME.device-modbus"
