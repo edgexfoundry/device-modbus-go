@@ -4,7 +4,6 @@ Port = 49991
 ConnectRetries = 3
 Labels = []
 OpenMsg = "device modbus started"
-ReadMaxLimit = 256
 Timeout = 5000
 EnableAsyncReadings = true
 AsyncBufferSize = 16
@@ -15,6 +14,14 @@ Port = 8500
 CheckInterval = "10s"
 FailLimit = 3
 FailWaitTime = 10
+Type = "consul"
+
+[Logging]
+EnableRemote = false
+File = "./device-Modbus.log"
+
+[Writable]
+LogLevel = "DEBUG"
 
 [Clients]
   [Clients.Data]
@@ -46,11 +53,6 @@ FailWaitTime = 10
   RemoveCmd = ""
   RemoveCmdArgs = ""
   ProfilesDir = "./res/example"
-
-[Logging]
-EnableRemote = false
-File = "./device-Modbus.log"
-Level = "DEBUG"
 
 # Pre-define Devices
 [[DeviceList]]
