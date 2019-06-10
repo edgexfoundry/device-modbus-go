@@ -14,6 +14,14 @@ Port = 8500
 CheckInterval = "10s"
 FailLimit = 3
 FailWaitTime = 10
+Type = "consul"
+
+[Logging]
+EnableRemote = false
+File = "./device-Modbus.log"
+
+[Writable]
+LogLevel = "DEBUG"
 
 [Clients]
   [Clients.Data]
@@ -45,11 +53,6 @@ FailWaitTime = 10
   RemoveCmd = ""
   RemoveCmdArgs = ""
   ProfilesDir = "./res/example"
-
-[Logging]
-EnableRemote = false
-File = "./device-Modbus.log"
-Level = "DEBUG"
 
 # Pre-define Devices
 [[DeviceList]]

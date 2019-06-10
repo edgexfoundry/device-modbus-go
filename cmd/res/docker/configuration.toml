@@ -17,7 +17,7 @@ FailWaitTime = 10
 Type = "consul"
 
 [Logging]
-EnableRemote = false
+EnableRemote = true
 File = "./device-Modbus.log"
 
 [Writable]
