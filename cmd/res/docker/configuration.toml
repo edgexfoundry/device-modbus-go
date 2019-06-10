@@ -4,7 +4,6 @@ Port = 49991
 ConnectRetries = 3
 Labels = []
 OpenMsg = "device modbus started"
-ReadMaxLimit = 256
 Timeout = 5000
 EnableAsyncReadings = true
 AsyncBufferSize = 16
@@ -18,7 +17,7 @@ FailWaitTime = 10
 Type = "consul"
 
 [Logging]
-EnableRemote = false
+EnableRemote = true
 File = "./device-Modbus.log"
 
 [Writable]
