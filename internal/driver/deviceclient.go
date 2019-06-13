@@ -83,7 +83,7 @@ func TransformDateBytesToResult(req *sdkModel.CommandRequest, dataBytes []byte, 
 	var result = &sdkModel.CommandValue{}
 	var stringResult string
 	var err error
-	var resTime = time.Now().UnixNano() / int64(time.Millisecond)
+	var resTime = time.Now().UnixNano()
 
 	switch commandInfo.ValueType {
 	case sdkModel.Uint16:
