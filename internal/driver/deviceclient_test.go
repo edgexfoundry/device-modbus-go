@@ -265,7 +265,7 @@ func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewInt16Value(req.DeviceResourceName, resTime, -25)
 	expected := []byte{255, 231}
 
@@ -286,7 +286,7 @@ func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
 	expected := []byte{0, 0, 1, 11}
 
@@ -307,7 +307,7 @@ func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewInt64Value(req.DeviceResourceName, resTime, 281474976841985)
 	expected := []byte{0, 1, 0, 0, 0, 2, 1, 1}
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -327,7 +327,7 @@ func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewUint16Value(req.DeviceResourceName, resTime, 11)
 	expected := []byte{0, 11}
 
@@ -348,7 +348,7 @@ func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
 	expected := []byte{0, 0, 1, 11}
 
@@ -369,7 +369,7 @@ func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewUint64Value(req.DeviceResourceName, resTime, 281474976841985)
 	expected := []byte{0, 1, 0, 0, 0, 2, 1, 1}
 
@@ -390,7 +390,7 @@ func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
 	expected := []byte{63, 143, 92, 41}
 
@@ -411,7 +411,7 @@ func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, 1.12)
 	expected := []byte{63, 241, 235, 133, 30, 184, 81, 236}
 
@@ -432,7 +432,7 @@ func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
 		},
 	}
 	commandInfo := createCommandInfo(&req)
-	resTime := time.Now().UnixNano() / int64(time.Millisecond)
+	resTime := time.Now().UnixNano()
 	val, _ := sdkModel.NewBoolValue(req.DeviceResourceName, resTime, true)
 	expected := []byte{1}
 
