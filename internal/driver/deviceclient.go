@@ -41,7 +41,6 @@ func createCommandInfo(req *sdkModel.CommandRequest) *CommandInfo {
 	primaryTable = strings.ToUpper(primaryTable)
 
 	startingAddress, _ := toUint16(req.Attributes["startingAddress"])
-	startingAddress = startingAddress - 1
 
 	length := calculateAddressLength(primaryTable, req.Type)
 
