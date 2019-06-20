@@ -27,7 +27,9 @@ epoch: 1
 apps:
   device-modbus:
     adapter: none
-    command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry
+    command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry $CONSUL_ADDR
+    environment:
+      CONSUL_ADDR: "consul://localhost:8500"
     daemon: simple
     plugs: [network, network-bind]
 
