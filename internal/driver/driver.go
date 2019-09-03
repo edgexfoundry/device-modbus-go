@@ -128,7 +128,10 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	var result = &sdkModel.CommandValue{}
 	var err error
 
-	commandInfo := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		return nil, err
+	}
 
 	response, err = deviceClient.GetValue(commandInfo)
 	if err != nil {
@@ -136,7 +139,7 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 	}
 
 	//stringResult := TransformDateBytesToString(response, commandInfo)
-	result, err = TransformDateBytesToResult(&req, response, commandInfo)
+	result, err = TransformDataBytesToResult(&req, response, commandInfo)
 
 	if err != nil {
 		return result, err
@@ -197,7 +200,10 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
 	var err error
 
-	commandInfo := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		return err
+	}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, param)
 	if err != nil {
