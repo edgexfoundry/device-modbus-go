@@ -15,11 +15,11 @@ import (
 
 func init() {
 	driver = new(Driver)
-	driver.Logger = logger.NewClient("test", false, "", "DEBUG")
+	driver.Logger = logger.NewClient("test", false, "./device-Modbus.log", "DEBUG")
 }
 
 func TestLockAddressWithAddressCountLimit(t *testing.T) {
-	address := "/dev/USB0tty,19200,8,1,0"
+	address := "/dev/USB0tty"
 	driver.addressMap = make(map[string]chan bool)
 	driver.workingAddressCount = make(map[string]int)
 	driver.workingAddressCount[address] = concurrentCommandLimit
@@ -32,7 +32,7 @@ func TestLockAddressWithAddressCountLimit(t *testing.T) {
 }
 
 func TestLockAddressWithAddressCountUnderLimit(t *testing.T) {
-	address := "/dev/USB0tty,19200,8,1,0"
+	address := "/dev/USB0tty"
 	driver.addressMap = make(map[string]chan bool)
 	driver.workingAddressCount = make(map[string]int)
 	driver.workingAddressCount[address] = concurrentCommandLimit - 1
