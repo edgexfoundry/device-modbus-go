@@ -232,6 +232,21 @@ func (d *Driver) Stop(force bool) error {
 	return nil
 }
 
+func (d *Driver) AddDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
+	d.Logger.Debug(fmt.Sprintf("Device %s is added", deviceName))
+	return nil
+}
+
+func (d *Driver) UpdateDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
+	d.Logger.Debug(fmt.Sprintf("Device %s is updated", deviceName))
+	return nil
+}
+
+func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
+	d.Logger.Debug(fmt.Sprintf("Device %s is removed", deviceName))
+	return nil
+}
+
 func NewProtocolDriver() sdkModel.ProtocolDriver {
 	once.Do(func() {
 		driver = new(Driver)
