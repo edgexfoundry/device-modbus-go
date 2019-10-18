@@ -24,4 +24,4 @@ EXPOSE $APP_PORT
 
 COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/cmd /
 
-ENTRYPOINT ["/device-modbus","--profile=docker","--confdir=/res"]
+ENTRYPOINT ["/device-modbus","--profile=docker","--confdir=/res","--registry=consul://edgex-core-consul:8500"]
