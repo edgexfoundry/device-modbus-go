@@ -78,34 +78,34 @@ deviceCommands:
 -
   name: "Switch"
   get:
-  - { index: "1", operation: "set", object: "SwitchA", parameter: "SwitchA", mappings: { "true":"ON","false":"OFF"}}
-  - { index: "2", operation: "set", object: "SwitchB", parameter: "SwitchB", mappings: { "true":"ON","false":"OFF"}}
+    - { index: "1", operation: "set", deviceResource: "SwitchA", mappings: { "true":"ON","false":"OFF"}}
+    - { index: "2", operation: "set", deviceResource: "SwitchB", mappings: { "true":"ON","false":"OFF"}}
   set:
-  - { index: "1", operation: "set", object: "SwitchA", parameter: "SwitchA", mappings: { "OFF":"false","ON":"true"}}
-  - { index: "1", operation: "set", object: "SwitchB", parameter: "SwitchB", mappings: { "OFF":"false","ON":"true"}}
+    - { index: "1", operation: "set", deviceResource: "SwitchA", mappings: { "OFF":"false","ON":"true"}}
+    - { index: "1", operation: "set", deviceResource: "SwitchB", mappings: { "OFF":"false","ON":"true"}}
 -
   name: "Values"
   get:
-  - { index: "1", operation: "get", object: "SwitchA", parameter: "SwitchA", mappings: { "true":"ON","false":"OFF"}}
-  - { index: "2", operation: "get", object: "OperationMode", parameter: "OperationMode", mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
-  - { index: "3", operation: "get", object: "FanSpeed", parameter: "FanSpeed", mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
-  - { index: "4", operation: "get", object: "RoomTemperature", parameter: "RoomTemperature" }
-  - { index: "5", operation: "get", object: "Temperature", parameter: "Temperature" }
+    - { index: "1", operation: "get", deviceResource: "SwitchA", mappings: { "true":"ON","false":"OFF"}}
+    - { index: "2", operation: "get", deviceResource: "OperationMode", mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
+    - { index: "3", operation: "get", deviceResource: "FanSpeed", mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
+    - { index: "4", operation: "get", deviceResource: "RoomTemperature"}
+    - { index: "5", operation: "get", deviceResource: "Temperature"}
   set:
-  - { index: "1", operation: "set", object: "SwitchA", parameter: "SwitchA", mappings: { "ON":"true","OFF":"false"}}
-  - { index: "2", operation: "set", object: "OperationMode", parameter: "OperationMode", mappings: { "Cool":"0","Heat":"1","Auto":"2","Dry":"3","HAUX":"4","Fan":"5","HH":"6","VAM Auto":"8","VAM Bypass":"9","VAM Heat":"10","VAM Normal":"11"} }
-  - { index: "3", operation: "set", object: "FanSpeed", parameter: "FanSpeed", mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"} }
-  - { index: "4", operation: "set", object: "Temperature", parameter: "Temperature" }
+    - { index: "1", operation: "set", deviceResource: "SwitchA", mappings: { "ON":"true","OFF":"false"}}
+    - { index: "2", operation: "set", deviceResource: "OperationMode", mappings: { "Cool":"0","Heat":"1","Auto":"2","Dry":"3","HAUX":"4","Fan":"5","HH":"6","VAM Auto":"8","VAM Bypass":"9","VAM Heat":"10","VAM Normal":"11"} }
+    - { index: "3", operation: "set", deviceResource: "FanSpeed", mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"} }
+    - { index: "4", operation: "set", deviceResource: "Temperature"}
 -
   name: "HVACValues"
   get:
-  - { index: "1", operation: "get", object: "OperationMode", parameter: "OperationMode",mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
-  - { index: "2", operation: "get", object: "FanSpeed", parameter: "FanSpeed",mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
-  - { index: "3", operation: "get", object: "Temperature", parameter: "Temperature" }
+    - { index: "1", operation: "get", deviceResource: "OperationMode", mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
+    - { index: "2", operation: "get", deviceResource: "FanSpeed", mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
+    - { index: "3", operation: "get", deviceResource: "Temperature"}
   set:
-  - { index: "1", operation: "set", object: "OperationMode", parameter: "OperationMode",mappings: { "Cool":"0","Heat":"1","Auto":"2","Dry":"3","HAUX":"4","Fan":"5","HH":"6","VAM Auto":"8","VAM Bypass":"9","VAM Heat":"10","VAM Normal":"11"} }
-  - { index: "2", operation: "set", object: "FanSpeed", parameter: "FanSpeed",mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"} }
-  - { index: "3", operation: "set", object: "Temperature", parameter: "Temperature" }
+    - { index: "1", operation: "set", deviceResource: "OperationMode", mappings: { "Cool":"0","Heat":"1","Auto":"2","Dry":"3","HAUX":"4","Fan":"5","HH":"6","VAM Auto":"8","VAM Bypass":"9","VAM Heat":"10","VAM Normal":"11"} }
+    - { index: "2", operation: "set", deviceResource: "FanSpeed", mappings: { "Low":"0","Med":"1","High":"2","Auto":"3","Top":"4","Very Lo":"5","VAM Super Hi":"7","VAM Lo FreshUp":"8","VAMHiFreshUp":"9"} }
+    - { index: "3", operation: "set", deviceResource: "Temperature"}
 
 coreCommands:
 -
@@ -116,8 +116,8 @@ coreCommands:
     - code: "200"
       description: "Get the Switch"
       expectedValues: ["SwitchA","SwitchB"]
-    - code: "503"
-      description: "service unavailable"
+    - code: "500"
+      description: "internal server error"
       expectedValues: []
   put:
     path: "/api/v1/device/{deviceId}/Switch"
@@ -127,9 +127,8 @@ coreCommands:
       code: "204"
       description: "Set the Switch"
       expectedValues: []
-    -
-      code: "503"
-      description: "service unavailable"
+    - code: "500"
+      description: "internal server error"
       expectedValues: []
 -
   name: "Values"
@@ -140,9 +139,8 @@ coreCommands:
       code: "200"
       description: "Get the values from the device"
       expectedValues: ["SwitchA","OperationMode","FanSpeed","RoomTemperature","Temperature"]
-    -
-      code: "503"
-      description: "service unavailable"
+    - code: "500"
+      description: "internal server error"
       expectedValues: []
   put:
     path: "/api/v1/device/{deviceId}/Values"
@@ -152,9 +150,8 @@ coreCommands:
       code: "204"
       description: "Set the HVAC Values"
       expectedValues: []
-    -
-      code: "503"
-      description: "service unavailable"
+    - code: "500"
+      description: "internal server error"
       expectedValues: []
 -
   name: "HVACValues"
@@ -165,9 +162,8 @@ coreCommands:
       code: "200"
       description: "Get the HVAC values from the device"
       expectedValues: ["OperationMode","FanSpeed","Temperature"]
-    -
-      code: "503"
-      description: "service unavailable"
+    - code: "500"
+      description: "internal server error"
       expectedValues: []
   put:
     path: "/api/v1/device/{deviceId}/HVACValues"
@@ -177,7 +173,6 @@ coreCommands:
       code: "204"
       description: "Set the HVAC Values"
       expectedValues: []
-    -
-      code: "503"
-      description: "service unavailable"
+    - code: "500"
+      description: "internal server error"
       expectedValues: []

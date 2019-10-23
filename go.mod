@@ -1,9 +1,8 @@
 module github.com/edgexfoundry/device-modbus-go
 
 require (
-	github.com/edgexfoundry/device-sdk-go v0.0.0-20191011152726-1c6d166166ea
-	github.com/edgexfoundry/go-mod-core-contracts v0.1.16
-	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/edgexfoundry/device-sdk-go v0.0.0-20191023092354-4a3b48e27207
+	github.com/edgexfoundry/go-mod-core-contracts v0.1.31
 	github.com/goburrow/modbus v0.1.0
 	github.com/goburrow/serial v0.1.0
 	github.com/google/uuid v1.1.1 // indirect
