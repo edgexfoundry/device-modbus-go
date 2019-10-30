@@ -7,23 +7,25 @@
 package driver
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
 	"strings"
-	"encoding/binary"
 
 	MODBUS "github.com/goburrow/modbus"
 )
 
 // ModbusClient is used for connecting the device and read/write value
 type ModbusClient struct {
-	// IsModbusTcp is a value indicating the connection type
-	IsModbusTcp bool
-	// TCPClientHandler is ued for holding device TCP connection
+	// ModbusProtocol is a value indicating the connection type
+	ModbusProtocol string
+	// TCPClientHandler is used for holding device TCP connection
 	TCPClientHandler MODBUS.TCPClientHandler
-	// TCPClientHandler is ued for holding device RTU connection
+	// RTUClientHandler is used for holding device RTU connection
 	RTUClientHandler MODBUS.RTUClientHandler
+	// ASCIIClientHandler is used for holding device ASCII connection
+	ASCIIClientHandler MODBUS.ASCIIClientHandler
 
 	client MODBUS.Client
 }
@@ -31,14 +33,18 @@ type ModbusClient struct {
 func (c *ModbusClient) OpenConnection() error {
 	var err error
 	var newClient MODBUS.Client
-	if c.IsModbusTcp {
+	if c.ModbusProtocol == ProtocolTCP {
 		err = c.TCPClientHandler.Connect()
 		newClient = MODBUS.NewClient(&c.TCPClientHandler)
 		driver.Logger.Info(fmt.Sprintf("Modbus client create TCP connection."))
-	} else {
+	} else if c.ModbusProtocol == ProtocolRTU {
 		err = c.RTUClientHandler.Connect()
 		newClient = MODBUS.NewClient(&c.RTUClientHandler)
 		driver.Logger.Info(fmt.Sprintf("Modbus client create RTU connection."))
+	} else {
+		err = c.ASCIIClientHandler.Connect()
+		newClient = MODBUS.NewClient(&c.ASCIIClientHandler)
+		driver.Logger.Info(fmt.Sprintf("Modbus client create ASCII connection."))
 	}
 	c.client = newClient
 	return err
@@ -46,11 +52,12 @@ func (c *ModbusClient) OpenConnection() error {
 
 func (c *ModbusClient) CloseConnection() error {
 	var err error
-	if c.IsModbusTcp {
+	if c.ModbusProtocol == ProtocolTCP {
 		err = c.TCPClientHandler.Close()
-
-	} else {
+	} else if c.ModbusProtocol == ProtocolRTU {
 		err = c.RTUClientHandler.Close()
+	} else {
+		err = c.ASCIIClientHandler.Close()
 	}
 	return err
 }
@@ -104,9 +111,9 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 
 	case HOLDING_REGISTERS:
 		if modbusCommandInfo.Length == 1 {
-		  result, err = c.client.WriteSingleRegister(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
-		} else {		
-		  result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+			result, err = c.client.WriteSingleRegister(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
+		} else {
+			result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 		}
 	default:
 	}
@@ -124,15 +131,14 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	var err error
 	var tcpClientHandler = new(MODBUS.TCPClientHandler)
 	var rtuClientHandler = new(MODBUS.RTUClientHandler)
+	var asciiClientHandler = new(MODBUS.ASCIIClientHandler)
+
 	if connectionInfo.Protocol == ProtocolTCP {
-		client.IsModbusTcp = true
-	}
-	if client.IsModbusTcp {
 		tcpClientHandler = MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
 		tcpClientHandler.SlaveId = byte(connectionInfo.UnitID)
 		tcpClientHandler.IdleTimeout = 0
 		tcpClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
-	} else {
+	} else if connectionInfo.Protocol == ProtocolRTU {
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		rtuClientHandler = MODBUS.NewRTUClientHandler(serialParams[0])
 		rtuClientHandler.SlaveId = byte(connectionInfo.UnitID)
@@ -142,9 +148,20 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		rtuClientHandler.StopBits = connectionInfo.StopBits
 		rtuClientHandler.Parity = connectionInfo.Parity
 		rtuClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
+	} else {
+		serialParams := strings.Split(connectionInfo.Address, ",")
+		asciiClientHandler = MODBUS.NewASCIIClientHandler(serialParams[0])
+		asciiClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		asciiClientHandler.IdleTimeout = 0
+		asciiClientHandler.BaudRate = connectionInfo.BaudRate
+		asciiClientHandler.DataBits = connectionInfo.DataBits
+		asciiClientHandler.StopBits = connectionInfo.StopBits
+		asciiClientHandler.Parity = connectionInfo.Parity
+		asciiClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	}
 
 	client.TCPClientHandler = *tcpClientHandler
 	client.RTUClientHandler = *rtuClientHandler
+	client.ASCIIClientHandler = *asciiClientHandler
 	return client, err
 }

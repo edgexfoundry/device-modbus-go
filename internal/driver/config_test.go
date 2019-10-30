@@ -13,6 +13,36 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/models"
 )
 
+func TestCreateASCIIConnectionInfo_dataBits7(t *testing.T) {
+	address := "/dev/USB0tty"
+	baudRate := 19200
+	dataBits := 7
+	stopBits := 1
+	parity := "N"
+	unitID := uint8(255)
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolASCII: {
+			Address:  address,
+			UnitID:   "255",
+			BaudRate: "19200",
+			DataBits: "7",
+			StopBits: "1",
+			Parity:   "N",
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+	if connectionInfo.Protocol != ProtocolASCII || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
+		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
+		connectionInfo.Parity != parity {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+}
+
 func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	address := "/dev/USB0tty"
 	baudRate := 19200
