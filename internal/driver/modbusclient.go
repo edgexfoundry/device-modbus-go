@@ -7,11 +7,11 @@
 package driver
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
 	"strings"
-	"encoding/binary"
 
 	MODBUS "github.com/goburrow/modbus"
 )
@@ -104,9 +104,9 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 
 	case HOLDING_REGISTERS:
 		if modbusCommandInfo.Length == 1 {
-		  result, err = c.client.WriteSingleRegister(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
-		} else {		
-		  result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+			result, err = c.client.WriteSingleRegister(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
+		} else {
+			result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 		}
 	default:
 	}
