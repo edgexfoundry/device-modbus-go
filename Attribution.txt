@@ -95,3 +95,9 @@ https://github.com/pkg/errors/blob/master/LICENSE
 
 golang.org/x/net (Unspecified) https://github.com/golang/net
 https://github.com/golang/net/blob/master/LICENSE
+
+jessevdk/go-flags (BSD-3) https://github.com/jessevdk/go-flags
+https://github.com/jessevdk/go-flags/blob/master/LICENSE
+
+OneOfOne/xxhash (Apache 2.0) https://github.com/OneOfOne/xxhash
+https://github.com/OneOfOne/xxhash/blob/master/LICENSE
