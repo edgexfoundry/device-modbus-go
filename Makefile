@@ -21,7 +21,7 @@ cmd/device-modbus:
 
 test:
 	$(GO) test ./... -coverprofile=coverage.out
-#	$(GO) vet ./...
+	$(GO) vet ./...
 	gofmt -l .
 	[ "`gofmt -l .`" = "" ]
 	./bin/test-attribution-txt.sh
