@@ -9,7 +9,8 @@ MICROSERVICES=cmd/device-modbus
 DOCKERS=docker_device_modbus_go
 .PHONY: $(DOCKERS)
 
-VERSION=$(shell cat ./VERSION)
+VERSION=$(shell cat ./VERSION 2>/dev/null || echo 0.0.0)
+
 GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION)"
 

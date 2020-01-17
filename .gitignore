@@ -27,3 +27,4 @@ stage/
 parts/
 squashfs-root/
 coverage.out
+VERSION
