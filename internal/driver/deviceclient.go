@@ -40,10 +40,10 @@ type CommandInfo struct {
 }
 
 func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
-	primaryTable, _ := req.Attributes["primaryTable"]
+	primaryTable, _ := req.Attributes[PRIMARY_TABLE]
 	primaryTable = strings.ToUpper(primaryTable)
 
-	startingAddress, _ := toUint16(req.Attributes["startingAddress"])
+	startingAddress, _ := toUint16(req.Attributes[STARTING_ADDRESS])
 	startingAddress = startingAddress - 1
 
 	rawType, err := getRawType(req)
@@ -53,15 +53,15 @@ func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
 	length := calculateAddressLength(primaryTable, rawType)
 
 	var isByteSwap = false
-	_, ok := req.Attributes["isByteSwap"]
+	_, ok := req.Attributes[IS_BYTE_SWAP]
 	if ok {
-		isByteSwap, _ = toBool(req.Attributes["isByteSwap"])
+		isByteSwap, _ = toBool(req.Attributes[IS_BYTE_SWAP])
 	}
 
 	var isWordSwap = false
-	_, ok = req.Attributes["isWordSwap"]
+	_, ok = req.Attributes[IS_WORD_SWAP]
 	if ok {
-		isWordSwap, _ = toBool(req.Attributes["isWordSwap"])
+		isWordSwap, _ = toBool(req.Attributes[IS_WORD_SWAP])
 	}
 
 	return &CommandInfo{

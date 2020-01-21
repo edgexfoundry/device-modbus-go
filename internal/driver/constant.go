@@ -29,6 +29,8 @@ const (
 
 	PRIMARY_TABLE    = "primaryTable"
 	STARTING_ADDRESS = "startingAddress"
+	IS_BYTE_SWAP     = "isByteSwap"
+	IS_WORD_SWAP     = "isWordSwap"
 	// RAW_TYPE define binary data type which read from Modbus device
 	RAW_TYPE = "rawType"
 )

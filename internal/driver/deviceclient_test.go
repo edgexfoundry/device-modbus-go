@@ -50,8 +50,8 @@ func TestTransformDataBytesToResult_INT16(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Int16,
 		Attributes: map[string]string{
-			"primaryTable":    INPUT_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -77,8 +77,8 @@ func TestTransformDataBytesToResult_INT32(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Int32,
 		Attributes: map[string]string{
-			"primaryTable":    INPUT_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -103,8 +103,8 @@ func TestTransformDataBytesToResult_INT64(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Int64,
 		Attributes: map[string]string{
-			"primaryTable":    INPUT_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -129,8 +129,8 @@ func TestTransformDataBytesToResult_UINT16(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Uint16,
 		Attributes: map[string]string{
-			"primaryTable":    INPUT_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -156,8 +156,8 @@ func TestTransformDataBytesToResult_UINT32(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Uint32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -182,8 +182,8 @@ func TestTransformDataBytesToResult_UINT64(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Uint64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -209,8 +209,8 @@ func TestTransformDataBytesToResult_FLOAT32(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -235,8 +235,8 @@ func TestTransformDataBytesToResult_FLOAT64(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -261,8 +261,8 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Bool,
 		Attributes: map[string]string{
-			"primaryTable":    DISCRETES_INPUT,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    DISCRETES_INPUT,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -409,8 +409,8 @@ func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Int16,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -433,8 +433,8 @@ func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Int32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -457,8 +457,8 @@ func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Int64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -480,8 +480,8 @@ func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Uint16,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -504,8 +504,8 @@ func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Uint32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -528,8 +528,8 @@ func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Uint64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -552,8 +552,8 @@ func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -576,8 +576,8 @@ func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -600,8 +600,8 @@ func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
 		DeviceResourceName: "light",
 		Type:               sdkModel.Bool,
 		Attributes: map[string]string{
-			"primaryTable":    COILS,
-			"startingAddress": "10",
+			PRIMARY_TABLE:    COILS,
+			STARTING_ADDRESS: "10",
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -624,9 +624,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_INT16(t *tes
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
-			RAW_TYPE:          INT16,
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			RAW_TYPE:         INT16,
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -651,9 +651,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_UINT16(t *te
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float32,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
-			RAW_TYPE:          UINT16,
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			RAW_TYPE:         UINT16,
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -678,9 +678,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_INT16(t *tes
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
-			RAW_TYPE:          INT16,
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			RAW_TYPE:         INT16,
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)
@@ -705,9 +705,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *te
 		DeviceResourceName: "light",
 		Type:               sdkModel.Float64,
 		Attributes: map[string]string{
-			"primaryTable":    HOLDING_REGISTERS,
-			"startingAddress": "10",
-			RAW_TYPE:          UINT16,
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			RAW_TYPE:         UINT16,
 		},
 	}
 	commandInfo, err := createCommandInfo(&req)

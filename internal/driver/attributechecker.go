@@ -17,27 +17,27 @@ func checkAttributes(reqs []sdkModel.CommandRequest) error {
 	for _, req := range reqs {
 		attributes := req.Attributes
 
-		_, err = toString(attributes["primaryTable"])
+		_, err = toString(attributes[PRIMARY_TABLE])
 		if err != nil {
 			return fmt.Errorf("primaryTable fail to convert interface inoto string: %v", err)
 		}
 
-		_, err = toUint16(attributes["startingAddress"])
+		_, err = toUint16(attributes[STARTING_ADDRESS])
 		if err != nil {
 			return fmt.Errorf("startingAddress fail to convert interface inoto unit16: %v", err)
 		}
 
-		_, ok := attributes["isByteSwap"]
+		_, ok := attributes[IS_BYTE_SWAP]
 		if ok {
-			_, err = toBool(attributes["isByteSwap"])
+			_, err = toBool(attributes[IS_BYTE_SWAP])
 			if err != nil {
 				return fmt.Errorf("isByteSwap fail to convert interface inoto boolean: %v", err)
 			}
 		}
 
-		_, ok = attributes["isWordSwap"]
+		_, ok = attributes[IS_WORD_SWAP]
 		if ok {
-			_, err = toBool(attributes["isWordSwap"])
+			_, err = toBool(attributes[IS_WORD_SWAP])
 			if err != nil {
 				return fmt.Errorf("isWordSwap fail to convert interface inoto boolean: %v", err)
 			}
