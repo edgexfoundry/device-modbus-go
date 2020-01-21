@@ -58,7 +58,7 @@ func (d *Driver) lockAddress(address string) error {
 		d.Logger.Error(errorMessage)
 		return fmt.Errorf(errorMessage)
 	} else {
-		d.workingAddressCount[address] = d.workingAddressCount[address] + 1
+		d.workingAddressCount[address] = count + 1
 	}
 
 	d.mutex.Unlock()
@@ -116,7 +116,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 
 	// handle command requests
 	for i, req := range reqs {
-		res, err := d.handleReadCommandRequest(deviceClient, req)
+		res, err := handleReadCommandRequest(deviceClient, req)
 		if err != nil {
 			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err))
 			return responses, err
@@ -128,7 +128,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	return responses, nil
 }
 
-func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
+func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
 	var response []byte
 	var result = &sdkModel.CommandValue{}
 	var err error
@@ -191,7 +191,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 
 	// handle command requests
 	for i, req := range reqs {
-		err = d.handleWriteCommandRequest(deviceClient, req, params[i])
+		err = handleWriteCommandRequest(deviceClient, req, params[i])
 		if err != nil {
 			d.Logger.Error(err.Error())
 			break
@@ -201,7 +201,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	return err
 }
 
-func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
+func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
 	var err error
 
 	commandInfo, err := createCommandInfo(&req)
