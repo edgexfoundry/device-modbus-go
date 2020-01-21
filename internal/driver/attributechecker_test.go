@@ -17,16 +17,16 @@ func TestCheckAttributes(t *testing.T) {
 	requests := []sdkModel.CommandRequest{
 		{
 			Attributes: map[string]string{
-				"primaryTable":    "HOLDING_REGISTERS",
-				"startingAddress": "1001",
-				"isByteSwap":      "true",
+				PRIMARY_TABLE:    HOLDING_REGISTERS,
+				STARTING_ADDRESS: "1001",
+				IS_BYTE_SWAP:     "true",
 			},
 		},
 		{
 			Attributes: map[string]string{
-				"primaryTable":    "HOLDING_REGISTERS",
-				"startingAddress": "1002",
-				"isByteSwap":      "true",
+				PRIMARY_TABLE:    HOLDING_REGISTERS,
+				STARTING_ADDRESS: "1002",
+				IS_BYTE_SWAP:     "true",
 			},
 		},
 	}
@@ -41,16 +41,16 @@ func TestCheckAttributes_fail(t *testing.T) {
 	requests := []sdkModel.CommandRequest{
 		{
 			Attributes: map[string]string{
-				"primaryTable":    "HOLDING_REGISTERS",
-				"startingAddress": "1001",
-				"isByteSwap":      "true",
+				PRIMARY_TABLE:    HOLDING_REGISTERS,
+				STARTING_ADDRESS: "1001",
+				IS_BYTE_SWAP:     "true",
 			},
 		},
 		{
 			Attributes: map[string]string{
-				"primaryTable":    "HOLDING_REGISTERS",
-				"startingAddress": "test-1002",
-				"isByteSwap":      "true",
+				PRIMARY_TABLE:    HOLDING_REGISTERS,
+				STARTING_ADDRESS: "test-1002",
+				IS_BYTE_SWAP:     "true",
 			},
 		},
 	}
