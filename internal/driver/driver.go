@@ -10,6 +10,7 @@ package driver
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
@@ -25,6 +26,7 @@ type Driver struct {
 	mutex               sync.Mutex
 	addressMap          map[string]chan bool
 	workingAddressCount map[string]int
+	stopped             bool
 }
 
 var concurrentCommandLimit = 100
@@ -36,6 +38,9 @@ func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models
 
 // lockAddress mark address is unavailable because real device handle one request at a time
 func (d *Driver) lockAddress(address string) error {
+	if d.stopped {
+		return fmt.Errorf("service attempts to stop and unable to handle new request")
+	}
 	d.mutex.Lock()
 	lock, ok := d.addressMap[address]
 	if !ok {
@@ -228,8 +233,29 @@ func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.As
 }
 
 func (d *Driver) Stop(force bool) error {
-	d.Logger.Warn("Driver's stop function didn't implement")
+	d.stopped = true
+	if !force {
+		d.waitAllCommandsToFinish()
+	}
+	for _, locked := range d.addressMap {
+		close(locked)
+	}
 	return nil
+}
+
+// waitAllCommandsToFinish used to check and wait for the unfinished job
+func (d *Driver) waitAllCommandsToFinish() {
+loop:
+	for {
+		for _, count := range d.workingAddressCount {
+			if count != 0 {
+				// wait a moment and check again
+				time.Sleep(time.Second * SERVICE_STOP_WAIT_TIME)
+				continue loop
+			}
+		}
+		break loop
+	}
 }
 
 func (d *Driver) AddDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
