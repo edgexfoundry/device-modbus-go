@@ -55,7 +55,7 @@ func (d *Driver) lockAddress(address string) error {
 	} else if count >= concurrentCommandLimit {
 		d.mutex.Unlock()
 		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
-		d.Logger.Warn(errorMessage)
+		d.Logger.Error(errorMessage)
 		return fmt.Errorf(errorMessage)
 	} else {
 		d.workingAddressCount[address] = d.workingAddressCount[address] + 1
@@ -143,7 +143,6 @@ func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkMode
 		return result, err
 	}
 
-	//stringResult := TransformDateBytesToString(response, commandInfo)
 	result, err = TransformDataBytesToResult(&req, response, commandInfo)
 
 	if err != nil {
