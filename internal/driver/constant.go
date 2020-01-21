@@ -33,6 +33,8 @@ const (
 	IS_WORD_SWAP     = "isWordSwap"
 	// RAW_TYPE define binary data type which read from Modbus device
 	RAW_TYPE = "rawType"
+
+	SERVICE_STOP_WAIT_TIME = 1
 )
 
 var PrimaryTableBitCountMap = map[string]uint16{
