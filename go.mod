@@ -14,3 +14,5 @@ require (
 	github.com/tbrandon/mbserver v0.0.0-20170611213546-993e1772cc62
 	golang.org/x/net v0.0.0-20190228165749-92fc7df08ae7 // indirect
 )
+
+go 1.13

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.11-alpine
+ARG BASE=golang:1.13-alpine
 FROM ${BASE} AS builder
 
 ARG MAKE='make build'
@@ -23,7 +23,7 @@ RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/reposi
 RUN apk add --update --no-cache make git openssh build-base
 
 # set the working directory
-WORKDIR /device-modbus-go
+WORKDIR $GOPATH/src/github.com/edgexfoundry/device-modbus-go
 
 COPY . .
 
@@ -34,7 +34,7 @@ FROM scratch
 ENV APP_PORT=49991
 EXPOSE $APP_PORT
 
-COPY --from=builder /device-modbus-go/cmd /
+COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/cmd /
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
       copyright='Copyright (c) 2019: IoTech Ltd'
