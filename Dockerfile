@@ -14,29 +14,28 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.13-alpine
-FROM ${BASE} AS builder
+FROM golang:1.13-alpine AS builder
 
-ARG MAKE='make build'
+WORKDIR /go/src/github.com/edgexfoundry/device-modbus-go/simulator
 
 RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
-RUN apk add --update --no-cache make git openssh build-base
 
-# set the working directory
-WORKDIR $GOPATH/src/github.com/edgexfoundry/device-modbus-go
+RUN apk update && apk add zeromq-dev libsodium-dev pkgconfig build-base git
 
-COPY . .
+RUN git clone https://github.com/edgexfoundry/device-modbus-go.git
 
-RUN ${MAKE}
+RUN mv ./device-modbus-go/simulator/* .
+
+RUN CGO_ENABLED=0 GO111MODULE=on go build
 
 FROM scratch
 
-ENV APP_PORT=49991
+ENV APP_PORT=1502
 EXPOSE $APP_PORT
 
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/cmd /
+COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/simulator /
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-      copyright='Copyright (c) 2019: IoTech Ltd'
+      copyright='Copyright (c) 2020: IoTech Ltd'
 
-ENTRYPOINT ["/device-modbus","--profile=docker","--confdir=/res","--registry=consul://edgex-core-consul:8500"]
+ENTRYPOINT ["/simulator"]
