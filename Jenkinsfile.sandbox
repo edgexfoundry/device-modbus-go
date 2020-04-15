@@ -14,6 +14,8 @@
 // limitations under the License.
 //
 
+@Library("edgex-global-pipelines@experimental") _
+
 edgeXBuildGoApp (
     project: 'device-modbus-go',
     goVersion: '1.13'
