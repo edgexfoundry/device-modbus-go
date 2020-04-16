@@ -16,7 +16,7 @@
 
 edgeXBuildDocker (
     project: 'edgex-modbus-simulator',
-    mavenSettings: 'edgex-modbus-simulator-settings',
+    mavenSettings: 'device-modbus-go-settings',
     dockerImageName: 'edgex-modbus-simulator',
     dockerNamespace: 'edgex-devops',
     dockerNexusRepo: 'snapshots',
