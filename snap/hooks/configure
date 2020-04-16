@@ -1,4 +1,0 @@
-#!/bin/bash -e
-
-# empty configure hook to allow snap configuration with snap set / snapctl set
-# to work
