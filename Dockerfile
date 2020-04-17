@@ -37,6 +37,6 @@ EXPOSE $APP_PORT
 COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/cmd /
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-      copyright='Copyright (c) 2019: IoTech Ltd'
+      copyright='Copyright (c) 2020: IoTech Ltd'
 
-ENTRYPOINT ["/device-modbus","--profile=docker","--confdir=/res","--registry=consul://edgex-core-consul:8500"]
+ENTRYPOINT ["/device-modbus","--cp=consul://edgex-core-consul:8500","--registry","--confdir=/res"]
