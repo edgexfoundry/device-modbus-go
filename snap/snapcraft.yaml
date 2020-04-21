@@ -43,20 +43,20 @@ parts:
       # note - we specifically don't use arch
       case "$(dpkg --print-architecture)" in
         amd64)
-          FILE_NAME=go1.11.9.linux-amd64.tar.gz
-          FILE_HASH=e88aa3e39104e3ba6a95a4e05629348b4a1ec82791fb3c941a493ca349730608
+          FILE_NAME=go1.13.5.linux-amd64.tar.gz
+          FILE_HASH=512103d7ad296467814a6e3f635631bd35574cab3369a97a323c9a585ccaa569
           ;;
         arm64)
-          FILE_NAME=go1.11.9.linux-arm64.tar.gz
-          FILE_HASH=892ab6c2510c4caa5905b3b1b6a1d4c6f04e384841fec50881ca2be7e8accf05
+          FILE_NAME=go1.13.5.linux-arm64.tar.gz
+          FILE_HASH=227b718923e20c846460bbecddde9cb86bad73acc5fb6f8e1a96b81b5c84668b
           ;;
         armhf)
-          FILE_NAME=go1.11.9.linux-armv6l.tar.gz
-          FILE_HASH=f0d7b039cae61efdc346669f3459460e3dc03b6c6de528ca107fc53970cba0d1
+          FILE_NAME=go1.13.5.linux-armv6l.tar.gz
+          FILE_HASH=26259f61d52ee2297b1e8feef3a0fc82144b666a2b95512402c31cc49713c133
           ;;
         i386)
-          FILE_NAME=go1.11.9.linux-386.tar.gz
-          FILE_HASH=0fa4001fcf1ef0644e261bf6dde02fc9f10ae4df6d74fda61fc4d3c3cbef1d79
+          FILE_NAME=go1.13.5.linux-386.tar.gz
+          FILE_HASH=3b830fa25f79ab08b476f02c84ea4125f41296b074017b492ac1ff748cf1c7c9
           ;;
       esac
       # download the archive, failing on ssl cert problems
@@ -87,7 +87,7 @@ parts:
           -e s:'ProfilesDir = \"./res\"':'ProfilesDir = \"\$SNAP_DATA/config/device-modbus/res\"': > \
         "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/configuration.toml"
 
-      install -DT "./cmd/Attribution.txt" \
+      install -DT "./Attribution.txt" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"
       install -DT "./LICENSE" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/LICENSE"
