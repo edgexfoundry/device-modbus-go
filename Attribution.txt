@@ -39,9 +39,6 @@ https://github.com/tbrandon/mbserver/blob/master/LICENSE
 kr/logfmt (MIT) https://github.com/kr/logfmt
 https://github.com/kr/logfmt/blob/master/Readme
 
-hashicorp/consul 1.1.0 (Mozilla Public License 2.0) https://github.com/hashicorp/consul
-https://github.com/hashicorp/consul/blob/master/LICENSE
-
 hashicorp/go-cleanhttp (Mozilla Public License 2.0) https://github.com/hashicorp/go-cleanhttp
 https://github.com/hashicorp/go-cleanhttp/blob/master/LICENSE
 
@@ -96,7 +93,7 @@ https://github.com/pkg/errors/blob/master/LICENSE
 golang.org/x/net (Unspecified) https://github.com/golang/net
 https://github.com/golang/net/blob/master/LICENSE
 
-github.com/OneOfOne/xxhash
+github.com/OneOfOne/xxhash (Apache 2.0) https://github.com/OneOfOne/xxhash
 https://github.com/OneOfOne/xxhash/blob/master/LICENCE
 
 hashicorp/consul/api (Mozilla Public License 2.0) https://github.com/hashicorp/consul/api
