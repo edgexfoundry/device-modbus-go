@@ -30,6 +30,7 @@ apps:
     command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry $CONSUL_ADDR
     environment:
       CONSUL_ADDR: "consul://localhost:8500"
+      DEVICE_PROFILESDIR: $SNAP_DATA/config/device-modbus/res
     daemon: simple
     plugs: [network, network-bind]
 
@@ -77,15 +78,7 @@ parts:
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
-
-      # FIXME: settings can't be overridden from the cmd-line!
-      # Override 'LogFile' and 'LoggingRemoteURL'
-      install -d "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/"
-
-      cat "./cmd/res/configuration.toml" | \
-        sed -e s:\"./device-modbus.log\":\'\$SNAP_COMMON/device-modbus.log\': \
-          -e s:'ProfilesDir = \"./res\"':'ProfilesDir = \"\$SNAP_DATA/config/device-modbus/res\"': > \
-        "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/configuration.toml"
+      install -DT "./cmd/res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/configuration.toml"
 
       install -DT "./Attribution.txt" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"
