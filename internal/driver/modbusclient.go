@@ -7,6 +7,7 @@
 package driver
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"os"
@@ -102,7 +103,11 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 		result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 
 	case HOLDING_REGISTERS:
-		result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+		if modbusCommandInfo.Length == 1 {
+			result, err = c.client.WriteSingleRegister(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
+		} else {
+			result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+		}
 	default:
 	}
 
@@ -117,29 +122,24 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client := new(ModbusClient)
 	var err error
-	var tcpClientHandler = new(MODBUS.TCPClientHandler)
-	var rtuClientHandler = new(MODBUS.RTUClientHandler)
 	if connectionInfo.Protocol == ProtocolTCP {
 		client.IsModbusTcp = true
 	}
 	if client.IsModbusTcp {
-		tcpClientHandler = MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
-		tcpClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		tcpClientHandler.IdleTimeout = 0
-		tcpClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
+		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
+		client.TCPClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		client.TCPClientHandler.IdleTimeout = 0
+		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	} else {
 		serialParams := strings.Split(connectionInfo.Address, ",")
-		rtuClientHandler = MODBUS.NewRTUClientHandler(serialParams[0])
-		rtuClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		rtuClientHandler.IdleTimeout = 0
-		rtuClientHandler.BaudRate = connectionInfo.BaudRate
-		rtuClientHandler.DataBits = connectionInfo.DataBits
-		rtuClientHandler.StopBits = connectionInfo.StopBits
-		rtuClientHandler.Parity = connectionInfo.Parity
-		rtuClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
+		client.RTUClientHandler.Address = serialParams[0]
+		client.RTUClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		client.RTUClientHandler.IdleTimeout = 0
+		client.RTUClientHandler.BaudRate = connectionInfo.BaudRate
+		client.RTUClientHandler.DataBits = connectionInfo.DataBits
+		client.RTUClientHandler.StopBits = connectionInfo.StopBits
+		client.RTUClientHandler.Parity = connectionInfo.Parity
+		client.RTUClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	}
-
-	client.TCPClientHandler = *tcpClientHandler
-	client.RTUClientHandler = *rtuClientHandler
 	return client, err
 }

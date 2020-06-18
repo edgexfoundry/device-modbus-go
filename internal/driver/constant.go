@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2019 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -26,6 +26,15 @@ const (
 	COILS             = "COILS"
 	INPUT_REGISTERS   = "INPUT_REGISTERS"
 	HOLDING_REGISTERS = "HOLDING_REGISTERS"
+
+	PRIMARY_TABLE    = "primaryTable"
+	STARTING_ADDRESS = "startingAddress"
+	IS_BYTE_SWAP     = "isByteSwap"
+	IS_WORD_SWAP     = "isWordSwap"
+	// RAW_TYPE define binary data type which read from Modbus device
+	RAW_TYPE = "rawType"
+
+	SERVICE_STOP_WAIT_TIME = 1
 )
 
 var PrimaryTableBitCountMap = map[string]uint16{

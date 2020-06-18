@@ -15,30 +15,17 @@
 #
 
 ARG BASE=golang:1.13-alpine
-FROM ${BASE} AS builder
+FROM ${BASE}
 
-ARG MAKE='make build'
+LABEL license='SPDX-License-Identifier: Apache-2.0' \
+  copyright='Copyright (c) 2020: IOTech'
 
 RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
 RUN apk add --update --no-cache make git openssh build-base
 
 # set the working directory
-WORKDIR $GOPATH/src/github.com/edgexfoundry/device-modbus-go
+WORKDIR /device-modbus-go
 
 COPY . .
 
-RUN ${MAKE}
-
-FROM scratch
-
-ENV APP_PORT=49991
-EXPOSE $APP_PORT
-
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/cmd /
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/LICENSE /
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/Attribution.txt /
-
-LABEL license='SPDX-License-Identifier: Apache-2.0' \
-      copyright='Copyright (c) 2019-2020: IoTech Ltd'
-
-ENTRYPOINT ["/device-modbus","--cp=consul://edgex-core-consul:8500","--registry","--confdir=/res"]
+RUN go mod download

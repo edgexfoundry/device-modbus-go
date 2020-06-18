@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2019 IOTech Ltd
+// Copyright (C) 2018-2020 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,6 +10,7 @@ package driver
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
@@ -25,6 +26,7 @@ type Driver struct {
 	mutex               sync.Mutex
 	addressMap          map[string]chan bool
 	workingAddressCount map[string]int
+	stopped             bool
 }
 
 var concurrentCommandLimit = 100
@@ -36,6 +38,9 @@ func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models
 
 // lockAddress mark address is unavailable because real device handle one request at a time
 func (d *Driver) lockAddress(address string) error {
+	if d.stopped {
+		return fmt.Errorf("service attempts to stop and unable to handle new request")
+	}
 	d.mutex.Lock()
 	lock, ok := d.addressMap[address]
 	if !ok {
@@ -50,10 +55,10 @@ func (d *Driver) lockAddress(address string) error {
 	} else if count >= concurrentCommandLimit {
 		d.mutex.Unlock()
 		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
-		d.Logger.Warn(errorMessage)
+		d.Logger.Error(errorMessage)
 		return fmt.Errorf(errorMessage)
 	} else {
-		d.workingAddressCount[address] = d.workingAddressCount[address] + 1
+		d.workingAddressCount[address] = count + 1
 	}
 
 	d.mutex.Unlock()
@@ -111,7 +116,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 
 	// handle command requests
 	for i, req := range reqs {
-		res, err := d.handleReadCommandRequest(deviceClient, req)
+		res, err := handleReadCommandRequest(deviceClient, req)
 		if err != nil {
 			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err))
 			return responses, err
@@ -123,20 +128,22 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	return responses, nil
 }
 
-func (d *Driver) handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
+func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
 	var response []byte
 	var result = &sdkModel.CommandValue{}
 	var err error
 
-	commandInfo := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		return nil, err
+	}
 
 	response, err = deviceClient.GetValue(commandInfo)
 	if err != nil {
 		return result, err
 	}
 
-	//stringResult := TransformDateBytesToString(response, commandInfo)
-	result, err = TransformDateBytesToResult(&req, response, commandInfo)
+	result, err = TransformDataBytesToResult(&req, response, commandInfo)
 
 	if err != nil {
 		return result, err
@@ -184,7 +191,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 
 	// handle command requests
 	for i, req := range reqs {
-		err = d.handleWriteCommandRequest(deviceClient, req, params[i])
+		err = handleWriteCommandRequest(deviceClient, req, params[i])
 		if err != nil {
 			d.Logger.Error(err.Error())
 			break
@@ -194,10 +201,13 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	return err
 }
 
-func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
+func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
 	var err error
 
-	commandInfo := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		return err
+	}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, param)
 	if err != nil {
@@ -213,7 +223,7 @@ func (d *Driver) handleWriteCommandRequest(deviceClient DeviceClient, req sdkMod
 	return nil
 }
 
-func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.AsyncValues) error {
+func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.AsyncValues, deviceCh chan<- []sdkModel.DiscoveredDevice) error {
 	d.Logger = lc
 	d.AsyncCh = asyncCh
 	d.addressMap = make(map[string]chan bool)
@@ -222,7 +232,43 @@ func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.As
 }
 
 func (d *Driver) Stop(force bool) error {
-	d.Logger.Warn("Driver's stop function didn't implement")
+	d.stopped = true
+	if !force {
+		d.waitAllCommandsToFinish()
+	}
+	for _, locked := range d.addressMap {
+		close(locked)
+	}
+	return nil
+}
+
+// waitAllCommandsToFinish used to check and wait for the unfinished job
+func (d *Driver) waitAllCommandsToFinish() {
+loop:
+	for {
+		for _, count := range d.workingAddressCount {
+			if count != 0 {
+				// wait a moment and check again
+				time.Sleep(time.Second * SERVICE_STOP_WAIT_TIME)
+				continue loop
+			}
+		}
+		break loop
+	}
+}
+
+func (d *Driver) AddDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
+	d.Logger.Debug(fmt.Sprintf("Device %s is added", deviceName))
+	return nil
+}
+
+func (d *Driver) UpdateDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
+	d.Logger.Debug(fmt.Sprintf("Device %s is updated", deviceName))
+	return nil
+}
+
+func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
+	d.Logger.Debug(fmt.Sprintf("Device %s is removed", deviceName))
 	return nil
 }
 
