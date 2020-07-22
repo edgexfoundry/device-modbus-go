@@ -4,8 +4,8 @@ LogLevel = 'INFO'
 [Service]
 BootTimeout = 30000
 CheckInterval = '10s'
-ClientMonitor = 15000
 Host = 'localhost'
+ServerBindAddr = ''  # blank value defaults to Service.Host value
 Port = 49991
 Protocol = 'http'
 StartupMsg = 'device modbus started'
