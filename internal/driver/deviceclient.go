@@ -36,7 +36,7 @@ type CommandInfo struct {
 	Length     uint16
 	IsByteSwap bool
 	IsWordSwap bool
-	rawType    sdkModel.ValueType
+	RawType    sdkModel.ValueType
 }
 
 func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
@@ -71,7 +71,7 @@ func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
 		Length:          length,
 		IsByteSwap:      isByteSwap,
 		IsWordSwap:      isWordSwap,
-		rawType:         rawType,
+		RawType:         rawType,
 	}, nil
 }
 
@@ -130,9 +130,9 @@ func TransformDataBytesToResult(req *sdkModel.CommandRequest, dataBytes []byte, 
 		var res = int64(binary.BigEndian.Uint64(dataBytes))
 		result, err = sdkModel.NewInt64Value(req.DeviceResourceName, resTime, res)
 	case sdkModel.Float32:
-		switch commandInfo.rawType {
+		switch commandInfo.RawType {
 		case sdkModel.Float32:
-			var res = binary.BigEndian.Uint32(dataBytes)
+			var res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
 			var floatResult = math.Float32frombits(res)
 			result, err = sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, floatResult)
 		case sdkModel.Int16:
@@ -145,7 +145,7 @@ func TransformDataBytesToResult(req *sdkModel.CommandRequest, dataBytes []byte, 
 			driver.Logger.Debug(fmt.Sprintf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT32, res, result.ValueToString(contract.ENotation)))
 		}
 	case sdkModel.Float64:
-		switch commandInfo.rawType {
+		switch commandInfo.RawType {
 		case sdkModel.Float64:
 			var res = binary.BigEndian.Uint64(dataBytes)
 			var floatResult = math.Float64frombits(res)
@@ -195,12 +195,12 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 		if err != nil {
 			return dataBytes, err
 		}
-		if commandInfo.rawType == sdkModel.Int16 {
+		if commandInfo.RawType == sdkModel.Int16 {
 			dataBytes, err = getBinaryData(int16(val))
 			if err != nil {
 				return dataBytes, err
 			}
-		} else if commandInfo.rawType == sdkModel.Uint16 {
+		} else if commandInfo.RawType == sdkModel.Uint16 {
 			dataBytes, err = getBinaryData(uint16(val))
 			if err != nil {
 				return dataBytes, err
@@ -211,12 +211,12 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 		if err != nil {
 			return dataBytes, err
 		}
-		if commandInfo.rawType == sdkModel.Int16 {
+		if commandInfo.RawType == sdkModel.Int16 {
 			dataBytes, err = getBinaryData(int16(val))
 			if err != nil {
 				return dataBytes, err
 			}
-		} else if commandInfo.rawType == sdkModel.Uint16 {
+		} else if commandInfo.RawType == sdkModel.Uint16 {
 			dataBytes, err = getBinaryData(uint16(val))
 			if err != nil {
 				return dataBytes, err
@@ -237,34 +237,6 @@ func calculateByteCount(commandInfo *CommandInfo) uint16 {
 	}
 
 	return byteCount
-}
-
-func swap32BitDataBytes(dataBytes []byte, isByteSwap bool, isWordSwap bool) []byte {
-
-	if !isByteSwap && !isWordSwap {
-		return dataBytes
-	}
-
-	if len(dataBytes) < 4 {
-		return dataBytes
-	}
-
-	var newDataBytes = make([]byte, len(dataBytes))
-
-	if isByteSwap {
-		newDataBytes[0] = dataBytes[1]
-		newDataBytes[1] = dataBytes[0]
-		newDataBytes[2] = dataBytes[3]
-		newDataBytes[3] = dataBytes[2]
-	}
-	if isWordSwap {
-		newDataBytes[0] = dataBytes[2]
-		newDataBytes[1] = dataBytes[3]
-		newDataBytes[2] = dataBytes[0]
-		newDataBytes[3] = dataBytes[1]
-	}
-
-	return newDataBytes
 }
 
 func getBinaryData(val interface{}) (dataBytes []byte, err error) {
