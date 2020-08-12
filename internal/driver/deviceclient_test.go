@@ -20,31 +20,6 @@ func init() {
 	driver.Logger = logger.NewClient("test", false, "./device-Modbus.log", "DEBUG")
 }
 
-// Test byte, word swap
-func TestByteSwap32BitDataBytes(t *testing.T) {
-	var isByteSwap = true
-	var isWordSwap = false
-	var dataBytes = []byte{6, 9, 12, 15}
-
-	var expectResult = swap32BitDataBytes(dataBytes, isByteSwap, isWordSwap)
-
-	if expectResult[0] != 9 || expectResult[1] != 6 || expectResult[2] != 15 || expectResult[3] != 12 {
-		t.Fatalf("Swap32BitDataBytes 32 bits failed! ")
-	}
-}
-
-func TestWordSwap32BitDataBytes(t *testing.T) {
-	var isByteSwap = false
-	var isWordSwap = true
-	var dataBytes = []byte{6, 9, 12, 15}
-
-	var expectResult = swap32BitDataBytes(dataBytes, isByteSwap, isWordSwap)
-
-	if expectResult[0] != 12 || expectResult[1] != 15 || expectResult[2] != 6 || expectResult[3] != 9 {
-		t.Fatalf("Swap32BitDataBytes 32 bits failed! ")
-	}
-}
-
 func TestTransformDataBytesToResult_INT16(t *testing.T) {
 	req := sdkModel.CommandRequest{
 		DeviceResourceName: "light",
@@ -724,5 +699,535 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *te
 		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
 	} else if !bytes.Equal(dataBytes, expected) {
 		t.Fatalf("Unexpected result. expected result %v should equal to %v", expected, dataBytes)
+	}
+}
+
+// Test swap operation for read command
+func TestTransformDataBytesToResultWithByteSwap_INT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Int32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{0, 0, 11, 1} // bytes swap & big-endian => [11,1,0,0] => 11+2^8=267
+	expected := int32(267)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Int32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %d should be equal to the expected value %d", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithWordSwap_INT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Int32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{1, 11, 0, 0} // words swap & big-endian => [11,1,0,0] => 11+2^8=267
+	expected := int32(267)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Int32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %d should be equal to the expected value %d", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithByteAndWordSwap_INT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Int32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{11, 1, 0, 0} // bytes and words swap & big-endian => [11,1,0,0] => 11+2^8=267
+	expected := int32(267)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Int32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %d should be equal to the expected value %d", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithByteSwap_UINT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Uint32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{0, 0, 11, 1} // bytes swap & big-endian => [11,1,0,0] => 11+2^8=267
+	expected := uint32(267)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Uint32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %d should be equal to the expected value %d", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithWordSwap_UINT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Uint32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{1, 11, 0, 0} // words swap & big-endian => [11,1,0,0] => 11+2^8=267
+	expected := uint32(267)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Uint32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %d should be equal to the expected value %d", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithByteAndWordSwap_UINT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Uint32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{11, 1, 0, 0} // bytes and words swap & big-endian => [11,1,0,0] => 11+2^8=267
+	expected := uint32(267)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Uint32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %d should be equal to the expected value %d", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithByteSwap_FLOAT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Float32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{143, 63, 41, 92} // bytes swap & big-endian => [41,92,143,63] => 1.12
+	expected := float32(1.12)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Float32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %f should be equal to the expected value %f", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithWordSwap_FLOAT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Float32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{92, 41, 63, 143} // words swap & big-endian => [41,92,143,63] => 1.12
+	expected := float32(1.12)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Float32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %f should be equal to the expected value %f", result, expected)
+	}
+}
+
+func TestTransformDataBytesToResultWithByteAndWordSwap_FLOAT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Float32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	dataBytes := []byte{41, 92, 143, 63} // bytes and words swap & big-endian => [41,92,143,63] => 1.12
+	expected := float32(1.12)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	if err != nil {
+		t.Fatalf("Fail to tramsform data bytes to result. Error: %v", err)
+	}
+	result, err := commandValue.Float32Value()
+	if err != nil {
+		t.Fatalf("Fail to test the TransformDataBytesToResult function. Error: %v", err)
+	}
+	if expected != result {
+		t.Fatalf("Unexpected result, the result %f should be equal to the expected value %f", result, expected)
+	}
+}
+
+// Test swap operation for write command
+func TestTransformCommandValueToDataBytesWithByteSwap_INT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Int32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	expected := []byte{0, 0, 11, 1}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithWordSwap_INT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Int32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	expected := []byte{1, 11, 0, 0}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithByteAndWordSwap_INT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Int32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	expected := []byte{11, 1, 0, 0}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithByteSwap_UINT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Uint32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	expected := []byte{0, 0, 11, 1}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithWordSwap_UINT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Uint32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	expected := []byte{1, 11, 0, 0}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithByteAndWordSwap_UINT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Uint32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	expected := []byte{11, 1, 0, 0}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithByteSwap_FLOAT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Float32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	expected := []byte{143, 63, 41, 92}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithWordSwap_FLOAT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Float32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	expected := []byte{92, 41, 63, 143}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
+	}
+}
+
+func TestTransformCommandValueToDataBytesWithByteAndWordSwap_FLOAT32(t *testing.T) {
+	req := sdkModel.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               sdkModel.Float32,
+		Attributes: map[string]string{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: "10",
+			IS_BYTE_SWAP:     "true",
+			IS_WORD_SWAP:     "true",
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	if err != nil {
+		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
+	}
+	resTime := time.Now().UnixNano()
+	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	expected := []byte{41, 92, 143, 63}
+
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+
+	if err != nil {
+		t.Fatalf("Fail to tramsform command value to data bytes. Error: %v", err)
+	}
+	if !bytes.Equal(dataBytes, expected) {
+		t.Fatalf("Unexpected result, the result %v should be equal to the expected value %v", dataBytes, expected)
 	}
 }
