@@ -76,6 +76,17 @@ func (d *Driver) unlockAddress(address string) {
 	<-lock
 }
 
+// lockableAddress return the lockable address according to the protocol
+func (d *Driver) lockableAddress(info *ConnectionInfo) string {
+	var address string
+	if info.Protocol == ProtocolTCP {
+		address = fmt.Sprintf("%s:%d", info.Address, info.Port)
+	} else {
+		address = info.Address
+	}
+	return address
+}
+
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
@@ -83,11 +94,11 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 		return responses, err
 	}
 
-	err = d.lockAddress(connectionInfo.Address)
+	err = d.lockAddress(d.lockableAddress(connectionInfo))
 	if err != nil {
 		return responses, err
 	}
-	defer d.unlockAddress(connectionInfo.Address)
+	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
 	responses = make([]*sdkModel.CommandValue, len(reqs))
 	var deviceClient DeviceClient
@@ -161,11 +172,11 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 		return err
 	}
 
-	err = d.lockAddress(connectionInfo.Address)
+	err = d.lockAddress(d.lockableAddress(connectionInfo))
 	if err != nil {
 		return err
 	}
-	defer d.unlockAddress(connectionInfo.Address)
+	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
 	var deviceClient DeviceClient
 
