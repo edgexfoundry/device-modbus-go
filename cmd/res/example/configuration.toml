@@ -62,6 +62,7 @@ File = ''
        Address = '0.0.0.0'
        Port = '1502'
        UnitID = '1'
+       ZeroBase = 'false'
   [[DeviceList.AutoEvents]]
     Frequency = '20s'
     OnChange = false
@@ -80,3 +81,4 @@ File = ''
        StopBits = '1'
        Parity = 'N'
        UnitID = '1'
+       ZeroBase = 'false'

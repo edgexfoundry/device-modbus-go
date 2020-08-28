@@ -45,7 +45,7 @@ func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
 
 	startingAddress, _ := toUint16(req.Attributes[STARTING_ADDRESS])
 	startingAddress = startingAddress - 1
-
+	//if !zeroBased
 	rawType, err := getRawType(req)
 	if err != nil {
 		return nil, err

@@ -23,6 +23,8 @@ type ConnectionInfo struct {
 	StopBits int
 	Parity   string
 	UnitID   uint8
+	//flag to indicate 0 or 1 based addressing
+	ZeroBase bool
 }
 
 func createConnectionInfo(protocols map[string]models.ProtocolProperties) (info *ConnectionInfo, err error) {
@@ -101,6 +103,17 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
+	zeroBase := false
+	zero, hasKey := rtuProtocol[ZeroBase]
+
+	if hasKey {
+		value, err := strconv.ParseBool(zero)
+		if err != nil {
+			fmt.Println(fmt.Errorf(" Error: %v", err))
+		}
+		zeroBase = value
+
+	}
 	return &ConnectionInfo{
 		Protocol: ProtocolRTU,
 		Address:  address,
@@ -109,6 +122,7 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		StopBits: stopBits,
 		Parity:   parity,
 		UnitID:   byte(unitID),
+		ZeroBase: zeroBase,
 	}, nil
 }
 
@@ -137,10 +151,23 @@ func createTcpConnectionInfo(tcpProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
+	zeroBase := false
+	zero, hasKey := tcpProtocol[ZeroBase]
+
+	if hasKey {
+		value, err := strconv.ParseBool(zero)
+		if err != nil {
+
+			fmt.Println(fmt.Errorf(" Error: %v", err))
+		}
+		zeroBase = value
+
+	}
 	return &ConnectionInfo{
 		Protocol: ProtocolTCP,
 		Address:  address,
 		Port:     int(port),
 		UnitID:   byte(unitID),
+		ZeroBase: zeroBase,
 	}, nil
 }
