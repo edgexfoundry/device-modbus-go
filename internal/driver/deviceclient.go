@@ -39,13 +39,16 @@ type CommandInfo struct {
 	RawType    sdkModel.ValueType
 }
 
-func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
+//createCommandInfo version to handle zero base addressing
+func createCommandInfo(req *sdkModel.CommandRequest, zeroBase bool) (*CommandInfo, error) {
 	primaryTable, _ := req.Attributes[PRIMARY_TABLE]
 	primaryTable = strings.ToUpper(primaryTable)
 
 	startingAddress, _ := toUint16(req.Attributes[STARTING_ADDRESS])
-	startingAddress = startingAddress - 1
-	//if !zeroBased
+	//startingAddress = startingAddress - 1
+  if !zeroBase {
+    startingAddress = startingAddress - 1
+  }
 	rawType, err := getRawType(req)
 	if err != nil {
 		return nil, err

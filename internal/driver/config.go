@@ -103,13 +103,13 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
-	zeroBase := false
+	var zeroBase = false
 	zero, hasKey := rtuProtocol[ZeroBase]
 
 	if hasKey {
 		value, err := strconv.ParseBool(zero)
 		if err != nil {
-			fmt.Println(fmt.Errorf(" Error: %v", err))
+			return nil, fmt.Errorf("zeroBase value should be true or false. Error: %v", err)
 		}
 		zeroBase = value
 
@@ -151,14 +151,13 @@ func createTcpConnectionInfo(tcpProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
-	zeroBase := false
+	var zeroBase = false
 	zero, hasKey := tcpProtocol[ZeroBase]
 
 	if hasKey {
 		value, err := strconv.ParseBool(zero)
 		if err != nil {
-
-			fmt.Println(fmt.Errorf(" Error: %v", err))
+      return nil, fmt.Errorf("zeroBase value should be true or false. Error: %v", err)
 		}
 		zeroBase = value
 

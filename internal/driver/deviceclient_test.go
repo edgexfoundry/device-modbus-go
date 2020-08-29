@@ -29,7 +29,7 @@ func TestTransformDataBytesToResult_INT16(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestTransformDataBytesToResult_INT32(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -82,7 +82,7 @@ func TestTransformDataBytesToResult_INT64(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -108,7 +108,7 @@ func TestTransformDataBytesToResult_UINT16(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -135,7 +135,7 @@ func TestTransformDataBytesToResult_UINT32(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -161,7 +161,7 @@ func TestTransformDataBytesToResult_UINT64(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -188,7 +188,7 @@ func TestTransformDataBytesToResult_FLOAT32(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -214,7 +214,7 @@ func TestTransformDataBytesToResult_FLOAT64(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -240,7 +240,7 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -267,7 +267,7 @@ func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT32(t *testing.T
 			RAW_TYPE:         INT16,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -298,7 +298,7 @@ func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT32(t *testing.
 		},
 	}
 
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -328,7 +328,7 @@ func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT64(t *testing.T
 			RAW_TYPE:         INT16,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -359,7 +359,7 @@ func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT64(t *testing.
 		},
 	}
 
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -388,7 +388,7 @@ func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -412,7 +412,7 @@ func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -436,7 +436,7 @@ func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -459,7 +459,7 @@ func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -483,7 +483,7 @@ func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -507,7 +507,7 @@ func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -531,7 +531,7 @@ func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -555,7 +555,7 @@ func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -579,7 +579,7 @@ func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
 			STARTING_ADDRESS: "10",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -604,7 +604,7 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_INT16(t *tes
 			RAW_TYPE:         INT16,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -631,7 +631,7 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_UINT16(t *te
 			RAW_TYPE:         UINT16,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -658,7 +658,7 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_INT16(t *tes
 			RAW_TYPE:         INT16,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -685,7 +685,7 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *te
 			RAW_TYPE:         UINT16,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -713,7 +713,7 @@ func TestTransformDataBytesToResultWithByteSwap_INT32(t *testing.T) {
 			IS_BYTE_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -743,7 +743,7 @@ func TestTransformDataBytesToResultWithWordSwap_INT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -774,7 +774,7 @@ func TestTransformDataBytesToResultWithByteAndWordSwap_INT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -804,7 +804,7 @@ func TestTransformDataBytesToResultWithByteSwap_UINT32(t *testing.T) {
 			IS_BYTE_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -834,7 +834,7 @@ func TestTransformDataBytesToResultWithWordSwap_UINT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -865,7 +865,7 @@ func TestTransformDataBytesToResultWithByteAndWordSwap_UINT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -895,7 +895,7 @@ func TestTransformDataBytesToResultWithByteSwap_FLOAT32(t *testing.T) {
 			IS_BYTE_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -925,7 +925,7 @@ func TestTransformDataBytesToResultWithWordSwap_FLOAT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -956,7 +956,7 @@ func TestTransformDataBytesToResultWithByteAndWordSwap_FLOAT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -987,7 +987,7 @@ func TestTransformCommandValueToDataBytesWithByteSwap_INT32(t *testing.T) {
 			IS_BYTE_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1015,7 +1015,7 @@ func TestTransformCommandValueToDataBytesWithWordSwap_INT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1044,7 +1044,7 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_INT32(t *testing.T)
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1072,7 +1072,7 @@ func TestTransformCommandValueToDataBytesWithByteSwap_UINT32(t *testing.T) {
 			IS_BYTE_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1100,7 +1100,7 @@ func TestTransformCommandValueToDataBytesWithWordSwap_UINT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1129,7 +1129,7 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_UINT32(t *testing.T
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1157,7 +1157,7 @@ func TestTransformCommandValueToDataBytesWithByteSwap_FLOAT32(t *testing.T) {
 			IS_BYTE_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1185,7 +1185,7 @@ func TestTransformCommandValueToDataBytesWithWordSwap_FLOAT32(t *testing.T) {
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
@@ -1214,7 +1214,7 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_FLOAT32(t *testing.
 			IS_WORD_SWAP:     "true",
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
+	commandInfo, err := createCommandInfo(&req, false)
 	if err != nil {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
