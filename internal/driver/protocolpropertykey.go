@@ -18,4 +18,5 @@ const (
 	StopBits = "StopBits"
 	// Parity: N - None, O - Odd, E - Even
 	Parity = "Parity"
+  ZeroBase = "ZeroBase"
 )

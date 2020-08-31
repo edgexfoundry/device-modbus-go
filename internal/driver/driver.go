@@ -76,6 +76,7 @@ func (d *Driver) unlockAddress(address string) {
 	<-lock
 }
 
+<<<<<<< HEAD
 // lockableAddress return the lockable address according to the protocol
 func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 	var address string
@@ -86,6 +87,8 @@ func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 	}
 	return address
 }
+=======
+>>>>>>> master
 
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
 	connectionInfo, err := createConnectionInfo(protocols)
@@ -127,7 +130,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 
 	// handle command requests
 	for i, req := range reqs {
-		res, err := handleReadCommandRequest(deviceClient, req)
+		res, err := handleReadCommandRequest(deviceClient, req, connectionInfo.ZeroBase)
 		if err != nil {
 			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err))
 			return responses, err
@@ -139,12 +142,12 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	return responses, nil
 }
 
-func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
+func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, zeroBase bool) (*sdkModel.CommandValue, error) {
 	var response []byte
 	var result = &sdkModel.CommandValue{}
 	var err error
-
-	commandInfo, err := createCommandInfo(&req)
+	//added the zero base bool value
+	commandInfo, err := createCommandInfo(&req, zeroBase)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +205,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 
 	// handle command requests
 	for i, req := range reqs {
-		err = handleWriteCommandRequest(deviceClient, req, params[i])
+		err = handleWriteCommandRequest(deviceClient, req, params[i], connectionInfo.ZeroBase)
 		if err != nil {
 			d.Logger.Error(err.Error())
 			break
@@ -212,10 +215,11 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	return err
 }
 
-func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
+func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue, zeroBase bool) error {
 	var err error
 
-	commandInfo, err := createCommandInfo(&req)
+	//added the zero base bool value
+	commandInfo, err := createCommandInfo(&req, zeroBase)
 	if err != nil {
 		return err
 	}
