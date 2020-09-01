@@ -6,9 +6,6 @@ https://github.com/BurntSushi/toml/blob/master/COPYING
 cenkalti/backoff (MIT) https://github.com/cenkalti/backoff
 https://github.com/cenkalti/backoff/blob/master/LICENSE
 
-eclipse/paho.mqtt.golang (Eclipse Public License 1.0) https://github.com/eclipse/paho.mqtt.golang
-https://github.com/eclipse/paho.mqtt.golang/blob/master/LICENSE
-
 edgexfoundry/go-mod-core-contracts (Apache 2.0) https://github.com/edgexfoundry/go-mod-core-contracts
 https://github.com/edgexfoundry/go-mod-core-contracts/blob/master/LICENSE
 
@@ -72,12 +69,6 @@ https://github.com/hashicorp/go-immutable-radix/blob/master/LICENSE
 hashicorp/golang-lru (Mozilla Public License 2.0) https://github.com/hashicorp/golang-lru
 https://github.com/hashicorp/golang-lru/blob/master/LICENSE
 
-ugorji/go (MIT) https://github.com/ugorji/go
-https://github.com/ugorji/go/blob/master/LICENSE
-
-gopkg.in/mgo v2 (unspecified) https://github.com/go-mgo/mgo/tree/v2
-https://github.com/go-mgo/mgo/blob/v2/LICENSE
-
 gopkg.in/yaml v2 (Apache 2.0) https://github.com/go-yaml/yaml/tree/v2
 https://github.com/go-yaml/yaml/blob/v2/LICENSE
 
@@ -89,9 +80,6 @@ https://github.com/pelletier/go-toml/blob/master/LICENSE
 
 pkg/errors (BSD-2) https://github.com/pkg/errors
 https://github.com/pkg/errors/blob/master/LICENSE
-
-golang.org/x/net (Unspecified) https://github.com/golang/net
-https://github.com/golang/net/blob/master/LICENSE
 
 github.com/OneOfOne/xxhash (Apache 2.0) https://github.com/OneOfOne/xxhash
 https://github.com/OneOfOne/xxhash/blob/master/LICENCE
