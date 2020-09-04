@@ -76,7 +76,6 @@ func (d *Driver) unlockAddress(address string) {
 	<-lock
 }
 
-<<<<<<< HEAD
 // lockableAddress return the lockable address according to the protocol
 func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 	var address string
@@ -87,8 +86,6 @@ func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 	}
 	return address
 }
-=======
->>>>>>> master
 
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
 	connectionInfo, err := createConnectionInfo(protocols)
