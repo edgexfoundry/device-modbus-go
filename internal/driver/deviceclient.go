@@ -46,9 +46,9 @@ func createCommandInfo(req *sdkModel.CommandRequest, zeroBase bool) (*CommandInf
 
 	startingAddress, _ := toUint16(req.Attributes[STARTING_ADDRESS])
 	//startingAddress = startingAddress - 1
-  if !zeroBase {
-    startingAddress = startingAddress - 1
-  }
+	if !zeroBase {
+		startingAddress = startingAddress - 1
+	}
 	rawType, err := getRawType(req)
 	if err != nil {
 		return nil, err
