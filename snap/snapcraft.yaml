@@ -3,7 +3,12 @@ base: core18
 version: "replace-me"
 license: Apache-2.0
 version-script: |
-  echo $(cat VERSION)-$(date +%Y%m%d)+$(git rev-parse --short HEAD)
+  if [ -f VERSION ]; then
+    PROJECT_VERSION=$(cat VERSION)
+  else
+    PROJECT_VERSION=local-dev
+  fi
+    echo $PROJECT_VERSION-$(date +%Y%m%d)+$(git rev-parse --short HEAD)
 summary: Connect data Modbus to EdgeX using device-modbus reference Device Service
 title: EdgeX Modbus Device Service
 description: |

@@ -18,6 +18,7 @@ vendor/
 cmd/device-modbus
 glide.lock
 go.sum
+VERSION
 
 # snap files
 *.snap
