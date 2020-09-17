@@ -101,3 +101,12 @@ https://github.com/fxamacker/cbor/blob/master/LICENSE
 
 x448/float16 (MIT) https://github.com/x448/float16
 https://github.com/x448/float16/blob/master/LICENSE
+
+hashicorp/go-sockaddr (Mozilla Public License 2.0) https://github.com/hashicorp/go-sockaddr
+https://github.com/hashicorp/go-sockaddr/blob/master/LICENSE
+
+meikg/dns (Unspecified) https://github.com/miekg/dns
+https://github.com/miekg/dns
+
+golang.org/x/net (Unspecified) https://github.com/golang/net
+https://github.com/golang/net/blob/master/LICENSE
