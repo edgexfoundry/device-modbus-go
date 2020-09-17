@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.13-alpine
+ARG BASE=golang:1.15-alpine
 FROM ${BASE} AS builder
 
 ARG MAKE='make build'
