@@ -21,3 +21,7 @@ docker build -t modbus-simulator .
         -e SIMULATOR_NUMBER=1000 -e STARTING_PORT=10000 modbus-simulator
     ```
     To handle a lot of ports, docker recommends user using the host network, see https://docs.docker.com/network/host/.
+    
+    In scalability test mode, the simulator will count the Modbus command amount as the reading amount and provide APIs for edgex-taf to measure the event amount: 
+    * Query reading amount: http://localhost:1503/reading/count
+    * Reset reading amount: http://localhost:1503/reading/reset
