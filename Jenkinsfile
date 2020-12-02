@@ -20,6 +20,6 @@ edgeXBuildDocker (
     dockerImageName: 'edgex-modbus-simulator',
     dockerNamespace: 'edgex-devops',
     dockerNexusRepo: 'snapshots',
-    dockerTags: ["0.0.1"],
+    dockerTags: ["1.0.0"],
     releaseBranchOverride: 'edgex-modbus-simulator'
 )
