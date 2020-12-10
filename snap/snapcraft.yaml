@@ -1,14 +1,7 @@
 name: edgex-device-modbus
 base: core18
-version: "replace-me"
 license: Apache-2.0
-version-script: |
-  if [ -f VERSION ]; then
-    PROJECT_VERSION=$(cat VERSION)
-  else
-    PROJECT_VERSION=local-dev
-  fi
-    echo $PROJECT_VERSION-$(date +%Y%m%d)+$(git rev-parse --short HEAD)
+adopt-info: version
 summary: Connect data Modbus to EdgeX using device-modbus reference Device Service
 title: EdgeX Modbus Device Service
 description: |
@@ -33,6 +26,8 @@ apps:
   device-modbus:
     adapter: none
     command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry $CONSUL_ADDR
+    command-chain:
+      - bin/startup-env-var.sh
     environment:
       CONSUL_ADDR: "consul://localhost:8500"
       DEVICE_PROFILESDIR: $SNAP_DATA/config/device-modbus/res
@@ -40,6 +35,17 @@ apps:
     plugs: [network, network-bind]
 
 parts:
+  version:
+    plugin: nil
+    source: snap/local
+    override-pull: |
+      cd $SNAPCRAFT_PROJECT_DIR
+      if [ -f VERSION ]; then
+        PROJECT_VERSION=$(cat VERSION)
+      else
+        PROJECT_VERSION="0.0.0"
+      fi
+      snapcraftctl set-version ${PROJECT_VERSION}
   go:
     plugin: nil
     build-packages: [curl]
@@ -89,3 +95,6 @@ parts:
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"
       install -DT "./LICENSE" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/LICENSE"
+  config-common:
+    plugin: dump
+    source: snap/local/runtime-helpers
