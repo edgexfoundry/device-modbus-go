@@ -33,6 +33,8 @@ apps:
   device-modbus:
     adapter: none
     command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry $CONSUL_ADDR
+    command-chain:
+      - bin/startup-env-var.sh
     environment:
       CONSUL_ADDR: "consul://localhost:8500"
       DEVICE_PROFILESDIR: $SNAP_DATA/config/device-modbus/res
@@ -89,3 +91,6 @@ parts:
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"
       install -DT "./LICENSE" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/LICENSE"
+  config-common:
+    plugin: dump
+    source: snap/local/runtime-helpers
