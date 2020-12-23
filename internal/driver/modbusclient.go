@@ -93,14 +93,10 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 	var err error
 
 	switch modbusCommandInfo.PrimaryTable {
-	case DISCRETES_INPUT:
-		result, err = c.client.WriteMultipleCoils(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 
 	case COILS:
 		result, err = c.client.WriteMultipleCoils(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 
-	case INPUT_REGISTERS:
-		result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 
 	case HOLDING_REGISTERS:
 		if modbusCommandInfo.Length == 1 {
