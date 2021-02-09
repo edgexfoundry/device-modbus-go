@@ -71,3 +71,19 @@ Type = 'consul'
        StopBits = '1'
        Parity = 'N'
        UnitID = '1'
+
+# Pre-define Devices
+[[DeviceList]]
+  Name = 'Modbus TCP Read String'
+  Profile = 'Test.Device.Modbus.String.Profile'
+  Description = 'use for auto read a string value'
+  labels = [ 'modbus TCP' ]
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.modbus-tcp]
+       Address = '0.0.0.0'
+       Port = '1502'
+       UnitID = '1'
+  [[DeviceList.AutoEvents]]
+    Frequency = '2s'
+    OnChange = false
+    Resource = 'ReadString'

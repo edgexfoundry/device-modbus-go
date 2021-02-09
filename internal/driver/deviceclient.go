@@ -11,6 +11,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 	"time"
 
@@ -50,7 +51,18 @@ func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	length := calculateAddressLength(primaryTable, rawType)
+	var length uint16
+	switch req.Type {
+	case sdkModel.String:
+		l, err := strconv.Atoi(req.Attributes[STR_LENGTH])
+		if err != nil {
+			length = 1
+		} else {
+			length = uint16(l)
+		}
+	default:
+		length = calculateAddressLength(primaryTable, rawType)
+	}
 
 	var isByteSwap = false
 	_, ok := req.Attributes[IS_BYTE_SWAP]
@@ -166,6 +178,9 @@ func TransformDataBytesToResult(req *sdkModel.CommandRequest, dataBytes []byte, 
 			res = true
 		}
 		result, err = sdkModel.NewBoolValue(req.DeviceResourceName, resTime, res)
+	case sdkModel.String:
+		res := string(dataBytes)
+		result = sdkModel.NewStringValue(req.DeviceResourceName, resTime, res)
 	default:
 		err = fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}
@@ -177,7 +192,24 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 	var byteCount = calculateByteCount(commandInfo)
 	var err error
 	var maxSize = uint16(len(value.NumericValue))
-	var dataBytes = value.NumericValue[maxSize-byteCount : maxSize]
+	var dataBytes []byte
+	switch value.Type {
+	case sdkModel.String:
+		oriStr := value.ValueToString()
+		tempBytes := []byte(oriStr)
+		bytesl := len(tempBytes)
+		oribytel := int(commandInfo.Length * 2)
+		if bytesl < oribytel {
+			less := make([]byte, oribytel-bytesl)
+			dataBytes = append(tempBytes, less...)
+		} else if bytesl > oribytel {
+			dataBytes = tempBytes[:oribytel]
+		} else {
+			dataBytes = []byte(oriStr)
+		}
+	default:
+		dataBytes = value.NumericValue[maxSize-byteCount : maxSize]
+	}
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {
