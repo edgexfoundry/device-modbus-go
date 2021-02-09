@@ -84,6 +84,6 @@ Type = 'consul'
        Port = '1502'
        UnitID = '1'
   [[DeviceList.AutoEvents]]
-    Frequency = '2s'
+    Frequency = '20s'
     OnChange = false
     Resource = 'ReadString'
