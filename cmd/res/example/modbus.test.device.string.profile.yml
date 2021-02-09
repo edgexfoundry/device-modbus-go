@@ -1,0 +1,80 @@
+name: "Test.Device.Modbus.String.Profile"
+manufacturer: "no manufacturer"
+model: "string value type"
+labels:
+  - "no lable"
+description: "this profile is testing  string value type with read and write"
+
+deviceResources:
+  -
+    name: "StringA"
+    description: "no description"
+    attributes:
+      { primaryTable: "INPUT_REGISTERS", startingAddress: "1", stringLength: "1"}
+    properties:
+      value:
+        { type: "STRING", readWrite: "R"}
+      units:
+        { type: "String", readWrite: "R"}
+
+  -
+    name: "StringB"
+    description: "no description"
+    attributes:
+      { primaryTable: "HOLDING_REGISTERS", startingAddress: "15", stringLength: "5"}
+    properties:
+      value:
+        { type: "STRING", readWrite: "RW"}
+      units:
+        { type: "String", readWrite: "R"}
+
+
+
+deviceCommands:
+  -
+    name: "ReadString"
+    get:
+      - { index: "1", operation: "set", deviceResource: "StringA"}
+      - { index: "2", operation: "set", deviceResource: "StringB"}
+  -
+    name: "WriteString"
+    get:
+      - { index: "1", operation: "get", deviceResource: "StringB"}
+    set:
+      - { index: "1", operation: "set", deviceResource: "StringB"}
+
+coreCommands:
+  -
+    name: "ReadString"
+    get:
+      path: "/api/v1/device/{deviceId}/ReadString"
+      responses:
+        - code: "200"
+          description: "Get the Value of String"
+          expectedValues: ["StringA","StringB"]
+        - code: "500"
+          description: "internal server error"
+          expectedValues: []
+  -
+    name: "WriteString"
+    get:
+      path: "/api/v1/device/{deviceId}/WriteString"
+      responses:
+        -
+          code: "200"
+          description: "Get the values of string type"
+          expectedValues: ["StringB"]
+        - code: "500"
+          description: "internal server error"
+          expectedValues: []
+    put:
+      path: "/api/v1/device/{deviceId}/WriteString"
+      parameterNames: ["StringB"]
+      responses:
+        -
+          code: "204"
+          description: "Set the values of string type"
+          expectedValues: []
+        - code: "500"
+          description: "internal server error"
+          expectedValues: []
