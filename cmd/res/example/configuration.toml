@@ -53,6 +53,8 @@ Type = 'consul'
        Address = '0.0.0.0'
        Port = '1502'
        UnitID = '1'
+       Timeout = "5"
+       IdleTimeout = "5"
   [[DeviceList.AutoEvents]]
     Frequency = '20s'
     OnChange = false
@@ -71,3 +73,5 @@ Type = 'consul'
        StopBits = '1'
        Parity = 'N'
        UnitID = '1'
+       Timeout = "5"
+       IdleTimeout = "5"
