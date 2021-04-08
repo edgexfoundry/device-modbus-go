@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2/models"
 )
 
 func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {

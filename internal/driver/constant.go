@@ -1,12 +1,14 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2019 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package driver
 
-import sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
+import (
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2"
+)
 
 const (
 	BOOL = "BOOL"
@@ -44,17 +46,17 @@ var PrimaryTableBitCountMap = map[string]uint16{
 	HOLDING_REGISTERS: 16,
 }
 
-var ValueTypeBitCountMap = map[sdkModel.ValueType]uint16{
-	sdkModel.Int16: 16,
-	sdkModel.Int32: 32,
-	sdkModel.Int64: 64,
+var ValueTypeBitCountMap = map[string]uint16{
+	v2.ValueTypeInt16: 16,
+	v2.ValueTypeInt32: 32,
+	v2.ValueTypeInt64: 64,
 
-	sdkModel.Uint16: 16,
-	sdkModel.Uint32: 32,
-	sdkModel.Uint64: 64,
+	v2.ValueTypeUint16: 16,
+	v2.ValueTypeUint32: 32,
+	v2.ValueTypeUint64: 64,
 
-	sdkModel.Float32: 32,
-	sdkModel.Float64: 64,
+	v2.ValueTypeFloat32: 32,
+	v2.ValueTypeFloat64: 64,
 
-	sdkModel.Bool: 1,
+	v2.ValueTypeBool: 1,
 }

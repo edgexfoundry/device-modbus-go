@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2019 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,12 +10,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/logger"
 )
 
 func init() {
 	driver = new(Driver)
-	driver.Logger = logger.NewClient("test", false, "./device-Modbus.log", "DEBUG")
+	driver.Logger = logger.NewMockClient()
 }
 
 func TestLockAddressWithAddressCountLimit(t *testing.T) {

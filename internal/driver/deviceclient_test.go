@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2019 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,19 +11,20 @@ import (
 	"testing"
 	"time"
 
-	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
+	"github.com/edgexfoundry/device-sdk-go/v2/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/logger"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2"
 )
 
 func init() {
 	driver = new(Driver)
-	driver.Logger = logger.NewClient("test", false, "./device-Modbus.log", "DEBUG")
+	driver.Logger = logger.NewMockClient()
 }
 
 func TestTransformDataBytesToResult_INT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int16,
+		Type:               v2.ValueTypeInt16,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -48,9 +49,9 @@ func TestTransformDataBytesToResult_INT16(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -74,9 +75,9 @@ func TestTransformDataBytesToResult_INT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_INT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int64,
+		Type:               v2.ValueTypeInt64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -100,9 +101,9 @@ func TestTransformDataBytesToResult_INT64(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_UINT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint16,
+		Type:               v2.ValueTypeUint16,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -127,9 +128,9 @@ func TestTransformDataBytesToResult_UINT16(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -153,9 +154,9 @@ func TestTransformDataBytesToResult_UINT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_UINT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint64,
+		Type:               v2.ValueTypeUint64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -180,9 +181,9 @@ func TestTransformDataBytesToResult_UINT64(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -206,9 +207,9 @@ func TestTransformDataBytesToResult_FLOAT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_FLOAT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float64,
+		Type:               v2.ValueTypeFloat64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -232,9 +233,9 @@ func TestTransformDataBytesToResult_FLOAT64(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_BOOL(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Bool,
+		Type:               v2.ValueTypeBool,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    DISCRETES_INPUT,
 			STARTING_ADDRESS: "10",
@@ -258,9 +259,9 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 }
 
 func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -288,9 +289,9 @@ func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT32(t *testing.T
 }
 
 func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -319,9 +320,9 @@ func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT32(t *testing.
 }
 
 func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float64,
+		Type:               v2.ValueTypeFloat64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -349,9 +350,9 @@ func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT64(t *testing.T
 }
 
 func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float64,
+		Type:               v2.ValueTypeFloat64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -380,9 +381,9 @@ func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT64(t *testing.
 }
 
 func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int16,
+		Type:               v2.ValueTypeInt16,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -393,7 +394,8 @@ func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewInt16Value(req.DeviceResourceName, resTime, -25)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt16, int16(-25))
+	val.Origin = resTime
 	expected := []byte{255, 231}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -404,9 +406,9 @@ func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -417,7 +419,8 @@ func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt32, int32(267))
+	val.Origin = resTime
 	expected := []byte{0, 0, 1, 11}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -428,9 +431,9 @@ func TestTransformCommandValueToDataBytes_INT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int64,
+		Type:               v2.ValueTypeInt64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -441,7 +444,8 @@ func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewInt64Value(req.DeviceResourceName, resTime, 281474976841985)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt64, int64(281474976841985))
+	val.Origin = resTime
 	expected := []byte{0, 1, 0, 0, 0, 2, 1, 1}
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
 
@@ -451,9 +455,9 @@ func TestTransformCommandValueToDataBytes_INT64(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint16,
+		Type:               v2.ValueTypeUint16,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -464,7 +468,8 @@ func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewUint16Value(req.DeviceResourceName, resTime, 11)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint16, uint16(11))
+	val.Origin = resTime
 	expected := []byte{0, 11}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -475,9 +480,9 @@ func TestTransformCommandValueToDataBytes_UINT16(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -488,7 +493,8 @@ func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint32, uint32(267))
+	val.Origin = resTime
 	expected := []byte{0, 0, 1, 11}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -499,9 +505,9 @@ func TestTransformCommandValueToDataBytes_UINT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint64,
+		Type:               v2.ValueTypeUint64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -512,7 +518,8 @@ func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewUint64Value(req.DeviceResourceName, resTime, 281474976841985)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint64, uint64(281474976841985))
+	val.Origin = resTime
 	expected := []byte{0, 1, 0, 0, 0, 2, 1, 1}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -523,9 +530,9 @@ func TestTransformCommandValueToDataBytes_UINT64(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -536,7 +543,8 @@ func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(1.12))
+	val.Origin = resTime
 	expected := []byte{63, 143, 92, 41}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -547,9 +555,9 @@ func TestTransformCommandValueToDataBytes_FLOAT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float64,
+		Type:               v2.ValueTypeFloat64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -560,7 +568,8 @@ func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, 1.12)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat64, 1.12)
+	val.Origin = resTime
 	expected := []byte{63, 241, 235, 133, 30, 184, 81, 236}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -571,9 +580,9 @@ func TestTransformCommandValueToDataBytes_FLOAT64(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Bool,
+		Type:               v2.ValueTypeBool,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    COILS,
 			STARTING_ADDRESS: "10",
@@ -584,7 +593,8 @@ func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewBoolValue(req.DeviceResourceName, resTime, true)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeBool, true)
+	val.Origin = resTime
 	expected := []byte{1}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -595,9 +605,9 @@ func TestTransformCommandValueToDataBytes_BOOL(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_INT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -609,7 +619,8 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_INT16(t *tes
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, -52.0)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(-52.0))
+	val.Origin = resTime
 	expected := []byte{255, 204}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -622,9 +633,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_INT16(t *tes
 }
 
 func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_UINT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -636,7 +647,8 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_UINT16(t *te
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 112.1)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(112.1))
+	val.Origin = resTime
 	expected := []byte{0, 112}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -649,9 +661,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT32_RawType_UINT16(t *te
 }
 
 func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_INT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float64,
+		Type:               v2.ValueTypeFloat64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -663,7 +675,8 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_INT16(t *tes
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, -52.0)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat64, -52.0)
+	val.Origin = resTime
 	expected := []byte{255, 204}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -676,9 +689,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_INT16(t *tes
 }
 
 func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float64,
+		Type:               v2.ValueTypeFloat64,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -690,7 +703,8 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *te
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, 112.1)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat64, 112.1)
+	val.Origin = resTime
 	expected := []byte{0, 112}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -704,9 +718,9 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *te
 
 // Test swap operation for read command
 func TestTransformDataBytesToResultWithByteSwap_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -734,9 +748,9 @@ func TestTransformDataBytesToResultWithByteSwap_INT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithWordSwap_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -764,9 +778,9 @@ func TestTransformDataBytesToResultWithWordSwap_INT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithByteAndWordSwap_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    INPUT_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -795,9 +809,9 @@ func TestTransformDataBytesToResultWithByteAndWordSwap_INT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithByteSwap_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -825,9 +839,9 @@ func TestTransformDataBytesToResultWithByteSwap_UINT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithWordSwap_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -855,9 +869,9 @@ func TestTransformDataBytesToResultWithWordSwap_UINT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithByteAndWordSwap_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -886,9 +900,9 @@ func TestTransformDataBytesToResultWithByteAndWordSwap_UINT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithByteSwap_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -916,9 +930,9 @@ func TestTransformDataBytesToResultWithByteSwap_FLOAT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithWordSwap_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -946,9 +960,9 @@ func TestTransformDataBytesToResultWithWordSwap_FLOAT32(t *testing.T) {
 }
 
 func TestTransformDataBytesToResultWithByteAndWordSwap_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -978,9 +992,9 @@ func TestTransformDataBytesToResultWithByteAndWordSwap_FLOAT32(t *testing.T) {
 
 // Test swap operation for write command
 func TestTransformCommandValueToDataBytesWithByteSwap_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -992,7 +1006,8 @@ func TestTransformCommandValueToDataBytesWithByteSwap_INT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt32, int32(267))
+	val.Origin = resTime
 	expected := []byte{0, 0, 11, 1}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1006,9 +1021,9 @@ func TestTransformCommandValueToDataBytesWithByteSwap_INT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytesWithWordSwap_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1020,7 +1035,8 @@ func TestTransformCommandValueToDataBytesWithWordSwap_INT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt32, int32(267))
+	val.Origin = resTime
 	expected := []byte{1, 11, 0, 0}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1034,9 +1050,9 @@ func TestTransformCommandValueToDataBytesWithWordSwap_INT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytesWithByteAndWordSwap_INT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Int32,
+		Type:               v2.ValueTypeInt32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1049,7 +1065,8 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_INT32(t *testing.T)
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewInt32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt32, int32(267))
+	val.Origin = resTime
 	expected := []byte{11, 1, 0, 0}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1063,9 +1080,9 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_INT32(t *testing.T)
 }
 
 func TestTransformCommandValueToDataBytesWithByteSwap_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1077,7 +1094,8 @@ func TestTransformCommandValueToDataBytesWithByteSwap_UINT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint32, uint32(267))
+	val.Origin = resTime
 	expected := []byte{0, 0, 11, 1}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1091,9 +1109,9 @@ func TestTransformCommandValueToDataBytesWithByteSwap_UINT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytesWithWordSwap_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1105,7 +1123,8 @@ func TestTransformCommandValueToDataBytesWithWordSwap_UINT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint32, uint32(267))
+	val.Origin = resTime
 	expected := []byte{1, 11, 0, 0}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1119,9 +1138,9 @@ func TestTransformCommandValueToDataBytesWithWordSwap_UINT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytesWithByteAndWordSwap_UINT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Uint32,
+		Type:               v2.ValueTypeUint32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1134,7 +1153,8 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_UINT32(t *testing.T
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewUint32Value(req.DeviceResourceName, resTime, 267)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint32, uint32(267))
+	val.Origin = resTime
 	expected := []byte{11, 1, 0, 0}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1148,9 +1168,9 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_UINT32(t *testing.T
 }
 
 func TestTransformCommandValueToDataBytesWithByteSwap_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1162,7 +1182,8 @@ func TestTransformCommandValueToDataBytesWithByteSwap_FLOAT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(1.12))
+	val.Origin = resTime
 	expected := []byte{143, 63, 41, 92}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1176,9 +1197,9 @@ func TestTransformCommandValueToDataBytesWithByteSwap_FLOAT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytesWithWordSwap_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1190,7 +1211,8 @@ func TestTransformCommandValueToDataBytesWithWordSwap_FLOAT32(t *testing.T) {
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(1.12))
+	val.Origin = resTime
 	expected := []byte{92, 41, 63, 143}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
@@ -1204,9 +1226,9 @@ func TestTransformCommandValueToDataBytesWithWordSwap_FLOAT32(t *testing.T) {
 }
 
 func TestTransformCommandValueToDataBytesWithByteAndWordSwap_FLOAT32(t *testing.T) {
-	req := sdkModel.CommandRequest{
+	req := models.CommandRequest{
 		DeviceResourceName: "light",
-		Type:               sdkModel.Float32,
+		Type:               v2.ValueTypeFloat32,
 		Attributes: map[string]string{
 			PRIMARY_TABLE:    HOLDING_REGISTERS,
 			STARTING_ADDRESS: "10",
@@ -1219,7 +1241,8 @@ func TestTransformCommandValueToDataBytesWithByteAndWordSwap_FLOAT32(t *testing.
 		t.Fatalf("Fail to createcommandInfo. Error: %v", err)
 	}
 	resTime := time.Now().UnixNano()
-	val, _ := sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, 1.12)
+	val, _ := models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(1.12))
+	val.Origin = resTime
 	expected := []byte{41, 92, 143, 63}
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)

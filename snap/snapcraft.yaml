@@ -82,7 +82,11 @@ parts:
   device-modbus:
     source: .
     plugin: make
-    build-packages: [git]
+    build-packages:
+      - git
+      - libzmq3-dev
+      - zip
+      - pkg-config
     after: [go]
     override-build: |
       cd $SNAPCRAFT_PART_SRC
