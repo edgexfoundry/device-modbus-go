@@ -105,127 +105,74 @@ func calculateAddressLength(primaryTable string, valueType string) uint16 {
 	return length
 }
 
+// TransformDataBytesToResult is used to transform the device's binary data to the specified value type as the actual result.
 func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, commandInfo *CommandInfo) (*models.CommandValue, error) {
 	var err error
+	var res interface{}
 	var result = &models.CommandValue{}
-	var resTime = time.Now().UnixNano()
 
 	switch commandInfo.ValueType {
 	case v2.ValueTypeUint16:
-		var res = binary.BigEndian.Uint16(dataBytes)
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint16, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
+		res = binary.BigEndian.Uint16(dataBytes)
 	case v2.ValueTypeUint32:
-		var res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint32, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
+		res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
 	case v2.ValueTypeUint64:
-		var res = binary.BigEndian.Uint64(dataBytes)
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeUint64, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
+		res = binary.BigEndian.Uint64(dataBytes)
 	case v2.ValueTypeInt16:
-		var res = int16(binary.BigEndian.Uint16(dataBytes))
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt16, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
+		res = int16(binary.BigEndian.Uint16(dataBytes))
 	case v2.ValueTypeInt32:
-		var res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt32, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
+		res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
 	case v2.ValueTypeInt64:
-		var res = int64(binary.BigEndian.Uint64(dataBytes))
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeInt64, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
+		res = int64(binary.BigEndian.Uint64(dataBytes))
 	case v2.ValueTypeFloat32:
 		switch commandInfo.RawType {
 		case v2.ValueTypeFloat32:
-			var res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
-			var floatResult = math.Float32frombits(res)
-			result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, floatResult)
-			if err != nil {
-				return nil, err
-			}
-			result.Origin = resTime
+			raw := binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
+			res = math.Float32frombits(raw)
 		case v2.ValueTypeInt16:
-			var res = int16(binary.BigEndian.Uint16(dataBytes))
-			result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(res))
-			if err != nil {
-				return nil, err
-			}
-			result.Origin = resTime
+			raw := int16(binary.BigEndian.Uint16(dataBytes))
+			res = float32(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT32, res, result.ValueToString())
 		case v2.ValueTypeUint16:
-			var res = binary.BigEndian.Uint16(dataBytes)
-			result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat32, float32(res))
-			if err != nil {
-				return nil, err
-			}
-			result.Origin = resTime
+			raw := binary.BigEndian.Uint16(dataBytes)
+			res = float32(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT32, res, result.ValueToString())
 		}
 	case v2.ValueTypeFloat64:
 		switch commandInfo.RawType {
 		case v2.ValueTypeFloat64:
-			var res = binary.BigEndian.Uint64(dataBytes)
-			var floatResult = math.Float64frombits(res)
-			result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat64, floatResult)
-			if err != nil {
-				return nil, err
-			}
-			result.Origin = resTime
+			raw := binary.BigEndian.Uint64(dataBytes)
+			res = math.Float64frombits(raw)
 		case v2.ValueTypeInt16:
-			var res = int16(binary.BigEndian.Uint16(dataBytes))
-			result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat64, float64(res))
-			if err != nil {
-				return nil, err
-			}
-			result.Origin = resTime
+			raw := int16(binary.BigEndian.Uint16(dataBytes))
+			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT64, res, result.ValueToString())
 		case v2.ValueTypeUint16:
-			var res = binary.BigEndian.Uint16(dataBytes)
-			result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeFloat64, float64(res))
-			if err != nil {
-				return nil, err
-			}
-			result.Origin = resTime
+			raw := binary.BigEndian.Uint16(dataBytes)
+			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT64, res, result.ValueToString())
 		}
 	case v2.ValueTypeBool:
-		var res = false
+		res = false
 		// to find the 1st bit of the dataBytes by mask it with 2^0 = 1 (00000001)
 		if (dataBytes[0] & 1) > 0 {
 			res = true
 		}
-		result, err = models.NewCommandValue(req.DeviceResourceName, v2.ValueTypeBool, res)
-		if err != nil {
-			return nil, err
-		}
-		result.Origin = resTime
 	default:
 		return nil, fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}
+
+	result, err = models.NewCommandValue(req.DeviceResourceName, commandInfo.ValueType, res)
+	if err != nil {
+		return nil, err
+	}
+	result.Origin = time.Now().UnixNano()
 
 	driver.Logger.Debugf("Transfer dataBytes to CommandValue(%v) successful.", result.ValueToString())
 	return result, nil
 }
 
+// TransformCommandValueToDataBytes transforms the reading value to binary data which is used to transfer data via Modbus protocol.
 func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.CommandValue) ([]byte, error) {
 	var err error
 	var byteCount = calculateByteCount(commandInfo)

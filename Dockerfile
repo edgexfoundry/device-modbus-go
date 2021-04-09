@@ -34,6 +34,9 @@ FROM alpine:3.12
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
       copyright='Copyright (c) 2019-2021: IoTech Ltd'
 
+RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
+RUN apk add --update --no-cache zeromq dumb-init
+
 COPY --from=builder /device-modbus-go/cmd /
 COPY --from=builder /device-modbus-go/LICENSE /
 COPY --from=builder /device-modbus-go/Attribution.txt /

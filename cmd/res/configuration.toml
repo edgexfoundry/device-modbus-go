@@ -64,8 +64,8 @@ ServerName = ''
 TokenFile = '/tmp/edgex/secrets/device-modbus/secrets-token.json'
 AdditionalRetryAttempts = 10
 RetryWaitPeriod = "1s"
-[SecretStore.Authentication]
-AuthType = 'X-Vault-Token'
+  [SecretStore.Authentication]
+  AuthType = 'X-Vault-Token'
 
 [Device]
   DataTransform = true
@@ -75,7 +75,6 @@ AuthType = 'X-Vault-Token'
   MaxCmdValueLen = 256
   RemoveCmd = ''
   RemoveCmdArgs = ''
-  ProfilesDir = './res/profiles'
-  DevicesDir = './res/devices'
+  ProfilesDir = ''
+  DevicesDir = ''
   UpdateLastConnected = false
-  
