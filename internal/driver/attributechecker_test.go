@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,11 +10,11 @@ import (
 	"strings"
 	"testing"
 
-	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/edgexfoundry/device-sdk-go/v2/pkg/models"
 )
 
 func TestCheckAttributes(t *testing.T) {
-	requests := []sdkModel.CommandRequest{
+	requests := []models.CommandRequest{
 		{
 			Attributes: map[string]string{
 				PRIMARY_TABLE:    HOLDING_REGISTERS,
@@ -38,7 +38,7 @@ func TestCheckAttributes(t *testing.T) {
 }
 
 func TestCheckAttributes_fail(t *testing.T) {
-	requests := []sdkModel.CommandRequest{
+	requests := []models.CommandRequest{
 		{
 			Attributes: map[string]string{
 				PRIMARY_TABLE:    HOLDING_REGISTERS,

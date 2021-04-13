@@ -1,15 +1,16 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package main
 
 import (
+	"github.com/edgexfoundry/device-sdk-go/v2/pkg/startup"
+
 	"github.com/edgexfoundry/device-modbus-go"
 	"github.com/edgexfoundry/device-modbus-go/internal/driver"
-	"github.com/edgexfoundry/device-sdk-go/pkg/startup"
 )
 
 const (

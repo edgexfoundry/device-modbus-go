@@ -1,0 +1,107 @@
+name: "Test.Device.Modbus.Profile"
+manufacturer: "Cool Automation"
+model: "CoolMasterNet"
+labels:
+- "HVAC"
+- "Air conditioner"
+description: "CoolMasterNet is an unique communication bridge that seamlessly connects advanced VRF / Split Air Conditioning Systems and home automation / Building Management Systems (BMS) controllers."
+
+deviceResources:
+-
+  name: "SwitchA"
+  isHidden: true
+  description: "On/Off , 0-OFF 1-ON"
+  attributes:
+    { primaryTable: "COILS", startingAddress: "1" }
+  properties:
+    valueType: "Bool"
+    readWrite: "RW"
+    scale: "1"
+    minimum: "0"
+    maximum: "1"
+    defaultValue: "0"
+-
+  name: "SwitchB"
+  isHidden: true
+  description: "On/Off , 0-OFF 1-ON"
+  attributes:
+    { primaryTable: "COILS", startingAddress: "15" }
+  properties:
+    valueType: "Bool"
+    readWrite: "RW"
+    scale: "1"
+    minimum: "0"
+    maximum: "1"
+    defaultValue: "0"
+-
+  name: "OperationMode"
+  isHidden: true
+  description: "0-Cool 1-Heat 2-Auto 3-Dry 4-HAUX 5-Fan 6-HH 8-VAM Auto 9-VAM Bypass 10-VAM Heat Exc 11-VAM Normal"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "2" }
+  properties:
+    valueType: "Int16"
+    readWrite: "RW"
+    scale: "1"
+    minimum: "0"
+    maximum: "11"
+    defaultValue: "0"
+-
+  name: "FanSpeed"
+  isHidden: true
+  description: "0-Low 1-Med 2-High 3-Auto 4-Top 5-Very Lo 7-VAM Super Hi 8-VAM Lo FreshUp 9-VAMHiFreshUp"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "3" }
+  properties:
+    valueType: "Int32"
+    readWrite: "RW"
+    scale: "1"
+    minimum: "0"
+    maximum: "9"
+    defaultValue: "0"
+-
+  name: "RoomTemperature"
+  isHidden: false
+  description: "Room Temperature x10 °C (Read Only)"
+  attributes:
+    { primaryTable: "INPUT_REGISTERS", startingAddress: "4" }
+  properties:
+    valueType: "Float32"
+    readWrite: "R"
+    scale: "1"
+-
+  name: "Temperature"
+  isHidden: true
+  description: "Temperature x10 °C"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "5" }
+  properties:
+    valueType: "Float64"
+    readWrite: "RW"
+    scale: "0.1"
+
+deviceCommands:
+-
+  name: "Switch"
+  readWrite: "RW"
+  isHidden: false
+  resourceOperations:
+    - { deviceResource: "SwitchA", mappings: {"true":"ON","false":"OFF"} }
+    - { deviceResource: "SwitchB", mappings: {"true":"ON","false":"OFF"} }
+-
+  name: "Values"
+  readWrite: "RW"
+  isHidden: false
+  resourceOperations:
+    - { deviceResource: "SwitchA", mappings: {"true":"ON","false":"OFF"} }
+    - { deviceResource: "OperationMode", mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
+    - { deviceResource: "FanSpeed", mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
+    - { deviceResource: "Temperature" }
+-
+  name: "HVACValues"
+  readWrite: "RW"
+  isHidden: false
+  resourceOperations:
+  - { deviceResource: "OperationMode", mappings: { "0":"Cool","1":"Heat","2":"Auto","3":"Dry","4":"HAUX","5":"Fan","6":"HH","8":"VAM Auto","9":"VAM Bypass","10":"VAM Heat","11":"VAM Normal"} }
+  - { deviceResource: "FanSpeed", mappings: { "0":"Low","1":"Med","2":"High","3":"Auto","4":"Top","5":"Very Lo","7":"VAM Super Hi","8":"VAM Lo FreshUp","9":"VAMHiFreshUp"} }
+  - { deviceResource: "Temperature" }
