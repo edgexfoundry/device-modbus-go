@@ -21,15 +21,51 @@ Port = 8500
 Type = 'consul'
 
 [Clients]
-  [Clients.Data]
+  [Clients.edgex-core-data]
   Protocol = 'http'
   Host = 'localhost'
   Port = 48080
 
-  [Clients.Metadata]
+  [Clients.edgex-core-metadata]
   Protocol = 'http'
   Host = 'localhost'
   Port = 48081
+
+[MessageQueue]
+Enabled = false
+Protocol = 'tcp'
+Host = 'localhost'
+Port = 1883
+Type = 'mqtt'
+PublishTopicPrefix = 'edgex/events' # /<device-profile-name>/<device-name>/<source-name> will be added to this Publish Topic prefix
+  [MessageQueue.Optional]
+  # Default MQTT Specific options that need to be here to enable environment variable overrides of them
+  # Client Identifiers
+  ClientId = "device-modbus"
+  # Connection information
+  Qos = "0" # Quality of Sevice values are 0 (At most once), 1 (At least once) or 2 (Exactly once)
+  KeepAlive = "10" # Seconds (must be 2 or greater)
+  Retained = "false"
+  AutoReconnect = "true"
+  ConnectTimeout = "5" # Seconds
+  SkipCertVerify = "false" # Only used if Cert/Key file or Cert/Key PEMblock are specified
+  ClientAuth = "none" # Valid values are: `none`, `usernamepassword` or `clientcert`
+  Secretpath = "messagebus"  # Path in secret store used if ClientAuth not `none`
+
+# Only used when EDGEX_SECURITY_SECRET_STORE=true which is now required for secure Consul
+[SecretStore]
+Type = 'vault'
+Host = 'localhost'
+Port = 8200
+Path = '/v1/secret/edgex/device-modbus/'
+Protocol = 'http'
+RootCaCertPath = ''
+ServerName = ''
+TokenFile = '/tmp/edgex/secrets/device-modbus/secrets-token.json'
+AdditionalRetryAttempts = 10
+RetryWaitPeriod = "1s"
+  [SecretStore.Authentication]
+  AuthType = 'X-Vault-Token'
 
 [Device]
   DataTransform = true
@@ -39,6 +75,6 @@ Type = 'consul'
   MaxCmdValueLen = 256
   RemoveCmd = ''
   RemoveCmdArgs = ''
-  ProfilesDir = './res'
+  ProfilesDir = ''
+  DevicesDir = ''
   UpdateLastConnected = false
-  

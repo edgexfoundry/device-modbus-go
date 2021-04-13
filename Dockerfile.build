@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2020 IOTech Ltd
+# Copyright (c) 2020-2021 IOTech Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ ARG BASE=golang:1.15-alpine3.12
 FROM ${BASE}
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-  copyright='Copyright (c) 2020: IOTech'
+  copyright='Copyright (c) 2020-2021: IOTech'
 
 RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
-RUN apk add --update --no-cache make git openssh build-base
+RUN apk add --update --no-cache make git openssh gcc libc-dev zeromq-dev libsodium-dev
 
 # set the working directory
 WORKDIR /device-modbus-go

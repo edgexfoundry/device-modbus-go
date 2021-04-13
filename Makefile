@@ -1,6 +1,7 @@
 .PHONY: build test clean prepare update docker
 
 GO=CGO_ENABLED=0 GO111MODULE=on go
+GOCGO=CGO_ENABLED=1 GO111MODULE=on go
 
 MICROSERVICES=cmd/device-modbus
 
@@ -15,14 +16,14 @@ GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION)"
 
 build: $(MICROSERVICES)
-	$(GO) build ./...
+	$(GOCGO) build ./...
 
 cmd/device-modbus:
-	$(GO) build $(GOFLAGS) -o $@ ./cmd
+	$(GOCGO) build $(GOFLAGS) -o $@ ./cmd
 
 test:
-	$(GO) test ./... -coverprofile=coverage.out
-	$(GO) vet ./...
+	$(GOCGO) test ./... -coverprofile=coverage.out
+	$(GOCGO) vet ./...
 	gofmt -l .
 	[ "`gofmt -l .`" = "" ]
 	./bin/test-attribution-txt.sh

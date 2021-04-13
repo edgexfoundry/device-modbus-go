@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2019 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/device-sdk-go/v2/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2"
 )
 
 // DeviceClient is a interface for modbus client lib to implementation
@@ -31,15 +31,15 @@ type DeviceClient interface {
 type CommandInfo struct {
 	PrimaryTable    string
 	StartingAddress uint16
-	ValueType       sdkModel.ValueType
+	ValueType       string
 	// how many register need to read
 	Length     uint16
 	IsByteSwap bool
 	IsWordSwap bool
-	RawType    sdkModel.ValueType
+	RawType    string
 }
 
-func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
+func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 	primaryTable, _ := req.Attributes[PRIMARY_TABLE]
 	primaryTable = strings.ToUpper(primaryTable)
 
@@ -75,7 +75,7 @@ func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
 	}, nil
 }
 
-func getRawType(req *sdkModel.CommandRequest) (valueType sdkModel.ValueType, err error) {
+func getRawType(req *models.CommandRequest) (valueType string, err error) {
 	rawType, ok := req.Attributes[RAW_TYPE]
 	if !ok || rawType == "" {
 		return req.Type, err
@@ -83,17 +83,17 @@ func getRawType(req *sdkModel.CommandRequest) (valueType sdkModel.ValueType, err
 
 	switch rawType {
 	case UINT16:
-		valueType = sdkModel.Uint16
+		valueType = v2.ValueTypeUint16
 	case INT16:
-		valueType = sdkModel.Int16
+		valueType = v2.ValueTypeInt16
 	default:
-		driver.Logger.Warn(fmt.Sprintf("The raw type %v is not supportted, use value type %v instead", rawType, req.Type))
-		err = fmt.Errorf("the raw type %v is not supportted", rawType)
+		driver.Logger.Warnf("The raw type %v is not supported, use value type %v instead", rawType, req.Type)
+		err = fmt.Errorf("the raw type %v is not supported", rawType)
 	}
 	return valueType, err
 }
 
-func calculateAddressLength(primaryTable string, valueType sdkModel.ValueType) uint16 {
+func calculateAddressLength(primaryTable string, valueType string) uint16 {
 	var primaryTableBit = PrimaryTableBitCountMap[primaryTable]
 	var valueTypeBitCount = ValueTypeBitCountMap[valueType]
 
@@ -105,79 +105,86 @@ func calculateAddressLength(primaryTable string, valueType sdkModel.ValueType) u
 	return length
 }
 
-func TransformDataBytesToResult(req *sdkModel.CommandRequest, dataBytes []byte, commandInfo *CommandInfo) (*sdkModel.CommandValue, error) {
-	var result = &sdkModel.CommandValue{}
+// TransformDataBytesToResult is used to transform the device's binary data to the specified value type as the actual result.
+func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, commandInfo *CommandInfo) (*models.CommandValue, error) {
 	var err error
-	var resTime = time.Now().UnixNano()
+	var res interface{}
+	var result = &models.CommandValue{}
 
 	switch commandInfo.ValueType {
-	case sdkModel.Uint16:
-		var res = binary.BigEndian.Uint16(dataBytes)
-		result, err = sdkModel.NewUint16Value(req.DeviceResourceName, resTime, res)
-	case sdkModel.Uint32:
-		var res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
-		result, err = sdkModel.NewUint32Value(req.DeviceResourceName, resTime, res)
-	case sdkModel.Uint64:
-		var res = binary.BigEndian.Uint64(dataBytes)
-		result, err = sdkModel.NewUint64Value(req.DeviceResourceName, resTime, res)
-	case sdkModel.Int16:
-		var res = int16(binary.BigEndian.Uint16(dataBytes))
-		result, err = sdkModel.NewInt16Value(req.DeviceResourceName, resTime, res)
-	case sdkModel.Int32:
-		var res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
-		result, err = sdkModel.NewInt32Value(req.DeviceResourceName, resTime, res)
-	case sdkModel.Int64:
-		var res = int64(binary.BigEndian.Uint64(dataBytes))
-		result, err = sdkModel.NewInt64Value(req.DeviceResourceName, resTime, res)
-	case sdkModel.Float32:
+	case v2.ValueTypeUint16:
+		res = binary.BigEndian.Uint16(dataBytes)
+	case v2.ValueTypeUint32:
+		res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
+	case v2.ValueTypeUint64:
+		res = binary.BigEndian.Uint64(dataBytes)
+	case v2.ValueTypeInt16:
+		res = int16(binary.BigEndian.Uint16(dataBytes))
+	case v2.ValueTypeInt32:
+		res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
+	case v2.ValueTypeInt64:
+		res = int64(binary.BigEndian.Uint64(dataBytes))
+	case v2.ValueTypeFloat32:
 		switch commandInfo.RawType {
-		case sdkModel.Float32:
-			var res = binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
-			var floatResult = math.Float32frombits(res)
-			result, err = sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, floatResult)
-		case sdkModel.Int16:
-			var res = int16(binary.BigEndian.Uint16(dataBytes))
-			result, err = sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, float32(res))
-			driver.Logger.Debug(fmt.Sprintf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT32, res, result.ValueToString(contract.ENotation)))
-		case sdkModel.Uint16:
-			var res = binary.BigEndian.Uint16(dataBytes)
-			result, err = sdkModel.NewFloat32Value(req.DeviceResourceName, resTime, float32(res))
-			driver.Logger.Debug(fmt.Sprintf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT32, res, result.ValueToString(contract.ENotation)))
+		case v2.ValueTypeFloat32:
+			raw := binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
+			res = math.Float32frombits(raw)
+		case v2.ValueTypeInt16:
+			raw := int16(binary.BigEndian.Uint16(dataBytes))
+			res = float32(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT32, res, result.ValueToString())
+		case v2.ValueTypeUint16:
+			raw := binary.BigEndian.Uint16(dataBytes)
+			res = float32(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT32, res, result.ValueToString())
 		}
-	case sdkModel.Float64:
+	case v2.ValueTypeFloat64:
 		switch commandInfo.RawType {
-		case sdkModel.Float64:
-			var res = binary.BigEndian.Uint64(dataBytes)
-			var floatResult = math.Float64frombits(res)
-			result, err = sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, floatResult)
-		case sdkModel.Int16:
-			var res = int16(binary.BigEndian.Uint16(dataBytes))
-			result, err = sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, float64(res))
-			driver.Logger.Debug(fmt.Sprintf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT64, res, result.ValueToString(contract.ENotation)))
-		case sdkModel.Uint16:
-			var res = binary.BigEndian.Uint16(dataBytes)
-			result, err = sdkModel.NewFloat64Value(req.DeviceResourceName, resTime, float64(res))
-			driver.Logger.Debug(fmt.Sprintf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT64, res, result.ValueToString(contract.ENotation)))
+		case v2.ValueTypeFloat64:
+			raw := binary.BigEndian.Uint64(dataBytes)
+			res = math.Float64frombits(raw)
+		case v2.ValueTypeInt16:
+			raw := int16(binary.BigEndian.Uint16(dataBytes))
+			res = float64(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT64, res, result.ValueToString())
+		case v2.ValueTypeUint16:
+			raw := binary.BigEndian.Uint16(dataBytes)
+			res = float64(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT64, res, result.ValueToString())
 		}
-	case sdkModel.Bool:
-		var res = false
+	case v2.ValueTypeBool:
+		res = false
 		// to find the 1st bit of the dataBytes by mask it with 2^0 = 1 (00000001)
 		if (dataBytes[0] & 1) > 0 {
 			res = true
 		}
-		result, err = sdkModel.NewBoolValue(req.DeviceResourceName, resTime, res)
 	default:
-		err = fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
+		return nil, fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}
-	driver.Logger.Debug(fmt.Sprintf("Transfer dataBytes to CommandValue(%v) successful.", result.ValueToString(contract.ENotation)))
-	return result, err
+
+	result, err = models.NewCommandValue(req.DeviceResourceName, commandInfo.ValueType, res)
+	if err != nil {
+		return nil, err
+	}
+	result.Origin = time.Now().UnixNano()
+
+	driver.Logger.Debugf("Transfer dataBytes to CommandValue(%v) successful.", result.ValueToString())
+	return result, nil
 }
 
-func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.CommandValue) ([]byte, error) {
-	var byteCount = calculateByteCount(commandInfo)
+// TransformCommandValueToDataBytes transforms the reading value to binary data which is used to transfer data via Modbus protocol.
+func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.CommandValue) ([]byte, error) {
 	var err error
-	var maxSize = uint16(len(value.NumericValue))
-	var dataBytes = value.NumericValue[maxSize-byteCount : maxSize]
+	var byteCount = calculateByteCount(commandInfo)
+	buf := new(bytes.Buffer)
+	err = binary.Write(buf, binary.BigEndian, value.Value)
+	if err != nil {
+		return nil, fmt.Errorf("failed to transform %v to []byte", value.Value)
+	}
+
+	numericValue := buf.Bytes()
+	var maxSize = uint16(len(numericValue))
+	var dataBytes = numericValue[maxSize-byteCount : maxSize]
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {
@@ -185,38 +192,38 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 		return dataBytes, err
 	}
 
-	if commandInfo.ValueType == sdkModel.Uint32 || commandInfo.ValueType == sdkModel.Int32 || commandInfo.ValueType == sdkModel.Float32 {
+	if commandInfo.ValueType == v2.ValueTypeUint32 || commandInfo.ValueType == v2.ValueTypeInt32 || commandInfo.ValueType == v2.ValueTypeFloat32 {
 		dataBytes = swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)
 	}
 
 	// Cast value according to the rawType, this feature only converts float value to integer 32bit value
-	if commandInfo.ValueType == sdkModel.Float32 {
-		val, err := value.Float32Value()
-		if err != nil {
-			return dataBytes, err
+	if commandInfo.ValueType == v2.ValueTypeFloat32 {
+		val, edgexErr := value.Float32Value()
+		if edgexErr != nil {
+			return dataBytes, edgexErr
 		}
-		if commandInfo.RawType == sdkModel.Int16 {
+		if commandInfo.RawType == v2.ValueTypeInt16 {
 			dataBytes, err = getBinaryData(int16(val))
 			if err != nil {
 				return dataBytes, err
 			}
-		} else if commandInfo.RawType == sdkModel.Uint16 {
+		} else if commandInfo.RawType == v2.ValueTypeUint16 {
 			dataBytes, err = getBinaryData(uint16(val))
 			if err != nil {
 				return dataBytes, err
 			}
 		}
-	} else if commandInfo.ValueType == sdkModel.Float64 {
-		val, err := value.Float64Value()
-		if err != nil {
-			return dataBytes, err
+	} else if commandInfo.ValueType == v2.ValueTypeFloat64 {
+		val, edgexErr := value.Float64Value()
+		if edgexErr != nil {
+			return dataBytes, edgexErr
 		}
-		if commandInfo.RawType == sdkModel.Int16 {
+		if commandInfo.RawType == v2.ValueTypeInt16 {
 			dataBytes, err = getBinaryData(int16(val))
 			if err != nil {
 				return dataBytes, err
 			}
-		} else if commandInfo.RawType == sdkModel.Uint16 {
+		} else if commandInfo.RawType == v2.ValueTypeUint16 {
 			dataBytes, err = getBinaryData(uint16(val))
 			if err != nil {
 				return dataBytes, err
@@ -224,7 +231,7 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 		}
 	}
 
-	driver.Logger.Debug(fmt.Sprintf("Transfer CommandValue to dataBytes for write command, %v, %v", commandInfo.ValueType, dataBytes))
+	driver.Logger.Debugf("Transfer CommandValue to dataBytes for write command, %v, %v", commandInfo.ValueType, dataBytes)
 	return dataBytes, err
 }
 

@@ -9,12 +9,12 @@ package driver
 import (
 	"testing"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/logger"
 )
 
 func init() {
 	driver = new(Driver)
-	driver.Logger = logger.NewClient("test", false, "./device-Modbus.log", "DEBUG")
+	driver.Logger = logger.NewMockClient()
 }
 
 func TestByteSwap32BitDataBytes(t *testing.T) {

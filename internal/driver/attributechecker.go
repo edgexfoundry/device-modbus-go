@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,10 +9,10 @@ package driver
 import (
 	"fmt"
 
-	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/edgexfoundry/device-sdk-go/v2/pkg/models"
 )
 
-func checkAttributes(reqs []sdkModel.CommandRequest) error {
+func checkAttributes(reqs []models.CommandRequest) error {
 	var err error = nil
 	for _, req := range reqs {
 		attributes := req.Attributes

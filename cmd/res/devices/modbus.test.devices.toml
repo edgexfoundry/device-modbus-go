@@ -1,0 +1,33 @@
+# Pre-define Devices
+[[DeviceList]]
+  Name = 'Modbus-TCP-test-device'
+  ProfileName = 'Test.Device.Modbus.Profile'
+  Description = 'This device is a product for monitoring and controlling digital inputs and outputs over a LAN.'
+  labels = [ 'Air conditioner','modbus TCP' ]
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.modbus-tcp]
+       Address = '0.0.0.0'
+       Port = '1502'
+       UnitID = '1'
+       Timeout = "5"
+       IdleTimeout = "5"
+  [[DeviceList.AutoEvents]]
+    Frequency = '20s'
+    OnChange = false
+    SourceName = 'HVACValues'
+
+[[DeviceList]]
+  Name = 'Modbus-RTU-test-device'
+  ProfileName = 'Test.Device.Modbus.Profile'
+  Description = 'This device is a product for monitoring and controlling digital inputs and outputs over a LAN.'
+  labels = [ 'Air conditioner','modbus RTU' ]
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.modbus-rtu]
+       Address = '/tmp/slave'
+       BaudRate = '19200'
+       DataBits = '8'
+       StopBits = '1'
+       Parity = 'N'
+       UnitID = '1'
+       Timeout = "5"
+       IdleTimeout = "5"

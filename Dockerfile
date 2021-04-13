@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2020 IOTech Ltd
+# Copyright (c) 2020-2021 IOTech Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,29 +17,31 @@
 ARG BASE=golang:1.15-alpine3.12
 FROM ${BASE} AS builder
 
-ARG MAKE='make build'
-
 RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
-RUN apk add --update --no-cache make git openssh build-base
+RUN apk add --update --no-cache make git openssh gcc libc-dev zeromq-dev libsodium-dev
 
 # set the working directory
-WORKDIR $GOPATH/src/github.com/edgexfoundry/device-modbus-go
+WORKDIR /device-modbus-go
 
 COPY . .
 
-RUN ${MAKE}
+RUN go mod download
 
-FROM scratch
+RUN make build
 
-ENV APP_PORT=49991
-EXPOSE $APP_PORT
-
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/cmd /
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/LICENSE /
-COPY --from=builder /go/src/github.com/edgexfoundry/device-modbus-go/Attribution.txt /
+FROM alpine:3.12
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-      copyright='Copyright (c) 2019-2020: IoTech Ltd'
+      copyright='Copyright (c) 2019-2021: IoTech Ltd'
+
+RUN sed -e 's/dl-cdn[.]alpinelinux.org/nl.alpinelinux.org/g' -i~ /etc/apk/repositories
+RUN apk add --update --no-cache zeromq dumb-init
+
+COPY --from=builder /device-modbus-go/cmd /
+COPY --from=builder /device-modbus-go/LICENSE /
+COPY --from=builder /device-modbus-go/Attribution.txt /
+
+EXPOSE 49991
 
 ENTRYPOINT ["/device-modbus"]
 CMD ["--cp=consul://edgex-core-consul:8500", "--registry", "--confdir=/res"]
