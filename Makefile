@@ -37,6 +37,6 @@ docker: $(DOCKERS)
 docker_device_modbus_go:
 	docker build \
 		--label "git_sha=$(GIT_SHA)" \
-		-t edgexfoundry/docker-device-modbus-go:$(GIT_SHA) \
-		-t edgexfoundry/docker-device-modbus-go:$(VERSION)-dev \
+		-t edgexfoundry/device-modbus:$(GIT_SHA) \
+		-t edgexfoundry/device-modbus:$(VERSION)-dev \
 		.
