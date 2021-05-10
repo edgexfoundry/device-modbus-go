@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/edgexfoundry/device-sdk-go/v2/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/errors"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2"
 )
 
@@ -27,7 +28,7 @@ type DeviceClient interface {
 	CloseConnection() error
 }
 
-// ConnectionInfo is command info
+// CommandInfo is command info
 type CommandInfo struct {
 	PrimaryTable    string
 	StartingAddress uint16
@@ -40,28 +41,44 @@ type CommandInfo struct {
 }
 
 func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
-	primaryTable, _ := req.Attributes[PRIMARY_TABLE]
+	if _, ok := req.Attributes[PRIMARY_TABLE]; !ok {
+		return nil, errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("attribute %s not exists", PRIMARY_TABLE), nil)
+	}
+	primaryTable := fmt.Sprintf("%v", req.Attributes[PRIMARY_TABLE])
 	primaryTable = strings.ToUpper(primaryTable)
 
-	startingAddress, _ := toUint16(req.Attributes[STARTING_ADDRESS])
-	startingAddress = startingAddress - 1
-
-	rawType, err := getRawType(req)
+	if _, ok := req.Attributes[STARTING_ADDRESS]; !ok {
+		return nil, errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("attribute %s not exists", STARTING_ADDRESS), nil)
+	}
+	startingAddress, err := castStartingAddress(req.Attributes[STARTING_ADDRESS])
 	if err != nil {
-		return nil, err
+		return nil, errors.NewCommonEdgeX(errors.Kind(err), fmt.Sprintf("fail to cast %s", STARTING_ADDRESS), err)
+	}
+
+	var rawType = req.Type
+	if _, ok := req.Attributes[RAW_TYPE]; ok {
+		rawType = fmt.Sprintf("%v", req.Attributes[RAW_TYPE])
+		rawType, err = normalizeRawType(rawType)
+		if err != nil {
+			return nil, err
+		}
 	}
 	length := calculateAddressLength(primaryTable, rawType)
 
 	var isByteSwap = false
-	_, ok := req.Attributes[IS_BYTE_SWAP]
-	if ok {
-		isByteSwap, _ = toBool(req.Attributes[IS_BYTE_SWAP])
+	if _, ok := req.Attributes[IS_BYTE_SWAP]; ok {
+		isByteSwap, err = castSwapAttribute(req.Attributes[IS_BYTE_SWAP])
+		if err != nil {
+			return nil, errors.NewCommonEdgeX(errors.Kind(err), fmt.Sprintf("fail to cast %s", IS_BYTE_SWAP), err)
+		}
 	}
 
 	var isWordSwap = false
-	_, ok = req.Attributes[IS_WORD_SWAP]
-	if ok {
-		isWordSwap, _ = toBool(req.Attributes[IS_WORD_SWAP])
+	if _, ok := req.Attributes[IS_WORD_SWAP]; ok {
+		isWordSwap, err = castSwapAttribute(req.Attributes[IS_WORD_SWAP])
+		if err != nil {
+			return nil, errors.NewCommonEdgeX(errors.Kind(err), fmt.Sprintf("fail to cast %s", IS_WORD_SWAP), err)
+		}
 	}
 
 	return &CommandInfo{
@@ -73,24 +90,6 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 		IsWordSwap:      isWordSwap,
 		RawType:         rawType,
 	}, nil
-}
-
-func getRawType(req *models.CommandRequest) (valueType string, err error) {
-	rawType, ok := req.Attributes[RAW_TYPE]
-	if !ok || rawType == "" {
-		return req.Type, err
-	}
-
-	switch rawType {
-	case UINT16:
-		valueType = v2.ValueTypeUint16
-	case INT16:
-		valueType = v2.ValueTypeInt16
-	default:
-		driver.Logger.Warnf("The raw type %v is not supported, use value type %v instead", rawType, req.Type)
-		err = fmt.Errorf("the raw type %v is not supported", rawType)
-	}
-	return valueType, err
 }
 
 func calculateAddressLength(primaryTable string, valueType string) uint16 {

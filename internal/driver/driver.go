@@ -103,13 +103,6 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	responses = make([]*sdkModel.CommandValue, len(reqs))
 	var deviceClient DeviceClient
 
-	// Check request's attribute to avoid interface cast error
-	err = checkAttributes(reqs)
-	if err != nil {
-		driver.Logger.Infof("CommandRequest's attribute are invalid. err:%v \n", err)
-		return responses, err
-	}
-
 	// create device client and open connection
 	deviceClient, err = NewDeviceClient(connectionInfo)
 	if err != nil {
@@ -179,13 +172,6 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
 	var deviceClient DeviceClient
-
-	// Check request's attribute to avoid interface cast error
-	err = checkAttributes(reqs)
-	if err != nil {
-		driver.Logger.Infof("CommandRequest's attribute are invalid. err:%v \n", err)
-		return err
-	}
 
 	// create device client and open connection
 	deviceClient, err = NewDeviceClient(connectionInfo)
