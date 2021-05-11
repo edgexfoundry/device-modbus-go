@@ -161,3 +161,18 @@ https://github.com/mattn/go-isatty/blob/master/LICENSE
 
 golang.org/x/sys (Unspecified) https://github.com/golang/sys
 https://github.com/golang/sys/blob/master/LICENSE
+
+stretchr/testify (MIT) https://github.com/stretchr/testify
+https://github.com/stretchr/testify/blob/master/LICENSE
+
+davecgh/go-spew (ISC) https://github.com/davecgh/go-spew
+https://github.com/davecgh/go-spew/blob/master/LICENSE
+
+pmezard/go-difflib (Unspecified) https://github.com/pmezard/go-difflib
+https://github.com/pmezard/go-difflib/blob/master/LICENSE
+
+golang.org/x/text (Unspecified) https://github.com/golang/text
+https://github.com/golang/text/blob/master/LICENSE
+
+gopkg.in/yaml.v3 (MIT) https://github.com/go-yaml/yaml/
+https://github.com/go-yaml/yaml/blob/v3/LICENSE

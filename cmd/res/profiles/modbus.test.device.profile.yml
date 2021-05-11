@@ -12,7 +12,7 @@ deviceResources:
   isHidden: true
   description: "On/Off , 0-OFF 1-ON"
   attributes:
-    { primaryTable: "COILS", startingAddress: "1" }
+    { primaryTable: "COILS", startingAddress: 0 }
   properties:
     valueType: "Bool"
     readWrite: "RW"
@@ -25,7 +25,7 @@ deviceResources:
   isHidden: true
   description: "On/Off , 0-OFF 1-ON"
   attributes:
-    { primaryTable: "COILS", startingAddress: "15" }
+    { primaryTable: "COILS", startingAddress: 14 }
   properties:
     valueType: "Bool"
     readWrite: "RW"
@@ -38,7 +38,7 @@ deviceResources:
   isHidden: true
   description: "0-Cool 1-Heat 2-Auto 3-Dry 4-HAUX 5-Fan 6-HH 8-VAM Auto 9-VAM Bypass 10-VAM Heat Exc 11-VAM Normal"
   attributes:
-    { primaryTable: "HOLDING_REGISTERS", startingAddress: "2" }
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: 1 }
   properties:
     valueType: "Int16"
     readWrite: "RW"
@@ -51,7 +51,7 @@ deviceResources:
   isHidden: true
   description: "0-Low 1-Med 2-High 3-Auto 4-Top 5-Very Lo 7-VAM Super Hi 8-VAM Lo FreshUp 9-VAMHiFreshUp"
   attributes:
-    { primaryTable: "HOLDING_REGISTERS", startingAddress: "3" }
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: 2 }
   properties:
     valueType: "Int32"
     readWrite: "RW"
@@ -64,7 +64,7 @@ deviceResources:
   isHidden: false
   description: "Room Temperature x10 °C (Read Only)"
   attributes:
-    { primaryTable: "INPUT_REGISTERS", startingAddress: "4" }
+    { primaryTable: "INPUT_REGISTERS", startingAddress: 3 }
   properties:
     valueType: "Float32"
     readWrite: "R"
@@ -74,7 +74,7 @@ deviceResources:
   isHidden: true
   description: "Temperature x10 °C"
   attributes:
-    { primaryTable: "HOLDING_REGISTERS", startingAddress: "5" }
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: 4 }
   properties:
     valueType: "Float64"
     readWrite: "RW"
