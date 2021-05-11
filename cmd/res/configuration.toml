@@ -1,5 +1,12 @@
 [Writable]
 LogLevel = 'INFO'
+  # InsecureSecrets are required for when Redis is used for message bus
+  [Writable.InsecureSecrets]
+    [Writable.InsecureSecrets.Sample]
+    path = "redisdb"
+      [Writable.InsecureSecrets.Sample.Secrets]
+      username = ""
+      password = ""
 
 [Service]
 BootTimeout = 30000
