@@ -16,9 +16,9 @@ GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION)"
 
 build: $(MICROSERVICES)
-	$(GOCGO) build ./...
 
 cmd/device-modbus:
+	go mod tidy
 	$(GOCGO) build $(GOFLAGS) -o $@ ./cmd
 
 test:
