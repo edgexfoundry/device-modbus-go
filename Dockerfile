@@ -25,6 +25,7 @@ WORKDIR /device-modbus-go
 
 COPY . .
 
+RUN go mod tidy
 RUN go mod download
 
 RUN make build
