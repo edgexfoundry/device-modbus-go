@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	serviceName string = "edgex-device-modbus"
+	serviceName string = "device-modbus"
 )
 
 func main() {
