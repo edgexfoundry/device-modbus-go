@@ -13,7 +13,7 @@ BootTimeout = 30000
 CheckInterval = '10s'
 Host = 'localhost'
 ServerBindAddr = ''  # blank value defaults to Service.Host value
-Port = 49991
+Port = 59901
 Protocol = 'http'
 StartupMsg = 'device modbus started'
 Timeout = 5000
@@ -32,12 +32,12 @@ Type = 'consul'
   [Clients.core-data]
   Protocol = 'http'
   Host = 'localhost'
-  Port = 48080
+  Port = 59880
 
   [Clients.core-metadata]
   Protocol = 'http'
   Host = 'localhost'
-  Port = 48081
+  Port = 59881
 
 [MessageQueue]
 Protocol = 'redis'
