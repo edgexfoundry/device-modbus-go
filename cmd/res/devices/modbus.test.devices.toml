@@ -12,7 +12,7 @@
        Timeout = "5"
        IdleTimeout = "5"
   [[DeviceList.AutoEvents]]
-    Frequency = '20s'
+    Interval = '20s'
     OnChange = false
     SourceName = 'HVACValues'
 
