@@ -9,19 +9,14 @@ LogLevel = 'INFO'
       password = ""
 
 [Service]
-BootTimeout = 30000
-CheckInterval = '10s'
+HealthCheckInterval = '10s'
 Host = 'localhost'
-ServerBindAddr = ''  # blank value defaults to Service.Host value
 Port = 59901
-Protocol = 'http'
+ServerBindAddr = ''  # blank value defaults to Service.Host value
 StartupMsg = 'device modbus started'
-Timeout = 5000
-ConnectRetries = 10
-Labels = []
-EnableAsyncReadings = true
-AsyncBufferSize = 16
-UseMessageBus = false
+# MaxRequestSize limit the request body size in byte of put command
+MaxRequestSize = 0 # value 0 unlimit the request size.
+RequestTimeout = '5s'
 
 [Registry]
 Host = 'localhost'
@@ -75,13 +70,17 @@ RetryWaitPeriod = "1s"
   AuthType = 'X-Vault-Token'
 
 [Device]
-  DataTransform = true
-  InitCmd = ''
-  InitCmdArgs = ''
-  MaxCmdOps = 128
-  MaxCmdValueLen = 256
-  RemoveCmd = ''
-  RemoveCmdArgs = ''
-  ProfilesDir = ''
-  DevicesDir = ''
-  UpdateLastConnected = false
+DataTransform = true
+InitCmd = ''
+InitCmdArgs = ''
+MaxCmdOps = 128
+MaxCmdValueLen = 256
+RemoveCmd = ''
+RemoveCmdArgs = ''
+ProfilesDir = ''
+DevicesDir = ''
+UpdateLastConnected = false
+Labels = []
+EnableAsyncReadings = true
+AsyncBufferSize = 16
+UseMessageBus = false
