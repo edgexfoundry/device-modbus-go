@@ -19,6 +19,30 @@ if [ ! -f "$SNAP_DATA/config/device-modbus/res/configuration.toml" ]; then
         "$SNAP_DATA/config/device-modbus/res/configuration.toml"
 fi
 
+# also copy the device profiles into $SNAP_DATA
+mkdir -p "$SNAP_DATA/config/device-modbus/res/profiles"
+find "$SNAP/config/device-rest/res/profiles/" -type f -print | grep .yaml | \
+     while read line; do
+        fname=$(basename "$line")
+        if [ ! -f "$SNAP_DATA/config/device-modbus/res/profiles/${fname}" ]; then
+            cp "$SNAP/config/device-modbus/res/profiles/${fname}" \
+            "$SNAP_DATA/config/device-modbus/res/profiles/${fname}"
+        fi
+    done
+
+# also copy the device into $SNAP_DATA
+mkdir -p "$SNAP_DATA/config/device-modbus/res/devices"
+find "$SNAP/config/device-modbus/res/devices/" -type f -print | grep .toml | \
+    while read line; do
+        fname=$(basename "$line")
+        if [ ! -f "$SNAP_DATA/config/device-modbus/res/devices/${fname}" ]; then
+            cp "$SNAP/config/device-modbus/res/devices/${fname}" \
+            "$SNAP_DATA/config/device-modbus/res/devices/${fname}"
+        fi
+    done
+
+
+
 # disable device-modbus initially because it specific requires configuration 
 # with a device profile that will be specific to each installation
 snapctl stop --disable "$SNAP_NAME.device-modbus"
