@@ -59,13 +59,11 @@ PublishTopicPrefix = 'edgex/events' # /<device-profile-name>/<device-name>/<sour
 Type = 'vault'
 Host = 'localhost'
 Port = 8200
-Path = '/v1/secret/edgex/device-modbus/'
+Path = 'device-modbus/'
 Protocol = 'http'
 RootCaCertPath = ''
 ServerName = ''
 TokenFile = '/tmp/edgex/secrets/device-modbus/secrets-token.json'
-AdditionalRetryAttempts = 10
-RetryWaitPeriod = "1s"
   [SecretStore.Authentication]
   AuthType = 'X-Vault-Token'
 
