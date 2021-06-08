@@ -19,8 +19,15 @@ architectures:
 grade: stable
 confinement: strict
 
-# edinburgh release is epoch 1
-epoch: 1
+# 1.x releases are epoch 1 and Ireland (2.x) is epoch 2
+epoch: 2
+
+slots:
+  edgex-secretstore-token:
+    interface: content
+    content: edgex-secretstore-token
+    source:
+      write: [$SNAP_DATA/device-modbus]
 
 apps:
   device-modbus:
@@ -30,7 +37,9 @@ apps:
       - bin/startup-env-var.sh
     environment:
       CONSUL_ADDR: "consul://localhost:8500"
-      DEVICE_PROFILESDIR: $SNAP_DATA/config/device-modbus/res
+      DEVICE_PROFILESDIR: "$SNAP_DATA/config/device-modbus/res/profiles"
+      DEVICE_DEVICESDIR: "$SNAP_DATA/config/device-modbus/res/devices"
+      SECRETSTORE_TOKENFILE: $SNAP_DATA/device-modbus/secrets-token.json
     daemon: simple
     plugs: [network, network-bind]
 
@@ -40,12 +49,8 @@ parts:
     source: snap/local
     override-pull: |
       cd $SNAPCRAFT_PROJECT_DIR
-      if [ -f VERSION ]; then
-        PROJECT_VERSION=$(cat VERSION)
-      else
-        PROJECT_VERSION="0.0.0"
-      fi
-      snapcraftctl set-version ${PROJECT_VERSION}
+      GIT_VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
+      snapcraftctl set-version ${GIT_VERSION}
   device-modbus:
     source: .
     plugin: make
@@ -59,7 +64,22 @@ parts:
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
+
+      install -d "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/"
+
       install -DT "./cmd/res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/configuration.toml"
+
+      for fpath in ./cmd/res/profiles/*; do
+          fname=$(basename "$fpath")
+          install -DT "./cmd/res/profiles/${fname}" \
+          "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/profiles/${fname}"
+      done
+
+      for fpath in ./cmd/res/devices/*.toml; do
+          fname=$(basename "$fpath")
+          install -DT "./cmd/res/devices/${fname}" \
+          "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/devices/${fname}"
+      done
 
       install -DT "./Attribution.txt" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"
