@@ -36,6 +36,8 @@ const (
 	// RAW_TYPE define binary data type which read from Modbus device
 	RAW_TYPE = "rawType"
 
+	// WORD_LENGTH  E.g. "abcd" need 4 bytes as is 2 word, so WORD_LENGTH=2
+	WORD_LENGTH            = "wordLength"
 	SERVICE_STOP_WAIT_TIME = 1
 )
 
@@ -58,5 +60,6 @@ var ValueTypeBitCountMap = map[string]uint16{
 	v2.ValueTypeFloat32: 32,
 	v2.ValueTypeFloat64: 64,
 
-	v2.ValueTypeBool: 1,
+	v2.ValueTypeBool:   1,
+	v2.ValueTypeString: 16,
 }
