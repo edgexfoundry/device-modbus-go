@@ -34,7 +34,8 @@ const (
 	// RAW_TYPE define binary data type which read from Modbus device
 	RAW_TYPE = "rawType"
 
-	STR_LENGTH             = "stringLength"
+	// WORD_LENGTH  E.g. "abcd" need 4 bytes as is 2 word, so WORD_LENGTH=2
+	WORD_LENGTH            = "wordLength"
 	SERVICE_STOP_WAIT_TIME = 1
 )
 
@@ -58,5 +59,5 @@ var ValueTypeBitCountMap = map[sdkModel.ValueType]uint16{
 	sdkModel.Float64: 64,
 
 	sdkModel.Bool:   1,
-	sdkModel.String: 1,
+	sdkModel.String: 16,
 }

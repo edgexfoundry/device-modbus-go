@@ -10,7 +10,7 @@ deviceResources:
     name: "StringA"
     description: "no description"
     attributes:
-      { primaryTable: "INPUT_REGISTERS", startingAddress: "1", stringLength: "1"}
+      { primaryTable: "INPUT_REGISTERS", startingAddress: "1", wordLength: "1"}
     properties:
       value:
         { type: "STRING", readWrite: "R"}
@@ -21,7 +21,7 @@ deviceResources:
     name: "StringB"
     description: "no description"
     attributes:
-      { primaryTable: "HOLDING_REGISTERS", startingAddress: "15", stringLength: "5"}
+      { primaryTable: "HOLDING_REGISTERS", startingAddress: "15", wordLength: "5"}
     properties:
       value:
         { type: "STRING", readWrite: "RW"}
