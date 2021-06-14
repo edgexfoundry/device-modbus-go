@@ -52,15 +52,14 @@ func createCommandInfo(req *sdkModel.CommandRequest) (*CommandInfo, error) {
 		return nil, err
 	}
 	var length uint16
-	switch req.Type {
-	case sdkModel.String:
-		l, err := strconv.Atoi(req.Attributes[STR_LENGTH])
+	if req.Type == sdkModel.String {
+		l, err := strconv.Atoi(req.Attributes[WORD_LENGTH])
 		if err != nil {
 			length = 1
 		} else {
 			length = uint16(l)
 		}
-	default:
+	} else {
 		length = calculateAddressLength(primaryTable, rawType)
 	}
 
@@ -193,8 +192,7 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 	var err error
 	var maxSize = uint16(len(value.NumericValue))
 	var dataBytes []byte
-	switch value.Type {
-	case sdkModel.String:
+	if value.Type == sdkModel.String {
 		oriStr := value.ValueToString()
 		tempBytes := []byte(oriStr)
 		bytesl := len(tempBytes)
@@ -207,7 +205,7 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *sdkModel.
 		} else {
 			dataBytes = []byte(oriStr)
 		}
-	default:
+	} else {
 		dataBytes = value.NumericValue[maxSize-byteCount : maxSize]
 	}
 
