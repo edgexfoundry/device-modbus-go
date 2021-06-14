@@ -19,8 +19,15 @@ architectures:
 grade: stable
 confinement: strict
 
-# edinburgh release is epoch 1
-epoch: 1
+# 1.x releases are epoch 1 and Ireland (2.x) is epoch 2
+epoch: 2
+
+slots:
+  edgex-secretstore-token:
+    interface: content
+    content: edgex-secretstore-token
+    source:
+      write: [$SNAP_DATA/device-modbus]
 
 apps:
   device-modbus:
@@ -30,7 +37,9 @@ apps:
       - bin/startup-env-var.sh
     environment:
       CONSUL_ADDR: "consul://localhost:8500"
-      DEVICE_PROFILESDIR: $SNAP_DATA/config/device-modbus/res
+      DEVICE_PROFILESDIR: "$SNAP_DATA/config/device-modbus/res/profiles"
+      DEVICE_DEVICESDIR: "$SNAP_DATA/config/device-modbus/res/devices"
+      SECRETSTORE_TOKENFILE: $SNAP_DATA/device-modbus/secrets-token.json
     daemon: simple
     plugs: [network, network-bind]
 
@@ -40,56 +49,37 @@ parts:
     source: snap/local
     override-pull: |
       cd $SNAPCRAFT_PROJECT_DIR
-      if [ -f VERSION ]; then
-        PROJECT_VERSION=$(cat VERSION)
-      else
-        PROJECT_VERSION="0.0.0"
-      fi
-      snapcraftctl set-version ${PROJECT_VERSION}
-  go:
-    plugin: nil
-    build-packages: [curl]
-    source: snap/local
-    override-build: |
-      # use dpkg architecture to figure out our target arch
-      # note - we specifically don't use arch
-      case "$(dpkg --print-architecture)" in
-        amd64)
-          FILE_NAME=go1.15.2.linux-amd64.tar.gz
-          FILE_HASH=b49fda1ca29a1946d6bb2a5a6982cf07ccd2aba849289508ee0f9918f6bb4552
-          ;;
-        arm64)
-          FILE_NAME=go1.15.2.linux-arm64.tar.gz
-          FILE_HASH=c8ec460cc82d61604b048f9439c06bd591722efce5cd48f49e19b5f6226bd36d
-          ;;
-        armhf)
-          FILE_NAME=go1.15.2.linux-armv6l.tar.gz
-          FILE_HASH=c12e2afdcb21e530d332d4994919f856dd2a676e9d67034c7d6fefcb241412d9
-          ;;
-        i386)
-          FILE_NAME=go1.15.2.linux-386.tar.gz
-          FILE_HASH=5a91080469df6b91f1022bdfb0ca75e01ca50387950b13518def3d0a7f6af9f1
-          ;;
-      esac
-      # download the archive, failing on ssl cert problems
-      curl https://dl.google.com/go/$FILE_NAME -O
-      echo "$FILE_HASH $FILE_NAME" > sha256
-      sha256sum -c sha256 | grep OK
-      tar -C $SNAPCRAFT_STAGE -xf go*.tar.gz --strip-components=1
-    prime:
-      - "-*"
-
+      GIT_VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
+      snapcraftctl set-version ${GIT_VERSION}
   device-modbus:
     source: .
     plugin: make
-    build-packages: [git]
-    after: [go]
+    build-packages: [git, libzmq3-dev, zip, pkg-config]
+    build-snaps:
+      - go/1.16/stable
+    stage-packages: [libzmq5]
     override-build: |
       cd $SNAPCRAFT_PART_SRC
+      go mod tidy
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
+
+      install -d "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/"
+
       install -DT "./cmd/res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/configuration.toml"
+
+      for fpath in ./cmd/res/profiles/*; do
+          fname=$(basename "$fpath")
+          install -DT "./cmd/res/profiles/${fname}" \
+          "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/profiles/${fname}"
+      done
+
+      for fpath in ./cmd/res/devices/*.toml; do
+          fname=$(basename "$fpath")
+          install -DT "./cmd/res/devices/${fname}" \
+          "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/devices/${fname}"
+      done
 
       install -DT "./Attribution.txt" \
          "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"

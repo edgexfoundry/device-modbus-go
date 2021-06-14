@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2019 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	MODBUS "github.com/goburrow/modbus"
 )
@@ -128,13 +129,15 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	if client.IsModbusTcp {
 		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
 		client.TCPClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		client.TCPClientHandler.IdleTimeout = 0
+		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
+		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	} else {
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.RTUClientHandler.Address = serialParams[0]
 		client.RTUClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		client.RTUClientHandler.IdleTimeout = 0
+		client.RTUClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
+		client.RTUClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.RTUClientHandler.BaudRate = connectionInfo.BaudRate
 		client.RTUClientHandler.DataBits = connectionInfo.DataBits
 		client.RTUClientHandler.StopBits = connectionInfo.StopBits

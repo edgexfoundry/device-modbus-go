@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2020 IOTech Ltd
+// Copyright (C) 2018-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,9 +12,9 @@ import (
 	"sync"
 	"time"
 
-	sdkModel "github.com/edgexfoundry/device-sdk-go/pkg/models"
-	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	sdkModel "github.com/edgexfoundry/device-sdk-go/v2/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/clients/logger"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2/models"
 )
 
 var once sync.Once
@@ -90,7 +90,7 @@ func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
-		driver.Logger.Error(fmt.Sprintf("Fail to create read command connection info. err:%v \n", err))
+		driver.Logger.Errorf("Fail to create read command connection info. err:%v \n", err)
 		return responses, err
 	}
 
@@ -103,23 +103,16 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	responses = make([]*sdkModel.CommandValue, len(reqs))
 	var deviceClient DeviceClient
 
-	// Check request's attribute to avoid interface cast error
-	err = checkAttributes(reqs)
-	if err != nil {
-		driver.Logger.Info(fmt.Sprintf("CommandRequest's attribute are invalid. err:%v \n", err))
-		return responses, err
-	}
-
 	// create device client and open connection
 	deviceClient, err = NewDeviceClient(connectionInfo)
 	if err != nil {
-		driver.Logger.Info(fmt.Sprintf("Read command NewDeviceClient failed. err:%v \n", err))
+		driver.Logger.Infof("Read command NewDeviceClient failed. err:%v \n", err)
 		return responses, err
 	}
 
 	err = deviceClient.OpenConnection()
 	if err != nil {
-		driver.Logger.Info(fmt.Sprintf("Read command OpenConnection failed. err:%v \n", err))
+		driver.Logger.Infof("Read command OpenConnection failed. err:%v \n", err)
 		return responses, err
 	}
 
@@ -129,7 +122,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	for i, req := range reqs {
 		res, err := handleReadCommandRequest(deviceClient, req)
 		if err != nil {
-			driver.Logger.Info(fmt.Sprintf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err))
+			driver.Logger.Infof("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err)
 			return responses, err
 		}
 
@@ -159,7 +152,7 @@ func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandReq
 	if err != nil {
 		return result, err
 	} else {
-		driver.Logger.Info(fmt.Sprintf("Read command finished. Cmd:%v, %v \n", req.DeviceResourceName, result))
+		driver.Logger.Infof("Read command finished. Cmd:%v, %v \n", req.DeviceResourceName, result)
 	}
 
 	return result, nil
@@ -168,7 +161,7 @@ func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandReq
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
-		driver.Logger.Error(fmt.Sprintf("Fail to create write command connection info. err:%v \n", err))
+		driver.Logger.Errorf("Fail to create write command connection info. err:%v \n", err)
 		return err
 	}
 
@@ -179,13 +172,6 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
 	var deviceClient DeviceClient
-
-	// Check request's attribute to avoid interface cast error
-	err = checkAttributes(reqs)
-	if err != nil {
-		driver.Logger.Info(fmt.Sprintf("CommandRequest's attribute are invalid. err:%v \n", err))
-		return err
-	}
 
 	// create device client and open connection
 	deviceClient, err = NewDeviceClient(connectionInfo)
@@ -230,7 +216,7 @@ func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRe
 		return fmt.Errorf("handle write command request failed, err: %v", err)
 	}
 
-	driver.Logger.Info(fmt.Sprintf("Write command finished. Cmd:%v \n", req.DeviceResourceName))
+	driver.Logger.Infof("Write command finished. Cmd:%v \n", req.DeviceResourceName)
 	return nil
 }
 
@@ -269,17 +255,17 @@ loop:
 }
 
 func (d *Driver) AddDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
-	d.Logger.Debug(fmt.Sprintf("Device %s is added", deviceName))
+	d.Logger.Debugf("Device %s is added", deviceName)
 	return nil
 }
 
 func (d *Driver) UpdateDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
-	d.Logger.Debug(fmt.Sprintf("Device %s is updated", deviceName))
+	d.Logger.Debugf("Device %s is updated", deviceName)
 	return nil
 }
 
 func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
-	d.Logger.Debug(fmt.Sprintf("Device %s is removed", deviceName))
+	d.Logger.Debugf("Device %s is removed", deviceName)
 	return nil
 }
 

@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2019 IOTech Ltd
+// Copyright (C) 2019-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/edgexfoundry/go-mod-core-contracts/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2/models"
 )
 
 // ConnectionInfo is device connection info
@@ -23,6 +23,10 @@ type ConnectionInfo struct {
 	StopBits int
 	Parity   string
 	UnitID   uint8
+	// Connect & Read timeout(seconds)
+	Timeout int
+	// Idle timeout(seconds) to close the connection
+	IdleTimeout int
 }
 
 func createConnectionInfo(protocols map[string]models.ProtocolProperties) (info *ConnectionInfo, err error) {
@@ -50,6 +54,18 @@ func createConnectionInfo(protocols map[string]models.ProtocolProperties) (info 
 	return info, nil
 }
 
+func parseIntValue(properties map[string]string, key string) (int, error) {
+	str, ok := properties[key]
+	if !ok {
+		return 0, fmt.Errorf("protocol config '%s' not exist", key)
+	}
+	val, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, fmt.Errorf("fail to parse protocol config '%s', %v", key, err)
+	}
+	return val, nil
+}
+
 func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInfo, err error) {
 	errorMessage := "unable to create RTU connection info, protocol config '%s' not exist"
 	address, ok := rtuProtocol[Address]
@@ -66,29 +82,17 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
-	bs, ok := rtuProtocol[BaudRate]
-	if !ok {
-		return nil, fmt.Errorf(errorMessage, BaudRate)
-	}
-	baudRate, err := strconv.Atoi(bs)
+	baudRate, err := parseIntValue(rtuProtocol, BaudRate)
 	if err != nil {
 		return nil, err
 	}
 
-	ds, ok := rtuProtocol[DataBits]
-	if !ok {
-		return nil, fmt.Errorf(errorMessage, DataBits)
-	}
-	dataBits, err := strconv.Atoi(ds)
+	dataBits, err := parseIntValue(rtuProtocol, DataBits)
 	if err != nil {
 		return nil, err
 	}
 
-	ss, ok := rtuProtocol[StopBits]
-	if !ok {
-		return nil, fmt.Errorf(errorMessage, StopBits)
-	}
-	stopBits, err := strconv.Atoi(ss)
+	stopBits, err := parseIntValue(rtuProtocol, StopBits)
 	if err != nil {
 		return nil, err
 	}
@@ -101,14 +105,26 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
+	timeout, err := parseIntValue(rtuProtocol, Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	idleTimeout, err := parseIntValue(rtuProtocol, IdleTimeout)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ConnectionInfo{
-		Protocol: ProtocolRTU,
-		Address:  address,
-		BaudRate: baudRate,
-		DataBits: dataBits,
-		StopBits: stopBits,
-		Parity:   parity,
-		UnitID:   byte(unitID),
+		Protocol:    ProtocolRTU,
+		Address:     address,
+		BaudRate:    baudRate,
+		DataBits:    dataBits,
+		StopBits:    stopBits,
+		Parity:      parity,
+		UnitID:      byte(unitID),
+		Timeout:     timeout,
+		IdleTimeout: idleTimeout,
 	}, nil
 }
 
@@ -137,10 +153,22 @@ func createTcpConnectionInfo(tcpProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
+	timeout, err := parseIntValue(tcpProtocol, Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	idleTimeout, err := parseIntValue(tcpProtocol, IdleTimeout)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ConnectionInfo{
-		Protocol: ProtocolTCP,
-		Address:  address,
-		Port:     int(port),
-		UnitID:   byte(unitID),
+		Protocol:    ProtocolTCP,
+		Address:     address,
+		Port:        int(port),
+		UnitID:      byte(unitID),
+		Timeout:     timeout,
+		IdleTimeout: idleTimeout,
 	}, nil
 }

@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2019 IOTech Ltd
+// Copyright (C) 2019-2021 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -18,4 +18,7 @@ const (
 	StopBits = "StopBits"
 	// Parity: N - None, O - Odd, E - Even
 	Parity = "Parity"
+
+	Timeout     = "Timeout"
+	IdleTimeout = "IdleTimeout"
 )
