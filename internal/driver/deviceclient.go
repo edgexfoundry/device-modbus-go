@@ -63,7 +63,17 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 			return nil, err
 		}
 	}
-	length := calculateAddressLength(primaryTable, rawType)
+	var length uint16
+	if req.Type == v2.ValueTypeString {
+		l, err := castStartingAddress(req.Attributes[WORD_LENGTH])
+		if err != nil {
+			length = 1
+		} else {
+			length = l
+		}
+	} else {
+		length = calculateAddressLength(primaryTable, rawType)
+	}
 
 	var isByteSwap = false
 	if _, ok := req.Attributes[IS_BYTE_SWAP]; ok {
@@ -157,6 +167,8 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 		if (dataBytes[0] & 1) > 0 {
 			res = true
 		}
+	case v2.ValueTypeString:
+		res = string(dataBytes)
 	default:
 		return nil, fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}
@@ -174,6 +186,7 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 // TransformCommandValueToDataBytes transforms the reading value to binary data which is used to transfer data via Modbus protocol.
 func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.CommandValue) ([]byte, error) {
 	var err error
+
 	var byteCount = calculateByteCount(commandInfo)
 	buf := new(bytes.Buffer)
 	err = binary.Write(buf, binary.BigEndian, value.Value)
@@ -183,7 +196,23 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.Co
 
 	numericValue := buf.Bytes()
 	var maxSize = uint16(len(numericValue))
-	var dataBytes = numericValue[maxSize-byteCount : maxSize]
+	var dataBytes []byte
+	if value.Type == v2.ValueTypeString {
+		oriStr := value.ValueToString()
+		tempBytes := []byte(oriStr)
+		bytesl := len(tempBytes)
+		oribytel := int(commandInfo.Length * 2)
+		if bytesl < oribytel {
+			less := make([]byte, oribytel-bytesl)
+			dataBytes = append(tempBytes, less...)
+		} else if bytesl > oribytel {
+			dataBytes = tempBytes[:oribytel]
+		} else {
+			dataBytes = []byte(oriStr)
+		}
+	} else {
+		dataBytes = numericValue[maxSize-byteCount : maxSize]
+	}
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {
