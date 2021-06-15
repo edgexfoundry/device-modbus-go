@@ -68,7 +68,7 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 		length, err = castStartingAddress(req.Attributes[STRING_REGISTER_SIZE])
 		if err != nil {
 			return nil, err
-		}else if length > 123 {
+		} else if (length > 123) || (length < 1) {
 			return nil, errors.NewCommonEdgeX(errors.KindLimitExceeded, fmt.Sprintf("register size should be within the range of 1~123, get %v.", length), nil)
 		}
 	} else {
