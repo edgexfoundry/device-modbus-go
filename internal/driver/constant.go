@@ -7,7 +7,7 @@
 package driver
 
 import (
-	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2"
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
 )
 
 const (
@@ -49,17 +49,17 @@ var PrimaryTableBitCountMap = map[string]uint16{
 }
 
 var ValueTypeBitCountMap = map[string]uint16{
-	v2.ValueTypeInt16: 16,
-	v2.ValueTypeInt32: 32,
-	v2.ValueTypeInt64: 64,
+	common.ValueTypeInt16: 16,
+	common.ValueTypeInt32: 32,
+	common.ValueTypeInt64: 64,
 
-	v2.ValueTypeUint16: 16,
-	v2.ValueTypeUint32: 32,
-	v2.ValueTypeUint64: 64,
+	common.ValueTypeUint16: 16,
+	common.ValueTypeUint32: 32,
+	common.ValueTypeUint64: 64,
 
-	v2.ValueTypeFloat32: 32,
-	v2.ValueTypeFloat64: 64,
+	common.ValueTypeFloat32: 32,
+	common.ValueTypeFloat64: 64,
 
-	v2.ValueTypeBool:   1,
-	v2.ValueTypeString: 16,
+	common.ValueTypeBool:   1,
+	common.ValueTypeString: 16,
 }
