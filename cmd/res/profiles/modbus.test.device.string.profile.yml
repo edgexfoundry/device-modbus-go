@@ -10,71 +10,32 @@ deviceResources:
     name: "StringA"
     description: "no description"
     attributes:
-      { primaryTable: "INPUT_REGISTERS", startingAddress: "1", wordLength: "1"}
+      { primaryTable: "INPUT_REGISTERS", startingAddress: "1", stringRegisterSize: "1"}
     properties:
-      value:
-        { type: "STRING", readWrite: "R"}
-      units:
-        { type: "String", readWrite: "R"}
+      valueType: "String"
+      readWrite: "R"
 
   -
     name: "StringB"
     description: "no description"
     attributes:
-      { primaryTable: "HOLDING_REGISTERS", startingAddress: "15", wordLength: "5"}
+      { primaryTable: "HOLDING_REGISTERS", startingAddress: "15", stringRegisterSize: "5"}
     properties:
-      value:
-        { type: "STRING", readWrite: "RW"}
-      units:
-        { type: "String", readWrite: "R"}
+      valueType: "String"
+      readWrite: "RW"
 
 
 
 deviceCommands:
   -
     name: "ReadString"
-    get:
-      - { index: "1", operation: "set", deviceResource: "StringA"}
-      - { index: "2", operation: "set", deviceResource: "StringB"}
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "StringA"}
   -
     name: "WriteString"
-    get:
-      - { index: "1", operation: "get", deviceResource: "StringB"}
-    set:
-      - { index: "1", operation: "set", deviceResource: "StringB"}
-
-coreCommands:
-  -
-    name: "ReadString"
-    get:
-      path: "/api/v1/device/{deviceId}/ReadString"
-      responses:
-        - code: "200"
-          description: "Get the Value of String"
-          expectedValues: ["StringA","StringB"]
-        - code: "500"
-          description: "internal server error"
-          expectedValues: []
-  -
-    name: "WriteString"
-    get:
-      path: "/api/v1/device/{deviceId}/WriteString"
-      responses:
-        -
-          code: "200"
-          description: "Get the values of string type"
-          expectedValues: ["StringB"]
-        - code: "500"
-          description: "internal server error"
-          expectedValues: []
-    put:
-      path: "/api/v1/device/{deviceId}/WriteString"
-      parameterNames: ["StringB"]
-      responses:
-        -
-          code: "204"
-          description: "Set the values of string type"
-          expectedValues: []
-        - code: "500"
-          description: "internal server error"
-          expectedValues: []
+    readWrite: "RW"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "StringB" }

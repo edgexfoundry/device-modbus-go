@@ -36,8 +36,8 @@ const (
 	// RAW_TYPE define binary data type which read from Modbus device
 	RAW_TYPE = "rawType"
 
-	// WORD_LENGTH  E.g. "abcd" need 4 bytes as is 2 word, so WORD_LENGTH=2
-	WORD_LENGTH            = "wordLength"
+	// STRING_REGISTER_SIZE  E.g. "abcd" need 4 bytes as is 2 registers(2 words), so STRING_REGISTER_SIZE=2
+	STRING_REGISTER_SIZE   = "stringRegisterSize"
 	SERVICE_STOP_WAIT_TIME = 1
 )
 
