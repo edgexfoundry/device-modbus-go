@@ -69,12 +69,8 @@ TokenFile = '/tmp/edgex/secrets/device-modbus/secrets-token.json'
 
 [Device]
 DataTransform = true
-InitCmd = ''
-InitCmdArgs = ''
 MaxCmdOps = 128
 MaxCmdValueLen = 256
-RemoveCmd = ''
-RemoveCmdArgs = ''
 ProfilesDir = ''
 DevicesDir = ''
 UpdateLastConnected = false
