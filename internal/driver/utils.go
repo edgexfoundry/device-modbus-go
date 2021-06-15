@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/errors"
-	"github.com/edgexfoundry/go-mod-core-contracts/v2/v2"
 )
 
 func castStartingAddress(i interface{}) (res uint16, err errors.EdgeX) {
@@ -43,9 +43,9 @@ func castStartingAddress(i interface{}) (res uint16, err errors.EdgeX) {
 func normalizeRawType(rawType string) (normalized string, err errors.EdgeX) {
 	switch strings.ToUpper(rawType) {
 	case UINT16:
-		normalized = v2.ValueTypeUint16
+		normalized = common.ValueTypeUint16
 	case INT16:
-		normalized = v2.ValueTypeInt16
+		normalized = common.ValueTypeInt16
 	default:
 		return "", errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("the raw type %s is not supported", rawType), nil)
 	}
