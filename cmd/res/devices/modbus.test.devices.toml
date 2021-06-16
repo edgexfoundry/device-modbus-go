@@ -34,17 +34,19 @@
 
 # Pre-define Devices
 [[DeviceList]]
-  Name = 'Modbus TCP Read String'
-  Profile = 'Test.Device.Modbus.String.Profile'
+  Name = 'Modbus-TCP-Read-String'
+  ProfileName = 'Test.Device.Modbus.String.Profile'
   Description = 'use for auto read a string value'
   labels = [ 'modbus TCP' ]
   [DeviceList.Protocols]
     [DeviceList.Protocols.modbus-tcp]
-        Address = '0.0.0.0'
-        Port = '1502'
-        UnitID = '1'
+      Address = '0.0.0.0'
+      Port = '1502'
+      UnitID = '1'
+      Timeout = '5'
+      IdleTimeout = '5'
   [[DeviceList.AutoEvents]]
-        Frequency = '20s'
-        OnChange = false
-        Resource = 'ReadString'
+    Interval = '20s'
+    OnChange = false
+    SourceName = 'ReadString'
 
