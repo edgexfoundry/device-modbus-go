@@ -77,4 +77,4 @@ UpdateLastConnected = false
 Labels = []
 EnableAsyncReadings = true
 AsyncBufferSize = 16
-UseMessageBus = false
+UseMessageBus = true
