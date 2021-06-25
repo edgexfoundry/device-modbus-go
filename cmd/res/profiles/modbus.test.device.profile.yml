@@ -1,4 +1,4 @@
-name: "Test.Device.Modbus.Profile"
+name: "Test-Device-Modbus-Profile"
 manufacturer: "Cool Automation"
 model: "CoolMasterNet"
 labels:

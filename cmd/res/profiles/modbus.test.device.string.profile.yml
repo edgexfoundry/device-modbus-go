@@ -1,4 +1,4 @@
-name: "Test.Device.Modbus.String.Profile"
+name: "Test-Device-Modbus-String-Profile"
 manufacturer: "no manufacturer"
 model: "string value type"
 labels:

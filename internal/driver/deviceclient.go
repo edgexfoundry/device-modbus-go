@@ -168,7 +168,7 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 			res = true
 		}
 	case common.ValueTypeString:
-		res = string(dataBytes)
+		res = trimString(dataBytes)
 	default:
 		return nil, fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}
@@ -187,15 +187,18 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.CommandValue) ([]byte, error) {
 	var err error
 	var byteCount = calculateByteCount(commandInfo)
+	var dataBytes []byte
 	buf := new(bytes.Buffer)
-	err = binary.Write(buf, binary.BigEndian, value.Value)
-	if err != nil {
-		return nil, fmt.Errorf("failed to transform %v to []byte", value.Value)
-	}
+	if commandInfo.ValueType != common.ValueTypeString {
+		err = binary.Write(buf, binary.BigEndian, value.Value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to transform %v to []byte", value.Value)
+		}
 
-	numericValue := buf.Bytes()
-	var maxSize = uint16(len(numericValue))
-	var dataBytes = numericValue[maxSize-byteCount : maxSize]
+		numericValue := buf.Bytes()
+		var maxSize = uint16(len(numericValue))
+		dataBytes = numericValue[maxSize-byteCount : maxSize]
+	}
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {

@@ -61,3 +61,24 @@ func castSwapAttribute(i interface{}) (res bool, err errors.EdgeX) {
 	}
 	return res, nil
 }
+
+func trimString(input []byte) string {
+	head := 0
+	for idx, _ := range input {
+		if input[idx] == 0 {
+			head = idx + 1
+		} else {
+			break
+		}
+	}
+	tempList := input[head:]
+	end := len(tempList)
+	for idx, _ := range tempList {
+		if tempList[len(tempList)-1-idx] == 0 {
+			end = len(tempList) - 1 - idx
+		} else {
+			break
+		}
+	}
+	return string(tempList[:end])
+}
