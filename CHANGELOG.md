@@ -4,6 +4,9 @@
 [Github repository](https://github.com/edgexfoundry/device-modbus-go)
 
 ## [v2.0.0] Ireland - 2021-06-30  (Not Compatible with 1.x releases)
+### Change Logs for EdgeX Dependencies
+- [device-sdk-go](https://github.com/edgexfoundry/device-sdk-go/blob/v2.0.0/CHANGELOG.md)
+- [go-mod-core-contracts](https://github.com/edgexfoundry/go-mod-core-contracts/blob/v2.0.0/CHANGELOG.md)
 
 ### Features ✨
 - Enable using MessageBus as the default ([#9743b62](https://github.com/edgexfoundry/device-modbus-go/commits/9743b62))
@@ -12,14 +15,8 @@
 - Add Timeout and IdleTimeout to Protocol property ([#fc248eb](https://github.com/edgexfoundry/device-modbus-go/commits/fc248eb))
 - Remove Logging configuration ([#b5c1d0b](https://github.com/edgexfoundry/device-modbus-go/commits/b5c1d0b))
 ### Bug Fixes 🐛
-- Remove retry items of SecretStore config and update secret path - go-mod-bootstrap has implemented the addition of prefix /v1/secret/edgex/ for the Path property of SecretStore config section, so we just use the service specific secret path in Toml files - also retry related item in SecretStore config no longer needed and hence removed ([#2a13e03](https://github.com/edgexfoundry/device-modbus-go/commits/2a13e03))
-- Addressed PR comments ([#5014bcb](https://github.com/edgexfoundry/device-modbus-go/commits/5014bcb))
 - Added missing InsecureSecrets section ([#0476c29](https://github.com/edgexfoundry/device-modbus-go/commits/0476c29))
-- **build:** update Dockerfiles to use go 1.16 ([#84e0467](https://github.com/edgexfoundry/device-modbus-go/commits/84e0467))
-- **snap:** update snap v2 support ([#93f9e78](https://github.com/edgexfoundry/device-modbus-go/commits/93f9e78))
-- **snap:** update go to 1.16 ([#8bae537](https://github.com/edgexfoundry/device-modbus-go/commits/8bae537))
 ### Code Refactoring ♻
-- bump dependency version and update import path ([#70498a3](https://github.com/edgexfoundry/device-modbus-go/commits/70498a3))
 - remove unimplemented InitCmd/RemoveCmd configuraiton ([#ebe2707](https://github.com/edgexfoundry/device-modbus-go/commits/ebe2707))
 - Change PublishTopicPrefix value to be 'edgex/events/device' ([#8f6bb82](https://github.com/edgexfoundry/device-modbus-go/commits/8f6bb82))
 - Update configuration for change to common ServiceInfo struct ([#64389da](https://github.com/edgexfoundry/device-modbus-go/commits/64389da))
@@ -33,7 +30,6 @@
     Device Modbus default port number has changed to 59901
     ```
 - rename example device AutoEvent Frequency to Interval ([#e2b33fc](https://github.com/edgexfoundry/device-modbus-go/commits/e2b33fc))
-- final go.mod update ([#84802ef](https://github.com/edgexfoundry/device-modbus-go/commits/84802ef))
 - Added go mod tidy to Docker and Makefile ([#0417c27](https://github.com/edgexfoundry/device-modbus-go/commits/0417c27))
 - Update for new service key names and overrides for hyphen to underscore ([#be50c87](https://github.com/edgexfoundry/device-modbus-go/commits/be50c87))
     ```
@@ -43,6 +39,10 @@
 - use v2 device-sdk ([#222](https://github.com/edgexfoundry/device-modbus-go/issues/222)) ([#7442c44](https://github.com/edgexfoundry/device-modbus-go/commits/7442c44))
 ### Documentation 📖
 - Add badges to readme ([#6adafa8](https://github.com/edgexfoundry/device-modbus-go/commits/6adafa8))
+### Build 👷
+- update Dockerfiles to use go 1.16 ([#84e0467](https://github.com/edgexfoundry/device-modbus-go/commits/84e0467))
+- **snap:** update snap v2 support ([#93f9e78](https://github.com/edgexfoundry/device-modbus-go/commits/93f9e78))
+- **snap:** update go to 1.16 ([#8bae537](https://github.com/edgexfoundry/device-modbus-go/commits/8bae537))
 ### Continuous Integration 🔄
 - update local docker image names ([#3113a28](https://github.com/edgexfoundry/device-modbus-go/commits/3113a28))
 - fix link to Contributing.md ([#221](https://github.com/edgexfoundry/device-modbus-go/issues/221)) ([#bdd9c76](https://github.com/edgexfoundry/device-modbus-go/commits/bdd9c76))
