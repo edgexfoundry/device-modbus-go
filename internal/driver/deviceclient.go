@@ -168,7 +168,7 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 			res = true
 		}
 	case common.ValueTypeString:
-		res = trimString(dataBytes)
+		res = string(bytes.Trim(dataBytes, string(rune(0))))
 	default:
 		return nil, fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}

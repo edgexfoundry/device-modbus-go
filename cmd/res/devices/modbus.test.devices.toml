@@ -35,7 +35,7 @@
 # Pre-define Devices
 [[DeviceList]]
   Name = 'Modbus-TCP-Read-String'
-  ProfileName = 'Test.Device.Modbus.String.Profile'
+  ProfileName = 'Test-Device-Modbus-String-Profile'
   Description = 'use for auto read a string value'
   labels = [ 'modbus TCP' ]
   [DeviceList.Protocols]
