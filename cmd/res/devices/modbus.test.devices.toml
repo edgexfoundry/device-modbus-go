@@ -31,3 +31,22 @@
        UnitID = '1'
        Timeout = "5"
        IdleTimeout = "5"
+
+# Pre-define Devices
+[[DeviceList]]
+  Name = 'Modbus-TCP-Read-String'
+  ProfileName = 'Test-Device-Modbus-String-Profile'
+  Description = 'use for auto read a string value'
+  labels = [ 'modbus TCP' ]
+  [DeviceList.Protocols]
+    [DeviceList.Protocols.modbus-tcp]
+      Address = '0.0.0.0'
+      Port = '1502'
+      UnitID = '1'
+      Timeout = '5'
+      IdleTimeout = '5'
+  [[DeviceList.AutoEvents]]
+    Interval = '20s'
+    OnChange = false
+    SourceName = 'ReadString'
+

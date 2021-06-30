@@ -36,6 +36,8 @@ const (
 	// RAW_TYPE define binary data type which read from Modbus device
 	RAW_TYPE = "rawType"
 
+	// STRING_REGISTER_SIZE  E.g. "abcd" need 4 bytes as is 2 registers(2 words), so STRING_REGISTER_SIZE=2
+	STRING_REGISTER_SIZE   = "stringRegisterSize"
 	SERVICE_STOP_WAIT_TIME = 1
 )
 
@@ -58,5 +60,6 @@ var ValueTypeBitCountMap = map[string]uint16{
 	common.ValueTypeFloat32: 32,
 	common.ValueTypeFloat64: 64,
 
-	common.ValueTypeBool: 1,
+	common.ValueTypeBool:   1,
+	common.ValueTypeString: 16,
 }
