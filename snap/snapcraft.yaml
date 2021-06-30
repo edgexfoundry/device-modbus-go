@@ -31,7 +31,7 @@ slots:
 
 apps:
   device-modbus:
-    adapter: none
+    adapter: full
     command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry $CONSUL_ADDR
     command-chain:
       - bin/startup-env-var.sh
