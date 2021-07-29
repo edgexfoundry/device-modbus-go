@@ -64,19 +64,19 @@ deviceResources:
   isHidden: false
   description: "Room Temperature x10 °C (Read Only)"
   attributes:
-    { primaryTable: "INPUT_REGISTERS", startingAddress: 3 }
+    { primaryTable: "INPUT_REGISTERS", startingAddress: 3, rawType: "Int16" }
   properties:
     valueType: "Float32"
     readWrite: "R"
-    scale: "1"
+    scale: "0.1"
 -
   name: "Temperature"
   isHidden: true
   description: "Temperature x10 °C"
   attributes:
-    { primaryTable: "HOLDING_REGISTERS", startingAddress: 4 }
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: 5, rawType: "Int16" }
   properties:
-    valueType: "Float64"
+    valueType: "Float32"
     readWrite: "RW"
     scale: "0.1"
 
