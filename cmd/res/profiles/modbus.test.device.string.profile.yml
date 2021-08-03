@@ -1,0 +1,41 @@
+name: "Test-Device-Modbus-String-Profile"
+manufacturer: "no manufacturer"
+model: "string value type"
+labels:
+  - "no lable"
+description: "this profile is testing  string value type with read and write"
+
+deviceResources:
+  -
+    name: "StringA"
+    description: "no description"
+    attributes:
+      { primaryTable: "INPUT_REGISTERS", startingAddress: 1, stringRegisterSize: 1}
+    properties:
+      valueType: "String"
+      readWrite: "R"
+
+  -
+    name: "StringB"
+    description: "no description"
+    attributes:
+      { primaryTable: "HOLDING_REGISTERS", startingAddress: 15, stringRegisterSize: 5}
+    properties:
+      valueType: "String"
+      readWrite: "RW"
+
+
+
+deviceCommands:
+  -
+    name: "ReadString"
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "StringA"}
+  -
+    name: "WriteString"
+    readWrite: "RW"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "StringB" }

@@ -63,7 +63,17 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 			return nil, err
 		}
 	}
-	length := calculateAddressLength(primaryTable, rawType)
+	var length uint16
+	if req.Type == common.ValueTypeString {
+		length, err = castStartingAddress(req.Attributes[STRING_REGISTER_SIZE])
+		if err != nil {
+			return nil, err
+		} else if (length > 123) || (length < 1) {
+			return nil, errors.NewCommonEdgeX(errors.KindLimitExceeded, fmt.Sprintf("register size should be within the range of 1~123, get %v.", length), nil)
+		}
+	} else {
+		length = calculateAddressLength(primaryTable, rawType)
+	}
 
 	var isByteSwap = false
 	if _, ok := req.Attributes[IS_BYTE_SWAP]; ok {
@@ -157,6 +167,8 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 		if (dataBytes[0] & 1) > 0 {
 			res = true
 		}
+	case common.ValueTypeString:
+		res = string(bytes.Trim(dataBytes, string(rune(0))))
 	default:
 		return nil, fmt.Errorf("return result fail, none supported value type: %v", commandInfo.ValueType)
 	}
@@ -175,15 +187,18 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.CommandValue) ([]byte, error) {
 	var err error
 	var byteCount = calculateByteCount(commandInfo)
+	var dataBytes []byte
 	buf := new(bytes.Buffer)
-	err = binary.Write(buf, binary.BigEndian, value.Value)
-	if err != nil {
-		return nil, fmt.Errorf("failed to transform %v to []byte", value.Value)
-	}
+	if commandInfo.ValueType != common.ValueTypeString {
+		err = binary.Write(buf, binary.BigEndian, value.Value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to transform %v to []byte", value.Value)
+		}
 
-	numericValue := buf.Bytes()
-	var maxSize = uint16(len(numericValue))
-	var dataBytes = numericValue[maxSize-byteCount : maxSize]
+		numericValue := buf.Bytes()
+		var maxSize = uint16(len(numericValue))
+		dataBytes = numericValue[maxSize-byteCount : maxSize]
+	}
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {
@@ -195,7 +210,7 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.Co
 		dataBytes = swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)
 	}
 
-	// Cast value according to the rawType, this feature only converts float value to integer 32bit value
+	// Cast value according to the rawType, this feature converts float value to integer 32bit value
 	if commandInfo.ValueType == common.ValueTypeFloat32 {
 		val, edgexErr := value.Float32Value()
 		if edgexErr != nil {
@@ -228,8 +243,21 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.Co
 				return dataBytes, err
 			}
 		}
+	} else if commandInfo.ValueType == common.ValueTypeString {
+		// Cast value of string type
+		oriStr := value.ValueToString()
+		tempBytes := []byte(oriStr)
+		bytesL := len(tempBytes)
+		oriByteL := int(commandInfo.Length * 2)
+		if bytesL < oriByteL {
+			less := make([]byte, oriByteL-bytesL)
+			dataBytes = append(tempBytes, less...)
+		} else if bytesL > oriByteL {
+			dataBytes = tempBytes[:oriByteL]
+		} else {
+			dataBytes = []byte(oriStr)
+		}
 	}
-
 	driver.Logger.Debugf("Transfer CommandValue to dataBytes for write command, %v, %v", commandInfo.ValueType, dataBytes)
 	return dataBytes, err
 }
