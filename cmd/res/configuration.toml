@@ -1,5 +1,5 @@
 [Writable]
-LogLevel = 'INFO'
+LogLevel = "INFO"
   # InsecureSecrets are required for when Redis is used for message bus
   [Writable.InsecureSecrets]
     [Writable.InsecureSecrets.Sample]
@@ -9,39 +9,39 @@ LogLevel = 'INFO'
       password = ""
 
 [Service]
-HealthCheckInterval = '10s'
-Host = 'localhost'
+HealthCheckInterval = "10s"
+Host = "localhost"
 Port = 59901
-ServerBindAddr = ''  # blank value defaults to Service.Host value
-StartupMsg = 'device modbus started'
+ServerBindAddr = ""  # blank value defaults to Service.Host value
+StartupMsg = "device modbus started"
 # MaxRequestSize limit the request body size in byte of put command
 MaxRequestSize = 0 # value 0 unlimit the request size.
-RequestTimeout = '5s'
+RequestTimeout = "5s"
 
 [Registry]
-Host = 'localhost'
+Host = "localhost"
 Port = 8500
-Type = 'consul'
+Type = "consul"
 
 [Clients]
   [Clients.core-data]
-  Protocol = 'http'
-  Host = 'localhost'
+  Protocol = "http"
+  Host = "localhost"
   Port = 59880
 
   [Clients.core-metadata]
-  Protocol = 'http'
-  Host = 'localhost'
+  Protocol = "http"
+  Host = "localhost"
   Port = 59881
 
 [MessageQueue]
-Protocol = 'redis'
-Host = 'localhost'
+Protocol = "redis"
+Host = "localhost"
 Port = 6379
-Type = 'redis'
-AuthMode = 'usernamepassword'  # required for redis messagebus (secure or insecure).
+Type = "redis"
+AuthMode = "usernamepassword"  # required for redis messagebus (secure or insecure).
 SecretName = "redisdb"
-PublishTopicPrefix = 'edgex/events/device' # /<device-profile-name>/<device-name>/<source-name> will be added to this Publish Topic prefix
+PublishTopicPrefix = "edgex/events/device" # /<device-profile-name>/<device-name>/<source-name> will be added to this Publish Topic prefix
   [MessageQueue.Optional]
   # Default MQTT Specific options that need to be here to enable environment variable overrides of them
   # Client Identifiers
@@ -56,23 +56,23 @@ PublishTopicPrefix = 'edgex/events/device' # /<device-profile-name>/<device-name
 
 # Only used when EDGEX_SECURITY_SECRET_STORE=true which is now required for secure Consul
 [SecretStore]
-Type = 'vault'
-Host = 'localhost'
+Type = "vault"
+Host = "localhost"
 Port = 8200
-Path = 'device-modbus/'
-Protocol = 'http'
-RootCaCertPath = ''
-ServerName = ''
-TokenFile = '/tmp/edgex/secrets/device-modbus/secrets-token.json'
+Path = "device-modbus/"
+Protocol = "http"
+RootCaCertPath = ""
+ServerName = ""
+TokenFile = "/tmp/edgex/secrets/device-modbus/secrets-token.json"
   [SecretStore.Authentication]
-  AuthType = 'X-Vault-Token'
+  AuthType = "X-Vault-Token"
 
 [Device]
 DataTransform = true
 MaxCmdOps = 128
 MaxCmdValueLen = 256
-ProfilesDir = ''
-DevicesDir = ''
+ProfilesDir = ""
+DevicesDir = ""
 UpdateLastConnected = false
 Labels = []
 EnableAsyncReadings = true
