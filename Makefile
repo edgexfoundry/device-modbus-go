@@ -15,21 +15,21 @@ VERSION=$(shell cat ./VERSION 2>/dev/null || echo 0.0.0)
 GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION)"
 
+tidy:
+	go mod tidy
+
 build: $(MICROSERVICES)
 
 cmd/device-modbus:
-	go mod tidy
 	$(GOCGO) build $(GOFLAGS) -o $@ ./cmd
 
 test:
-	go mod tidy
 	$(GOCGO) test ./... -coverprofile=coverage.out
 	$(GOCGO) vet ./...
-	gofmt -l .
-	[ "`gofmt -l .`" = "" ]
+	gofmt -l $$(find . -type f -name '*.go'| grep -v "/vendor/")
+	[ "`gofmt -l $$(find . -type f -name '*.go'| grep -v "/vendor/")`" = "" ]
 	./bin/test-attribution-txt.sh
-	./bin/test-go-mod-tidy.sh
-
+	
 clean:
 	rm -f $(MICROSERVICES)
 
@@ -41,3 +41,6 @@ docker_device_modbus_go:
 		-t edgexfoundry/device-modbus:$(GIT_SHA) \
 		-t edgexfoundry/device-modbus:$(VERSION)-dev \
 		.
+
+vendor:
+	$(GO) mod vendor
