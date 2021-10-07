@@ -14,13 +14,13 @@ if [ -d vendor.bk ]; then
     exit 1
 fi
 
-trap cleanup 1 2 3 6
+trap cleanup 0 1 2 3 6
 
 cleanup()
 {
     cd "$GIT_ROOT"
     # restore the vendor dir
-    rm -r vendor
+    rm -rf vendor
     if [ -d vendor.bk ]; then
         mv vendor.bk vendor
     fi
@@ -55,5 +55,3 @@ else
 fi
 
 cd "$GIT_ROOT"
-
-cleanup 
