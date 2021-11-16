@@ -84,7 +84,7 @@ slots:
   device-config:
     interface: content
     content: device-config
-    write:
+    read:
       - $SNAP/config
 ```
 
@@ -141,7 +141,7 @@ And restart the service:
 
 **Note** - at this time changes to configuration values in the [Writable] section are not supported.
 
-For details on the mapping of configuration options to Config options, please refer to "Service Environment Configuration Overrides".
+For details on the mapping of configuration options to Config options, please refer to [Service Environment Configuration Overrides](#service-environment-configuration-overrides) below.
 
 ## Service Environment Configuration Overrides
 
@@ -149,12 +149,10 @@ For details on the mapping of configuration options to Config options, please re
 
 ```
 [Service]
-service.boot-timeout            // Service.BootTimeout
 service.health-check-interval   // Service.HealthCheckInterval
 service.host                    // Service.Host
 service.server-bind-addr        // Service.ServerBindAddr
 service.port                    // Service.Port
-service.protocol                // Service.Protocol
 service.max-result-count        // Service.MaxResultCount
 service.max-request-size        // Service.MaxRequestSize
 service.startup-msg             // Service.StartupMsg
