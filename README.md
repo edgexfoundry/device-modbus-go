@@ -25,9 +25,9 @@ EdgeX Device modbus is also available as a snap package. Install the snap with t
 ```
 sudo snap install edgex-device-modbus
 ```
-for more details on the Device modbus Snap, including installation, configuration, please refer to [EdgeX Modbus Device Service Snap](https://github.com/edgexfoundry/device-modbus-go/tree/main/snap)
+For more details on the Device modbus Snap, including installation, configuration, please refer to [EdgeX Modbus Device Service Snap](https://github.com/edgexfoundry/device-modbus-go/tree/main/snap)
 
-for more details on Snap, including EdgeX Snap, viewing logs, security services, please check [Getting Started with Snap](https://docs.edgexfoundry.org/2.0/getting-started/Ch-GettingStartedSnapUsers/)
+For more details on deploying EdgeX with Snaps, viewing logs, security services, please check [Getting Started with Snap](https://docs.edgexfoundry.org/2.0/getting-started/Ch-GettingStartedSnapUsers/)
 
 ## Community
 - Chat: https://edgexfoundry.slack.com
