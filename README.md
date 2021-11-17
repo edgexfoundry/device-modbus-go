@@ -20,6 +20,14 @@ $ ./simulator
 Modbus TCP address: 0.0.0.0:1502 
 Start up a Modbus TCP simulator.
 ```
+### Running the device-modbus Service as a Snap
+EdgeX Device modbus is also available as a snap package. Install the snap with the following command:
+```
+sudo snap install edgex-device-modbus
+```
+For more details on the Device modbus Snap, including installation, configuration, please refer to [EdgeX Modbus Device Service Snap](https://github.com/edgexfoundry/device-modbus-go/tree/main/snap)
+
+For more details on deploying EdgeX with Snaps, viewing logs, security services, please check [Getting Started with Snap](https://docs.edgexfoundry.org/2.0/getting-started/Ch-GettingStartedSnapUsers/)
 
 ## Community
 - Chat: https://edgexfoundry.slack.com
