@@ -48,7 +48,7 @@ plugs:
   device-config:
     interface: content
     content: device-config
-    target: $SNAP_DATA/config/device-modbus/res
+    target: $SNAP_DATA/config/device-modbus
 
 parts:
   hooks:
