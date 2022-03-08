@@ -29,6 +29,9 @@ For more details on the Device modbus Snap, including installation, configuratio
 
 For more details on deploying EdgeX with Snaps, viewing logs, security services, please check [Getting Started with Snap](https://docs.edgexfoundry.org/2.0/getting-started/Ch-GettingStartedSnapUsers/)
 
+## Modbus RTU Usage
+Users can refer to [the document](https://docs.edgexfoundry.org/2.0/examples/Ch-ExamplesAddingModbusDevice/#set-up-the-modbus-rtu-device) to set up the Modbus RTU device.
+
 ## Community
 - Chat: https://edgexfoundry.slack.com
 - Mailing lists: https://lists.edgexfoundry.org/mailman/listinfo
