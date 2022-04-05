@@ -35,11 +35,11 @@ func (c *ModbusClient) OpenConnection() error {
 	if c.IsModbusTcp {
 		err = c.TCPClientHandler.Connect()
 		newClient = MODBUS.NewClient(&c.TCPClientHandler)
-		driver.Logger.Info(fmt.Sprintf("Modbus client create TCP connection."))
+		driver.Logger.Info("Modbus client create TCP connection.")
 	} else {
 		err = c.RTUClientHandler.Connect()
 		newClient = MODBUS.NewClient(&c.RTUClientHandler)
-		driver.Logger.Info(fmt.Sprintf("Modbus client create RTU connection."))
+		driver.Logger.Info("Modbus client create RTU connection.")
 	}
 	c.client = newClient
 	return err

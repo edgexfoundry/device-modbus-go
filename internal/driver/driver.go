@@ -116,7 +116,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 		return responses, err
 	}
 
-	defer deviceClient.CloseConnection()
+	defer func() { _ = deviceClient.CloseConnection() }()
 
 	// handle command requests
 	for i, req := range reqs {
@@ -184,7 +184,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 		return err
 	}
 
-	defer deviceClient.CloseConnection()
+	defer func() { _ = deviceClient.CloseConnection() }()
 
 	// handle command requests
 	for i, req := range reqs {
