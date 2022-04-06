@@ -79,7 +79,7 @@ parts:
       # this is needed for make build
       echo $GIT_VERSION > ./VERSION
 
-      go mod tidy
+      go mod tidy -compat=1.17
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
