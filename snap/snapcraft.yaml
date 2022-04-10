@@ -1,17 +1,8 @@
 name: edgex-device-modbus
 base: core20
 license: Apache-2.0
-adopt-info: device-modbus
-summary: Connect data Modbus to EdgeX using device-modbus reference Device Service
-title: EdgeX Modbus Device Service
-description: |
-  The official reference EdgeX device-modbus Device Service built using the 
-  device-sdk-go to interact with Modbus devices. 
-  Initially the daemon in the snap is disabled - a device profile must be
-  provisioned externally with core-metadata or provided to device-modbus inside
-  "$SNAP_DATA/config/device-modbus/res" before starting.
+adopt-info: metadata
 
-# TODO: add armhf when the project supports this
 architectures:
   - build-on: amd64
   - build-on: arm64
@@ -19,7 +10,8 @@ architectures:
 grade: stable
 confinement: strict
 
-# 1.x releases are epoch 1 and Ireland (2.x) is epoch 2
+# 1: <= hanoi
+# 2: >= ireland 
 epoch: 2
 
 slots:
@@ -62,6 +54,7 @@ parts:
       install -DT ./cmd/install/install "$SNAPCRAFT_PART_INSTALL/snap/hooks/install"
 
   device-modbus:
+    after: [metadata]
     source: .
     plugin: make
     build-packages: [git, libzmq3-dev, zip, pkg-config]
@@ -71,13 +64,8 @@ parts:
     override-build: |
       cd $SNAPCRAFT_PART_SRC
 
-      GIT_VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
-      if [ -z "$GIT_VERSION" ]; then
-        GIT_VERSION="0.0.0"
-      fi
-      snapcraftctl set-version ${GIT_VERSION}
-      # this is needed for make build
-      echo $GIT_VERSION > ./VERSION
+      # the version is needed for the build
+      cat ./VERSION
 
       go mod tidy -compat=1.17
       make build
@@ -107,3 +95,27 @@ parts:
   config-common:
     plugin: dump
     source: snap/local/runtime-helpers
+
+  metadata:
+    plugin: nil
+    source: https://github.com/canonical/edgex-snap-metadata.git
+    source-branch: appstream
+    source-depth: 1
+    override-build: |
+      # install the icon at the default internal path
+      install -DT edgex-snap-icon.png \
+        $SNAPCRAFT_PART_INSTALL/meta/gui/icon.png
+      
+      # change to this project's repo to get the version
+      cd $SNAPCRAFT_PROJECT_DIR
+      if git describe ; then
+        VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
+      else
+        VERSION="0.0.0"
+      fi
+      
+      # write version to file for the build
+      echo $VERSION > ./VERSION
+      # set the version of this snap
+      snapcraftctl set-version $VERSION
+    parse-info: [edgex-device-modbus.metainfo.xml]  
