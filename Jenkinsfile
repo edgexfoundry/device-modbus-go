@@ -16,5 +16,5 @@
 
 edgeXBuildGoApp (
     project: 'device-modbus-go',
-    buildSnap: true
+    buildSnap: false
 )
