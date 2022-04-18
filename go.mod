@@ -1,8 +1,8 @@
 module github.com/edgexfoundry/device-modbus-go
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v2 v2.2.0-dev.22
-	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.2.0-dev.21
+	github.com/edgexfoundry/device-sdk-go/v2 v2.2.0-dev.28
+	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.2.0-dev.23
 	github.com/goburrow/modbus v0.1.0
 	github.com/stretchr/testify v1.7.1
 )
@@ -16,7 +16,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5 // indirect
 	github.com/edgexfoundry/go-mod-bootstrap/v2 v2.2.0-dev.9 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v2 v2.1.0 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v2 v2.2.0-dev.9 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v2 v2.2.0-dev.12 // indirect
 	github.com/edgexfoundry/go-mod-registry/v2 v2.1.0 // indirect
 	github.com/edgexfoundry/go-mod-secrets/v2 v2.2.0-dev.5 // indirect
 	github.com/fatih/color v1.9.0 // indirect
