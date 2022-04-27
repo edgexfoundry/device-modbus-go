@@ -212,3 +212,6 @@ https://github.com/go-yaml/yaml/blob/v2/LICENSE
 
 pkg/errors (BSD-2) https://github.com/pkg/errors
 https://github.com/pkg/errors/blob/master/LICENSE
+
+rcrowley/go-metrics (Unspecified) https://github.com/rcrowley/go-metrics
+https://github.com/rcrowley/go-metrics/blob/master/LICENSE

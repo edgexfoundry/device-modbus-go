@@ -1,3 +1,5 @@
+MaxEventSize = 0 # value 0 unlimit the maximum event size that can be sent to message bus or core-data
+
 [Writable]
 LogLevel = "INFO"
   # InsecureSecrets are required for when Redis is used for message bus
@@ -7,6 +9,8 @@ LogLevel = "INFO"
       [Writable.InsecureSecrets.Sample.Secrets]
       username = ""
       password = ""
+  [Writable.Reading]
+  ReadingUnits = true
 
 [Service]
 HealthCheckInterval = "10s"
@@ -76,7 +80,15 @@ DisableScrubSecretsFile = false
 TokenFile = "/tmp/edgex/secrets/device-modbus/secrets-token.json"
   [SecretStore.Authentication]
   AuthType = "X-Vault-Token"
-
+  [SecretStore.RuntimeTokenProvider]
+  Enabled = false
+  Protocol = "https"
+  Host = "localhost"
+  Port = 59841
+  TrustDomain = "edgexfoundry.org"
+  EndpointSocket = "/tmp/edgex/secrets/spiffe/public/api.sock"
+  RequiredSecrets = "redisdb"
+  
 [Device]
 DataTransform = true
 MaxCmdOps = 128
