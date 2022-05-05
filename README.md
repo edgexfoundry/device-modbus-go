@@ -24,13 +24,9 @@ Start up a Modbus TCP simulator.
 
 This component is packaged as docker image and snap.
 
-For docker, please refer to the [Dockerfile] and [Docker Compose Builder] scripts.
+For docker, please refer to the [Dockerfile](Dockerfile) and [Docker Compose Builder] scripts.
 
-For the snap, refer to the [snap] directory.
-
-[Dockerfile]: Dockerfile
-[Docker Compose Builder]: https://github.com/edgexfoundry/edgex-compose/tree/main/compose-builder
-[snap]: snap
+For the snap, refer to the [snap](snap) directory.
 
 ## Modbus RTU Usage
 Users can refer to [the document](https://docs.edgexfoundry.org/2.0/examples/Ch-ExamplesAddingModbusDevice/#set-up-the-modbus-rtu-device) to set up the Modbus RTU device.
@@ -41,3 +37,5 @@ Users can refer to [the document](https://docs.edgexfoundry.org/2.0/examples/Ch-
 
 ## License
 [Apache-2.0](LICENSE)
+
+[Docker Compose Builder]: https://github.com/edgexfoundry/edgex-compose/tree/main/compose-builder
