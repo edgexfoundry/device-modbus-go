@@ -23,6 +23,23 @@
 ### Code Refactoring ♻
 - **snap:** remove redundant content indentifier ([#8c7365f](https://github.com/edgexfoundry/device-modbus-go/commits/8c7365f))
 
+### Documentation 📖
+- Update README.md for Modbus RTU usage ([#24e7f3a](https://github.com/edgexfoundry/device-modbus-go/commits/24e7f3a))
+
+### Build 👷
+- Update to latest SDK w/o ZMQ on windows ([#301d6ea](https://github.com/edgexfoundry/device-modbus-go/commits/301d6ea))
+    ```
+    BREAKING CHANGE:
+    ZeroMQ no longer supported on native Windows for EdgeX
+    MessageBus
+    ```
+- **deps:** Update device-sdk-go ([#16423cc](https://github.com/edgexfoundry/device-modbus-go/commits/16423cc))
+- **snap:** source metadata from central repo ([#e14069c](https://github.com/edgexfoundry/device-modbus-go/commits/e14069c))
+
+### Continuous Integration 🔄
+- gomod changes related for Go 1.17 ([#864adf6](https://github.com/edgexfoundry/device-modbus-go/commits/864adf6))
+- Go 1.17 related changes ([#27e7a32](https://github.com/edgexfoundry/device-modbus-go/commits/27e7a32))
+
 ## [v2.1.0] Jakarta - 2021-11-18  (Not Compatible with 1.x releases)
 
 ### Features ✨
@@ -31,6 +48,24 @@
 
 ### Bug Fixes 🐛
 - Update all TOML to use quote and not single-quote ([#8c4c380](https://github.com/edgexfoundry/device-modbus-go/commits/8c4c380))
+
+### Documentation 📖
+- Update build status badge ([#f4dca52](https://github.com/edgexfoundry/device-modbus-go/commits/f4dca52))
+- Update README.md and device profile ([#b6e2cd2](https://github.com/edgexfoundry/device-modbus-go/commits/b6e2cd2))
+- **snap:** Update snap section in README ([#0ef4a91](https://github.com/edgexfoundry/device-modbus-go/commits/0ef4a91))
+- **snap:** Update snap/README ([#54efd36](https://github.com/edgexfoundry/device-modbus-go/commits/54efd36))
+- **snap:** Update snap section in README.md ([#fd029c8](https://github.com/edgexfoundry/device-modbus-go/commits/fd029c8))
+- **snap:** Add snap section in README ([#8840200](https://github.com/edgexfoundry/device-modbus-go/commits/8840200))
+
+### Build 👷
+- Update to use released SDK ([#ce152de](https://github.com/edgexfoundry/device-modbus-go/commits/ce152de))
+- Update to latest SDK and released go-mods ([#fd5a279](https://github.com/edgexfoundry/device-modbus-go/commits/fd5a279))
+- Update to latest SDK ([#f129154](https://github.com/edgexfoundry/device-modbus-go/commits/f129154))
+- update alpine base to 3.14 ([#037866b](https://github.com/edgexfoundry/device-modbus-go/commits/037866b))
+- **snap:** upgrade base to core20 ([#494e11b](https://github.com/edgexfoundry/device-modbus-go/commits/494e11b))
+
+### Continuous Integration 🔄
+- Remove need for CI specific Dockerfile ([#d2a2473](https://github.com/edgexfoundry/device-modbus-go/commits/d2a2473))
 
 ## [v2.0.0] Ireland - 2021-06-30  (Not Compatible with 1.x releases)
 
