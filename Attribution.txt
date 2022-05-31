@@ -215,3 +215,6 @@ https://github.com/pkg/errors/blob/master/LICENSE
 
 rcrowley/go-metrics (Unspecified) https://github.com/rcrowley/go-metrics
 https://github.com/rcrowley/go-metrics/blob/master/LICENSE
+
+github.com/Microsoft/go-winio (MIT) https://github.com/Microsoft/go-winio
+https://github.com/microsoft/go-winio/blob/master/LICENSE
