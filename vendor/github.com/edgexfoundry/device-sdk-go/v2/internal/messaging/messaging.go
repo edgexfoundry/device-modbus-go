@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2021 Intel Corporation
+// Copyright (c) 2022 IOTech Ltd
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,10 +24,10 @@ import (
 	"sync"
 
 	"github.com/edgexfoundry/device-sdk-go/v2/internal/container"
-
 	bootstrapContainer "github.com/edgexfoundry/go-mod-bootstrap/v2/bootstrap/container"
 	bootstrapMessaging "github.com/edgexfoundry/go-mod-bootstrap/v2/bootstrap/messaging"
 	"github.com/edgexfoundry/go-mod-bootstrap/v2/bootstrap/startup"
+	bootstrapConfig "github.com/edgexfoundry/go-mod-bootstrap/v2/config"
 	"github.com/edgexfoundry/go-mod-bootstrap/v2/di"
 	"github.com/edgexfoundry/go-mod-messaging/v2/messaging"
 	"github.com/edgexfoundry/go-mod-messaging/v2/pkg/types"
@@ -40,7 +41,8 @@ func BootstrapHandler(ctx context.Context, wg *sync.WaitGroup, startupTimer star
 		return true
 	}
 
-	messageBusInfo := config.MessageQueue
+	// Make sure the MessageBus password is not leaked into the Service Config that can be retrieved via the /config endpoint
+	messageBusInfo := deepCopy(config.MessageQueue)
 
 	messageBusInfo.AuthMode = strings.ToLower(strings.TrimSpace(messageBusInfo.AuthMode))
 	if len(messageBusInfo.AuthMode) > 0 && messageBusInfo.AuthMode != bootstrapMessaging.AuthModeNone {
@@ -111,4 +113,24 @@ func BootstrapHandler(ctx context.Context, wg *sync.WaitGroup, startupTimer star
 
 	lc.Error("Connecting to MessageBus time out")
 	return false
+}
+
+func deepCopy(target bootstrapConfig.MessageBusInfo) bootstrapConfig.MessageBusInfo {
+	result := bootstrapConfig.MessageBusInfo{
+		Type:               target.Type,
+		Protocol:           target.Protocol,
+		Host:               target.Host,
+		Port:               target.Port,
+		PublishTopicPrefix: target.PublishTopicPrefix,
+		SubscribeTopic:     target.SubscribeTopic,
+		AuthMode:           target.AuthMode,
+		SecretName:         target.SecretName,
+		SubscribeEnabled:   target.SubscribeEnabled,
+	}
+	result.Optional = make(map[string]string)
+	for key, value := range target.Optional {
+		result.Optional[key] = value
+	}
+
+	return result
 }
