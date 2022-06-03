@@ -3,6 +3,16 @@
 ## EdgeX Modbus Device Service
 [Github repository](https://github.com/edgexfoundry/device-modbus-go)
 
+## Change Logs for EdgeX Dependencies
+
+- [device-sdk-go](https://github.com/edgexfoundry/device-sdk-go/blob/jakarta/CHANGELOG.md)
+
+## [v2.1.1] - Jakarta - 2021-06-08 (Only compatible with the 2.x releases)
+
+### Bug Fixes 🐛
+
+- see SDK changelog link above
+
 ## [v2.0.0] Ireland - 2021-06-30  (Not Compatible with 1.x releases)
 ### Change Logs for EdgeX Dependencies
 - [device-sdk-go](https://github.com/edgexfoundry/device-sdk-go/blob/v2.0.0/CHANGELOG.md)
