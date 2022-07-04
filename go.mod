@@ -4,7 +4,7 @@ require (
 	github.com/edgexfoundry/device-sdk-go/v2 v2.2.1-dev.10
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.2.0
 	github.com/goburrow/modbus v0.1.0
-	github.com/stretchr/testify v1.7.5
+	github.com/stretchr/testify v1.8.0
 )
 
 require (
