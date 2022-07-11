@@ -33,8 +33,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/eclipse/paho.mqtt.golang v1.3.5/go.mod h1:eTzb4gxwwyWpqBUHGQZ4ABAV7+Jgm1PklsYT/eo8Hcc=
 github.com/eclipse/paho.mqtt.golang v1.4.1 h1:tUSpviiL5G3P9SZZJPC4ZULZJsxQKXxfENpMvdbAXAI=
 github.com/eclipse/paho.mqtt.golang v1.4.1/go.mod h1:JGt0RsEwEX+Xa/agj90YJ9d9DH2b7upDZMK9HRbFvCA=
-github.com/edgexfoundry/device-sdk-go/v2 v2.2.1-dev.10 h1:+PmaE4sMwA9M+KOFML3tlGLVdV5Etrnlno1e9pF/He8=
-github.com/edgexfoundry/device-sdk-go/v2 v2.2.1-dev.10/go.mod h1:RGYM3LcclkozKyXz5tl9AbRb2Js27KcYjHNbWreyvls=
+github.com/edgexfoundry/device-sdk-go/v2 v2.2.1-dev.11 h1:a9py/vl0OVxqEU7JG2mGRwcqTh1b0odRhDz5DA3fx0I=
+github.com/edgexfoundry/device-sdk-go/v2 v2.2.1-dev.11/go.mod h1:qP1LQnTWY+KbLA/XQr+E3O7FjkmYkyetXIPMaQPKllo=
 github.com/edgexfoundry/go-mod-bootstrap/v2 v2.2.0 h1:4UVNGRaKbkH5aEhQrto26Q65ydmhZYReRw/6ZNQ5J5E=
 github.com/edgexfoundry/go-mod-bootstrap/v2 v2.2.0/go.mod h1:JKRxVTC5g1IRoQuT6T7pW6O6XnfjQTZgFjEazPHAHng=
 github.com/edgexfoundry/go-mod-configuration/v2 v2.2.0 h1:AZeaAPJM5X93ITFgwbwluYDtYEJ7tkCMSlj35GwfLLU=
@@ -42,8 +42,8 @@ github.com/edgexfoundry/go-mod-configuration/v2 v2.2.0/go.mod h1:YP17JhMnXTitowX
 github.com/edgexfoundry/go-mod-core-contracts/v2 v2.2.0 h1:Sfi9jAIgRXZaJQw8Ji6+8//47D+iOyGiXQSNZXhy3HE=
 github.com/edgexfoundry/go-mod-core-contracts/v2 v2.2.0/go.mod h1:jyfVSx7mI3u/o/oo10COxBRBvJ8O/9I3z2xAwPmNt/Q=
 github.com/edgexfoundry/go-mod-messaging/v2 v2.2.0/go.mod h1:+X6C0h8ZTJe+lLU2AGJfiAzCJK3zL+yM6cej9VC+79E=
-github.com/edgexfoundry/go-mod-messaging/v2 v2.2.1-dev.5 h1:QVT2qvW6DnYs68FbN0GL6UGz18h7XYnL3ZbZSOhgzBI=
-github.com/edgexfoundry/go-mod-messaging/v2 v2.2.1-dev.5/go.mod h1:YOeHj8uONVNqc4gXwgEanvWT6A8ni6Xjub75GpVWt30=
+github.com/edgexfoundry/go-mod-messaging/v2 v2.2.1-dev.8 h1:SxzHUEVEhPsMmU/QTZmvTJ/s2dWC93LkJgV1IKlSGT4=
+github.com/edgexfoundry/go-mod-messaging/v2 v2.2.1-dev.8/go.mod h1:vDHeO5Lssp0g9VXOXeM2C0d6KDuuaiJ27U2qpUnO2SA=
 github.com/edgexfoundry/go-mod-registry/v2 v2.2.0 h1:dk9ul1t7INAiyZXeu/GrpinFE3qOekdy8uZOqEGgIiE=
 github.com/edgexfoundry/go-mod-registry/v2 v2.2.0/go.mod h1:DUQRnAd5fVzoROc5SI+PTFUD/vCNeZmZHBMrLElbmwI=
 github.com/edgexfoundry/go-mod-secrets/v2 v2.2.0 h1:Rqr1CgBXppAeehCkPAHQ6hjyLlm2KTR4IKiKpExm7gg=
@@ -231,9 +231,8 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/stretchr/testify v1.7.3/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
-github.com/stretchr/testify v1.7.5 h1:s5PTfem8p8EbKQOctVV53k6jCJt3UX4IEJzwh+C324Q=
-github.com/stretchr/testify v1.7.5/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
+github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=
+github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=
 github.com/zeebo/errs v1.2.2 h1:5NFypMTuSdoySVTqlNs1dEoU21QVamMQJxW/Fii5O7g=
