@@ -46,7 +46,7 @@ parts:
     source: snap/local/hooks
     plugin: make
     build-snaps:
-      - go/1.17/stable
+      - go/1.18/stable
     override-build: |
       cd $SNAPCRAFT_PART_SRC
       make build
@@ -59,7 +59,7 @@ parts:
     plugin: make
     build-packages: [git, libzmq3-dev, zip, pkg-config]
     build-snaps:
-      - go/1.17/stable
+      - go/1.18/stable
     stage-packages: [libzmq5]
     override-build: |
       cd $SNAPCRAFT_PART_SRC
@@ -67,7 +67,7 @@ parts:
       # the version is needed for the build
       cat ./VERSION
 
-      go mod tidy -compat=1.17
+      go mod tidy
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"

@@ -25,10 +25,10 @@ GIT_SHA=$(shell git rev-parse HEAD)
 GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION)" -trimpath -mod=readonly
 CGOFLAGS=-ldflags "-linkmode=external -X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION)" -trimpath -mod=readonly -buildmode=pie
 
-tidy:
-	go mod tidy -compat=1.17
-
 build: $(MICROSERVICES)
+
+tidy:
+	go mod tidy
 
 cmd/device-modbus:
 	$(GOCGO) build $(CGOFLAGS) -o $@ ./cmd
@@ -37,7 +37,7 @@ unittest:
 	$(GOCGO) test ./... -coverprofile=coverage.out
 
 lint:
-	@which golangci-lint >/dev/null || echo "WARNING: go linter not installed. To install, run\n  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$$(go env GOPATH)/bin v1.42.1"
+	@which golangci-lint >/dev/null || echo "WARNING: go linter not installed. To install, run\n  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$$(go env GOPATH)/bin v1.46.2"
 	@if [ "z${ARCH}" = "zx86_64" ] && which golangci-lint >/dev/null ; then golangci-lint run --config .golangci.yml ; else echo "WARNING: Linting skipped (not on x86_64 or linter not installed)"; fi
 
 test: unittest lint
