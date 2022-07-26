@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2021 IOTech Ltd
+// Copyright (C) 2022 Schneider Electric
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,31 +13,15 @@ import (
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/common"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/errors"
+	"github.com/spf13/cast"
 )
 
-func castStartingAddress(i interface{}) (res uint16, err errors.EdgeX) {
-	switch v := i.(type) {
-	case float64:
-		res = uint16(v)
-	case float32:
-		res = uint16(v)
-	case int64:
-		res = uint16(v)
-	case int32:
-		res = uint16(v)
-	case int16:
-		res = uint16(v)
-	case int:
-		res = uint16(v)
-	case uint64:
-		res = uint16(v)
-	case uint32:
-		res = uint16(v)
-	case uint16:
-		res = v
-	default:
-		return 0, errors.NewCommonEdgeX(errors.KindContractInvalid, "startingAddress should be integer value", nil)
+func castStartingAddress(i interface{}) (uint16, errors.EdgeX) {
+	res, err := cast.ToUint16E(i)
+	if err != nil {
+		return 0, errors.NewCommonEdgeX(errors.KindContractInvalid, "startingAddress should be castable to an integer value", err)
 	}
+
 	return res, nil
 }
 
@@ -52,12 +37,11 @@ func normalizeRawType(rawType string) (normalized string, err errors.EdgeX) {
 	return normalized, err
 }
 
-func castSwapAttribute(i interface{}) (res bool, err errors.EdgeX) {
-	switch v := i.(type) {
-	case bool:
-		res = v
-	default:
-		return res, errors.NewCommonEdgeX(errors.KindContractInvalid, "swap attribute should be boolean value", nil)
+func castSwapAttribute(i interface{}) (bool, errors.EdgeX) {
+	res, err := cast.ToBoolE(i)
+	if err != nil {
+		return res, errors.NewCommonEdgeX(errors.KindContractInvalid, "swap attribute should be castable to a boolean value", err)
 	}
+
 	return res, nil
 }
