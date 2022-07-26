@@ -24,11 +24,13 @@ slots:
 apps:
   device-modbus:
     adapter: full
-    command: bin/device-modbus -confdir $SNAP_DATA/config/device-modbus -profile res --registry $CONSUL_ADDR
+    command: bin/device-modbus $CONFIG_PRO_ARG $CONF_ARG $REGISTRY_ARG
     command-chain:
-      - bin/startup-env-var.sh
+      - bin/source-env-file.sh
     environment:
-      CONSUL_ADDR: "consul://localhost:8500"
+      CONFIG_PRO_ARG: "--cp=consul.http://localhost:8500"
+      CONF_ARG: "--confdir=$SNAP_DATA/config/device-modbus/res"
+      REGISTRY_ARG: "--registry"
       DEVICE_PROFILESDIR: "$SNAP_DATA/config/device-modbus/res/profiles"
       DEVICE_DEVICESDIR: "$SNAP_DATA/config/device-modbus/res/devices"
       SECRETSTORE_TOKENFILE: $SNAP_DATA/device-modbus/secrets-token.json
@@ -42,16 +44,15 @@ plugs:
     target: $SNAP_DATA/config/device-modbus
 
 parts:
-  hooks:
-    source: snap/local/hooks
+  helper-go:
+    source: snap/local/helper-go
     plugin: make
     build-snaps:
       - go/1.18/stable
     override-build: |
       cd $SNAPCRAFT_PART_SRC
       make build
-      install -DT ./cmd/configure/configure "$SNAPCRAFT_PART_INSTALL/snap/hooks/configure"
-      install -DT ./cmd/install/install "$SNAPCRAFT_PART_INSTALL/snap/hooks/install"
+      install -DT ./helper-go $SNAPCRAFT_PART_INSTALL/bin/helper-go
 
   device-modbus:
     after: [metadata]
@@ -67,34 +68,27 @@ parts:
       # the version is needed for the build
       cat ./VERSION
 
-      go mod tidy
+      make tidy
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
 
-      install -d "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/"
+      RES=$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/
+      mkdir -p $RES
+      cp    cmd/res/configuration.toml $RES
+      cp -r cmd/res/devices $RES
+      cp -r cmd/res/profiles $RES
+      
+      DOC=$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus
+      mkdir -p $DOC
+      cp Attribution.txt $DOC/Attribution.txt
+      cp LICENSE $DOC/LICENSE
 
-      install -DT "./cmd/res/configuration.toml" "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/configuration.toml"
-
-      for fpath in ./cmd/res/profiles/*; do
-          fname=$(basename "$fpath")
-          install -DT "./cmd/res/profiles/${fname}" \
-          "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/profiles/${fname}"
-      done
-
-      for fpath in ./cmd/res/devices/*.toml; do
-          fname=$(basename "$fpath")
-          install -DT "./cmd/res/devices/${fname}" \
-          "$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/devices/${fname}"
-      done
-
-      install -DT "./Attribution.txt" \
-         "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/Attribution.txt"
-      install -DT "./LICENSE" \
-         "$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus/LICENSE"
-  config-common:
+  local-bin:
     plugin: dump
-    source: snap/local/runtime-helpers
+    source: snap/local/bin
+    organize:
+      source-env-file.sh: bin/source-env-file.sh
 
   metadata:
     plugin: nil
