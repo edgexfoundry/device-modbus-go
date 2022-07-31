@@ -221,3 +221,6 @@ https://github.com/microsoft/go-winio/blob/master/LICENSE
 
 golang.org/x/sync (Unspecified) https://cs.opensource.google/go/x/sync
 https://cs.opensource.google/go/x/sync/+/master:LICENSE
+
+github.com/spf13/cast (MIT) https://github.com/spf13/cast
+https://github.com/spf13/cast/blob/master/LICENSE
