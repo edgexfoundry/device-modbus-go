@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.18
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v2 v2.2.1-dev.14
+	github.com/edgexfoundry/device-sdk-go/v2 v2.3.0-dev.18
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.2.0
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.5.0
@@ -19,7 +19,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.1 // indirect
 	github.com/edgexfoundry/go-mod-bootstrap/v2 v2.2.0 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v2 v2.2.0 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v2 v2.2.1-dev.11 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v2 v2.3.0-dev.12 // indirect
 	github.com/edgexfoundry/go-mod-registry/v2 v2.2.0 // indirect
 	github.com/edgexfoundry/go-mod-secrets/v2 v2.2.0 // indirect
 	github.com/fatih/color v1.9.0 // indirect
@@ -52,6 +52,9 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
+	github.com/nats-io/nats.go v1.16.0 // indirect
+	github.com/nats-io/nkeys v0.3.0 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pebbe/zmq4 v1.2.7 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -59,14 +62,14 @@ require (
 	github.com/spiffe/go-spiffe/v2 v2.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zeebo/errs v1.2.2 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
 	google.golang.org/grpc v1.42.0 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
