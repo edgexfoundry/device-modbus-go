@@ -129,15 +129,15 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	if client.IsModbusTcp {
 		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
 		client.TCPClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
-		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
+		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout)
+		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout)
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	} else {
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.RTUClientHandler.Address = serialParams[0]
 		client.RTUClientHandler.SlaveId = byte(connectionInfo.UnitID)
-		client.RTUClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
-		client.RTUClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
+		client.RTUClientHandler.Timeout = time.Duration(connectionInfo.Timeout)
+		client.RTUClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout)
 		client.RTUClientHandler.BaudRate = connectionInfo.BaudRate
 		client.RTUClientHandler.DataBits = connectionInfo.DataBits
 		client.RTUClientHandler.StopBits = connectionInfo.StopBits
