@@ -9,7 +9,7 @@ package driver
 import (
 	"fmt"
 	"strconv"
-
+	"time"
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/models"
 )
 
@@ -24,9 +24,9 @@ type ConnectionInfo struct {
 	Parity   string
 	UnitID   uint8
 	// Connect & Read timeout(seconds)
-	Timeout int
+	Timeout time.Duration
 	// Idle timeout(seconds) to close the connection
-	IdleTimeout int
+	IdleTimeout time.Duration
 }
 
 func createConnectionInfo(protocols map[string]models.ProtocolProperties) (info *ConnectionInfo, err error) {
@@ -60,6 +60,18 @@ func parseIntValue(properties map[string]string, key string) (int, error) {
 		return 0, fmt.Errorf("protocol config '%s' not exist", key)
 	}
 	val, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, fmt.Errorf("fail to parse protocol config '%s', %v", key, err)
+	}
+	return val, nil
+}
+
+func parseDurationValue(properties map[string]string, key string) (time.Duration, error) {
+	str, ok := properties[key]
+	if !ok {
+		return 0, fmt.Errorf("protocol config '%s' not exist", key)
+	}
+	val, err := time.ParseDuration(str)
 	if err != nil {
 		return 0, fmt.Errorf("fail to parse protocol config '%s', %v", key, err)
 	}
@@ -105,12 +117,12 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
-	timeout, err := parseIntValue(rtuProtocol, Timeout)
+	timeout, err := parseDurationValue(rtuProtocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseIntValue(rtuProtocol, IdleTimeout)
+	idleTimeout, err := parseDurationValue(rtuProtocol, IdleTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -153,12 +165,12 @@ func createTcpConnectionInfo(tcpProtocol map[string]string) (info *ConnectionInf
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
-	timeout, err := parseIntValue(tcpProtocol, Timeout)
+	timeout, err := parseDurationValue(tcpProtocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseIntValue(tcpProtocol, IdleTimeout)
+	idleTimeout, err := parseDurationValue(tcpProtocol, IdleTimeout)
 	if err != nil {
 		return nil, err
 	}

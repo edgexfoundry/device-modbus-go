@@ -9,8 +9,8 @@
        Address = "0.0.0.0"
        Port = "1502"
        UnitID = "1"
-       Timeout = "5"
-       IdleTimeout = "5"
+       Timeout = "5s"
+       IdleTimeout = "5s"
   [[DeviceList.AutoEvents]]
     Interval = "20s"
     OnChange = false
@@ -29,8 +29,8 @@
        StopBits = "1"
        Parity = "N"
        UnitID = "1"
-       Timeout = "5"
-       IdleTimeout = "5"
+       Timeout = "5s"
+       IdleTimeout = "5s"
 
 # Pre-define Devices
 [[DeviceList]]
@@ -43,8 +43,8 @@
       Address = "0.0.0.0"
       Port = "1502"
       UnitID = "1"
-      Timeout = "5"
-      IdleTimeout = "5"
+      Timeout = "5s"
+      IdleTimeout = "5s"
   [[DeviceList.AutoEvents]]
     Interval = "20s"
     OnChange = false
