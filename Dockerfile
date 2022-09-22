@@ -17,7 +17,8 @@
 ARG BASE=golang:1.18-alpine3.16
 FROM ${BASE} AS builder
 
-ARG MAKE='make build'
+ARG ADD_BUILD_TAGS=""
+ARG MAKE="make -e ADD_BUILD_TAGS=$ADD_BUILD_TAGS build"
 
 RUN sed -e 's/dl-cdn[.]alpinelinux.org/dl-4.alpinelinux.org/g' -i~ /etc/apk/repositories
 RUN apk add --update --no-cache make git openssh gcc libc-dev zeromq-dev libsodium-dev
