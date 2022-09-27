@@ -3,6 +3,20 @@
 
 ## Overview
 Modbus Micro Service - device service for connecting Modbus devices to EdgeX.
+## Build with NATS Messaging
+Currently, the NATS Messaging capability (NATS MessageBus) is opt-in at build time.
+This means that the published Docker image and Snaps do not include the NATS messaging capability.
+
+The following make commands will build the local binary or local Docker image with NATS messaging
+capability included.
+```makefile
+make build-nats
+make docker-nats
+```
+
+The locally built Docker image can then be used in place of the published Docker image in your compose file.
+See [Compose Builder](https://github.com/edgexfoundry/edgex-compose/tree/main/compose-builder#gen) `nat-bus` option to generate compose file for NATS and local dev images.
+
 ## Usage
 Users can refer to [the document](https://docs.edgexfoundry.org/2.0/examples/Ch-ExamplesAddingModbusDevice) to learn how to use this device service.
 ## Example Profile and Device
