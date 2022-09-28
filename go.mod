@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.18
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v2 v2.3.0-dev.26
+	github.com/edgexfoundry/device-sdk-go/v2 v2.3.0-dev.30
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.3.0-dev.17
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.5.0
@@ -20,7 +20,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.1 // indirect
 	github.com/edgexfoundry/go-mod-bootstrap/v2 v2.3.0-dev.16 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v2 v2.2.0 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v2 v2.3.0-dev.17 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v2 v2.3.0-dev.18 // indirect
 	github.com/edgexfoundry/go-mod-registry/v2 v2.2.0 // indirect
 	github.com/edgexfoundry/go-mod-secrets/v2 v2.3.0-dev.7 // indirect
 	github.com/fatih/color v1.9.0 // indirect
@@ -63,10 +63,10 @@ require (
 	github.com/spiffe/go-spiffe/v2 v2.1.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zeebo/errs v1.2.2 // indirect
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
+	golang.org/x/crypto v0.0.0-20220919173607-35f4265a4bc0 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220906135438-9e1f76180b77 // indirect
+	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
 	google.golang.org/grpc v1.46.0 // indirect
