@@ -17,9 +17,17 @@ epoch: 2
 slots:
   edgex-secretstore-token:
     interface: content
-    content: edgex-secretstore-token
     source:
       write: [$SNAP_DATA/device-modbus]
+plugs:
+  device-modbus-config:
+    interface: content
+    target: $SNAP_DATA/config/device-modbus
+
+  # deprecated
+  device-config:
+    interface: content
+    target: $SNAP_DATA/config/device-modbus
 
 apps:
   device-modbus:
@@ -37,11 +45,6 @@ apps:
     daemon: simple
     install-mode: disable
     plugs: [network, network-bind]
-
-plugs:
-  device-config:
-    interface: content
-    target: $SNAP_DATA/config/device-modbus
 
 parts:
   helper-go:
