@@ -73,8 +73,8 @@ PublishTopicPrefix = "edgex/events/device" # /<device-profile-name>/<device-name
   DefaultPubRetryAttempts = "2"
   Subject = "edgex/#" # Required for NATS Jetstram only for stream autoprovsioning
   [MessageQueue.Topics]
-  CommandRequestTopic = "edgex/command/request/device-modbus/#"   # subscribing for inbound command requests
-  CommandResponseTopicPrefix = "edgex/command/response"   # publishing outbound command responses; <device-service>/<device-name>/<command-name>/<method> will be added to this publish topic prefix
+  CommandRequestTopic = "edgex/device/command/request/device-modbus/#"   # subscribing for inbound command requests
+  CommandResponseTopicPrefix = "edgex/device/command/response"   # publishing outbound command responses; <device-service>/<device-name>/<command-name>/<method> will be added to this publish topic prefix
 
 # Only used when EDGEX_SECURITY_SECRET_STORE=true which is now required for secure Consul
 [SecretStore]
