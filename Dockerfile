@@ -20,7 +20,6 @@ FROM ${BASE} AS builder
 ARG ADD_BUILD_TAGS=""
 ARG MAKE="make -e ADD_BUILD_TAGS=$ADD_BUILD_TAGS build"
 
-RUN sed -e 's/dl-cdn[.]alpinelinux.org/dl-4.alpinelinux.org/g' -i~ /etc/apk/repositories
 RUN apk add --update --no-cache make git openssh gcc libc-dev zeromq-dev libsodium-dev
 
 # set the working directory
@@ -37,7 +36,6 @@ FROM alpine:3.14
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
       copyright='Copyright (c) 2019-2021: IoTech Ltd'
 
-RUN sed -e 's/dl-cdn[.]alpinelinux.org/dl-4.alpinelinux.org/g' -i~ /etc/apk/repositories
 RUN apk add --update --no-cache zeromq dumb-init
 
 COPY --from=builder /device-modbus-go/cmd /
