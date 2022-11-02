@@ -12,7 +12,26 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
-## [v2.2.0] Kamakura - 2022-05-11  (Not Compatible with 1.x releases)
+## [v2.3.0] Levski - 2022-11-09  (Only compatible with the 2.x releases)
+
+### Features ✨
+
+- Add Service Metrics configuration  ([#387](https://github.com/edgexfoundry/device-modbus-go/issues/387)) ([#aaadd7f](https://github.com/edgexfoundry/device-modbus-go/commits/aaadd7f))
+- Add NATS configuration and build option ([#376](https://github.com/edgexfoundry/device-modbus-go/issues/376)) ([#6ac2f22](https://github.com/edgexfoundry/device-modbus-go/commits/6ac2f22))
+- Add commanding via message configuration ([#18fc891](https://github.com/edgexfoundry/device-modbus-go/commits/18fc891))
+- Add go-winio to attribution (new SPIFFE dependency) ([#348](https://github.com/edgexfoundry/device-modbus-go/issues/348)) ([#20ae4d4](https://github.com/edgexfoundry/device-modbus-go/commits/20ae4d4))
+- **snap:** add config interface with unique identifier ([#382](https://github.com/edgexfoundry/device-modbus-go/issues/382)) ([#9ccf6e7](https://github.com/edgexfoundry/device-modbus-go/commits/9ccf6e7))
+
+### Code Refactoring ♻
+
+- prefer spf13/cast to handle attributes ([#07d3dcc](https://github.com/edgexfoundry/device-modbus-go/commits/07d3dcc))
+- **snap:** edgex-snap-hooks related upgrade ([#363](https://github.com/edgexfoundry/device-modbus-go/issues/363)) ([#614ae84](https://github.com/edgexfoundry/device-modbus-go/commits/614ae84))
+
+### Build 👷
+
+- Upgrade to Go 1.18 and optimize attribution script ([#361](https://github.com/edgexfoundry/device-modbus-go/issues/361)) ([#9739056](https://github.com/edgexfoundry/device-modbus-go/commits/9739056))
+
+## [v2.2.0] Kamakura - 2022-05-11  (Only compatible with the 2.x releases)
 
 ### Features ✨
 - Enable security hardening ([#106969e](https://github.com/edgexfoundry/device-modbus-go/commits/106969e))
@@ -40,7 +59,7 @@
 - gomod changes related for Go 1.17 ([#864adf6](https://github.com/edgexfoundry/device-modbus-go/commits/864adf6))
 - Go 1.17 related changes ([#27e7a32](https://github.com/edgexfoundry/device-modbus-go/commits/27e7a32))
 
-## [v2.1.0] Jakarta - 2021-11-18  (Not Compatible with 1.x releases)
+## [v2.1.0] Jakarta - 2021-11-18  (Only compatible with the 2.x releases)
 
 ### Features ✨
 - Update configuration for new CORS and Secrets File settings ([#d233c32](https://github.com/edgexfoundry/device-modbus-go/commits/d233c32))
@@ -67,7 +86,7 @@
 ### Continuous Integration 🔄
 - Remove need for CI specific Dockerfile ([#d2a2473](https://github.com/edgexfoundry/device-modbus-go/commits/d2a2473))
 
-## [v2.0.0] Ireland - 2021-06-30  (Not Compatible with 1.x releases)
+## [v2.0.0] Ireland - 2021-06-30  (Only compatible with the 2.x releases)
 
 ### Features ✨
 - Enable using MessageBus as the default ([#9743b62](https://github.com/edgexfoundry/device-modbus-go/commits/9743b62))
