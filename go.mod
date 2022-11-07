@@ -7,7 +7,7 @@ require (
 	github.com/edgexfoundry/go-mod-core-contracts/v2 v2.3.0
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.5.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 )
 
 require (
