@@ -6,13 +6,13 @@ https://github.com/BurntSushi/toml/blob/master/COPYING
 cenkalti/backoff (MIT) https://github.com/cenkalti/backoff
 https://github.com/cenkalti/backoff/blob/master/LICENSE
 
-edgexfoundry/go-mod-core-contracts (Apache 2.0) https://github.com/edgexfoundry/go-mod-core-contracts/v2
+edgexfoundry/go-mod-core-contracts (Apache 2.0) https://github.com/edgexfoundry/go-mod-core-contracts/v3
 https://github.com/edgexfoundry/go-mod-core-contracts/blob/master/LICENSE
 
-edgexfoundry/go-mod-registry (Apache 2.0) https://github.com/edgexfoundry/go-mod-registry/v2
+edgexfoundry/go-mod-registry (Apache 2.0) https://github.com/edgexfoundry/go-mod-registry/v3
 https://github.com/edgexfoundry/go-mod-registry/blob/master/LICENSE
 
-edgexfoundry/device-sdk-go (Apache 2.0) https://github.com/edgexfoundry/device-sdk-go/v2
+edgexfoundry/device-sdk-go (Apache 2.0) https://github.com/edgexfoundry/device-sdk-go/v3
 https://github.com/edgexfoundry/device-sdk-go/blob/master/LICENSE
 
 gorilla/mux 1.6.2 (BSD-3) https://github.com/gorilla/mux
@@ -87,13 +87,13 @@ https://github.com/OneOfOne/xxhash/blob/master/LICENCE
 hashicorp/consul/api (Mozilla Public License 2.0) https://github.com/hashicorp/consul/api
 https://github.com/hashicorp/consul/blob/master/LICENSE
 
-edgexfoundry/go-mod-bootstrap (Apache 2.0) https://github.com/edgexfoundry/go-mod-bootstrap/v2
+edgexfoundry/go-mod-bootstrap (Apache 2.0) https://github.com/edgexfoundry/go-mod-bootstrap/v3
 https://github.com/edgexfoundry/go-mod-bootstrap/blob/master/LICENSE
 
-edgexfoundry/go-mod-secrets (Apache 2.0) https://github.com/edgexfoundry/go-mod-secrets/v2
+edgexfoundry/go-mod-secrets (Apache 2.0) https://github.com/edgexfoundry/go-mod-secrets/v3
 https://github.com/edgexfoundry/go-mod-secrets/blob/master/LICENSE
 
-edgexfoundry/go-mod-configuration (Apache 2.0) https://github.com/edgexfoundry/go-mod-configuration/v2
+edgexfoundry/go-mod-configuration (Apache 2.0) https://github.com/edgexfoundry/go-mod-configuration/v3
 https://github.com/edgexfoundry/go-mod-configuration/blob/master/LICENSE
 
 fxamacker/cbor (MIT) https://github.com/fxamacker/cbor/v2
@@ -129,7 +129,7 @@ https://github.com/leodido/go-urn
 eclipse/paho.mqtt.golang (Eclipse Public License 2.0) https://github.com/eclipse/paho.mqtt.golang
 https://github.com/eclipse/paho.mqtt.golang/blob/master/LICENSE
 
-edgexfoundry/go-mod-messaging (Apache 2.0) https://github.com/edgexfoundry/go-mod-messaging/v2
+edgexfoundry/go-mod-messaging (Apache 2.0) https://github.com/edgexfoundry/go-mod-messaging/v3
 https://github.com/edgexfoundry/go-mod-messaging/blob/master/LICENSE
 
 go-redis/redis (BSD-2) https://github.com/go-redis/redis/v7
