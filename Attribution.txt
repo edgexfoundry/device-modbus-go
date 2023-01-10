@@ -138,9 +138,6 @@ https://github.com/go-redis/redis/blob/master/LICENSE
 gorilla/websocket (BSD-2) https://github.com/gorilla/websocket
 https://github.com/gorilla/websocket/blob/master/LICENSE
 
-pebbe/zmq4 (BSD-2) https://github.com/pebbe/zmq4
-https://github.com/pebbe/zmq4/blob/master/LICENSE.txt
-
 golang.org/x/net (Unspecified) https://github.com/golang/net
 https://github.com/golang/net/blob/master/LICENSE
 
