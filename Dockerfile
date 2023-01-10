@@ -20,7 +20,7 @@ FROM ${BASE} AS builder
 ARG ADD_BUILD_TAGS=""
 ARG MAKE="make -e ADD_BUILD_TAGS=$ADD_BUILD_TAGS build"
 
-RUN apk add --update --no-cache make git openssh gcc libc-dev zeromq-dev libsodium-dev
+RUN apk add --update --no-cache make git openssh
 
 # set the working directory
 WORKDIR /device-modbus-go
@@ -36,7 +36,7 @@ FROM alpine:3.14
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
       copyright='Copyright (c) 2019-2021: IoTech Ltd'
 
-RUN apk add --update --no-cache zeromq dumb-init
+RUN apk add --update --no-cache dumb-init
 
 COPY --from=builder /device-modbus-go/cmd /
 COPY --from=builder /device-modbus-go/LICENSE /
