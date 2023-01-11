@@ -60,18 +60,18 @@ Type = "consul"
   Host = "localhost"
   Port = 59881
 
-[MessageQueue]
+[MessageBus]
 Protocol = "redis"
 Host = "localhost"
 Port = 6379
 Type = "redis"
 AuthMode = "usernamepassword"  # required for redis messagebus (secure or insecure).
 SecretName = "redisdb"
-PublishTopicPrefix = "edgex/events/device" # /<device-profile-name>/<device-name>/<source-name> will be added to this Publish Topic prefix
-  [MessageQueue.Topics]
+  [MessageBus.Topics]
+  PublishTopicPrefix = "edgex/events/device" # /<device-profile-name>/<device-name>/<source-name> will be added to this Publish Topic prefix
   CommandRequestTopic = "edgex/device/command/request/device-modbus/#"   # subscribing for inbound command requests
   CommandResponseTopicPrefix = "edgex/device/command/response"   # publishing outbound command responses; <device-service>/<device-name>/<command-name>/<method> will be added to this publish topic prefix
-  [MessageQueue.Optional]
+  [MessageBus.Optional]
   # Default MQTT & NATS Specific options that need to be here to enable environment variable overrides of them
   ClientId = "device-modbus"
   Qos =  "0" # Quality of Service values are 0 (At most once), 1 (At least once) or 2 (Exactly once)
