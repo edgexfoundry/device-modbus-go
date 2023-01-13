@@ -6,3 +6,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "gomod"
+    directory: "/snap/local/helper-go"
+    schedule:
+      interval: "daily"
