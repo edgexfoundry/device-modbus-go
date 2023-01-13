@@ -17,7 +17,6 @@
 package main
 
 import (
-	hooks "github.com/canonical/edgex-snap-hooks/v3"
 	"github.com/canonical/edgex-snap-hooks/v3/log"
 	"github.com/canonical/edgex-snap-hooks/v3/options"
 )
