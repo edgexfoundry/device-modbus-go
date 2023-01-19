@@ -71,6 +71,7 @@ SecretName = "redisdb"
   PublishTopicPrefix = "edgex/events/device" # /<device-profile-name>/<device-name>/<source-name> will be added to this Publish Topic prefix
   CommandRequestTopic = "edgex/device/command/request/device-modbus/#"   # subscribing for inbound command requests
   CommandResponseTopicPrefix = "edgex/device/command/response"   # publishing outbound command responses; <device-service>/<device-name>/<command-name>/<method> will be added to this publish topic prefix
+  SystemEventTopic = "edgex/system-events/core-metadata/device/+/device-modbus/#"
   [MessageBus.Optional]
   # Default MQTT & NATS Specific options that need to be here to enable environment variable overrides of them
   ClientId = "device-modbus"
@@ -90,29 +91,6 @@ SecretName = "redisdb"
   DefaultPubRetryAttempts = "2"
   Subject = "edgex/#" # Required for NATS JetStream only for stream auto provisioning
 
-# Only used when EDGEX_SECURITY_SECRET_STORE=true which is now required for secure Consul
-[SecretStore]
-Type = "vault"
-Host = "localhost"
-Port = 8200
-Path = "device-modbus/"
-Protocol = "http"
-RootCaCertPath = ""
-ServerName = ""
-SecretsFile = ""
-DisableScrubSecretsFile = false
-TokenFile = "/tmp/edgex/secrets/device-modbus/secrets-token.json"
-  [SecretStore.Authentication]
-  AuthType = "X-Vault-Token"
-  [SecretStore.RuntimeTokenProvider]
-  Enabled = false
-  Protocol = "https"
-  Host = "localhost"
-  Port = 59841
-  TrustDomain = "edgexfoundry.org"
-  EndpointSocket = "/tmp/edgex/secrets/spiffe/public/api.sock"
-  RequiredSecrets = "redisdb"
-  
 [Device]
 DataTransform = true
 MaxCmdOps = 128
