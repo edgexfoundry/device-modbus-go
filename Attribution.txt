@@ -230,3 +230,10 @@ https://github.com/nats-io/nkeys/blob/master/LICENSE
 
 github.com/nats-io/nuid (Apache-2.0) https://github.com/nats-io/nuid
 https://github.com/nats-io/nuid/blob/master/LICENSE
+
+golang.org/x/mod (BSD-3) https://github.com/golang/mod
+https://github.com/golang/mod/blob/master/LICENSE
+
+golang.org/x/tools (BSD-3) https://github.com/golang/tools
+https://github.com/golang/tools/blob/master/LICENSE
+
