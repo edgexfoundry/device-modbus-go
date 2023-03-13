@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2019-2021 IOTech Ltd
+// Copyright (C) 2019-2023 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -23,13 +23,13 @@ func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
-			UnitID:      "255",
-			BaudRate:    "19200",
-			DataBits:    "8",
-			StopBits:    "1",
+			UnitID:      255,
+			BaudRate:    19200,
+			DataBits:    8,
+			StopBits:    1,
 			Parity:      "N",
-			Timeout:     "5",
-			IdleTimeout: "5",
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 
@@ -55,13 +55,13 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
-			UnitID:      "0",
-			BaudRate:    "19200",
-			DataBits:    "8",
-			StopBits:    "1",
+			UnitID:      0,
+			BaudRate:    19200,
+			DataBits:    8,
+			StopBits:    1,
 			Parity:      "N",
-			Timeout:     "5",
-			IdleTimeout: "5",
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 
@@ -79,17 +79,17 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 
 func TestCreateConnectionInfo_unitIdOutOfRange(t *testing.T) {
 	address := "/dev/USB0tty"
-	unitID := "256"
+	unitID := 256
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
 			UnitID:      unitID,
-			BaudRate:    "19200",
-			DataBits:    "8",
-			StopBits:    "1",
+			BaudRate:    19200,
+			DataBits:    8,
+			StopBits:    1,
 			Parity:      "N",
-			Timeout:     "5",
-			IdleTimeout: "5",
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 
@@ -106,13 +106,13 @@ func TestCreateConnectionInfo_invalidParity(t *testing.T) {
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
-			UnitID:      "1",
-			BaudRate:    "19200",
-			DataBits:    "8",
-			StopBits:    "1",
+			UnitID:      1,
+			BaudRate:    19200,
+			DataBits:    8,
+			StopBits:    1,
 			Parity:      parity,
-			Timeout:     "5",
-			IdleTimeout: "5",
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 
@@ -130,10 +130,10 @@ func TestCreateTCPConnectionInfo(t *testing.T) {
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolTCP: {
 			Address:     address,
-			Port:        "502",
-			UnitID:      "255",
-			Timeout:     "5",
-			IdleTimeout: "5",
+			Port:        502,
+			UnitID:      255,
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 
@@ -150,14 +150,14 @@ func TestCreateTCPConnectionInfo(t *testing.T) {
 
 func TestCreateTCPConnectionInfo_unitIdOutOfRange(t *testing.T) {
 	address := "0.0.0.0"
-	unitID := "256"
+	unitID := 256
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolTCP: {
 			Address:     address,
-			Port:        "502",
+			Port:        502,
 			UnitID:      unitID,
-			Timeout:     "5",
-			IdleTimeout: "5",
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 
@@ -170,14 +170,14 @@ func TestCreateTCPConnectionInfo_unitIdOutOfRange(t *testing.T) {
 
 func TestCreateTCPConnectionInfo_portOutOfRange(t *testing.T) {
 	address := "0.0.0.0"
-	port := "65536"
+	port := 65536
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolTCP: {
 			Address:     address,
 			Port:        port,
-			UnitID:      "1",
-			Timeout:     "5",
-			IdleTimeout: "5",
+			UnitID:      1,
+			Timeout:     5,
+			IdleTimeout: 5,
 		},
 	}
 

@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2021 IOTech Ltd
+// Copyright (C) 2018-2023 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/edgexfoundry/device-sdk-go/v3/pkg/interfaces"
 	sdkModel "github.com/edgexfoundry/device-sdk-go/v3/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/v3/clients/logger"
 	"github.com/edgexfoundry/go-mod-core-contracts/v3/models"
@@ -220,9 +221,9 @@ func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRe
 	return nil
 }
 
-func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.AsyncValues, deviceCh chan<- []sdkModel.DiscoveredDevice) error {
-	d.Logger = lc
-	d.AsyncCh = asyncCh
+func (d *Driver) Initialize(sdk interfaces.DeviceServiceSDK) error {
+	d.Logger = sdk.LoggingClient()
+	d.AsyncCh = sdk.AsyncValuesChannel()
 	d.addressMap = make(map[string]chan bool)
 	d.workingAddressCount = make(map[string]int)
 	return nil
@@ -269,7 +270,7 @@ func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.Pro
 	return nil
 }
 
-func NewProtocolDriver() sdkModel.ProtocolDriver {
+func NewProtocolDriver() interfaces.ProtocolDriver {
 	once.Do(func() {
 		driver = new(Driver)
 	})

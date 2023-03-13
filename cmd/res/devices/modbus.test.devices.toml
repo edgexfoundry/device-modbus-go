@@ -7,10 +7,10 @@
   [DeviceList.Protocols]
     [DeviceList.Protocols.modbus-tcp]
        Address = "0.0.0.0"
-       Port = "1502"
-       UnitID = "1"
-       Timeout = "5"
-       IdleTimeout = "5"
+       Port = 1502
+       UnitID = 1
+       Timeout = 5
+       IdleTimeout = 5
   [[DeviceList.AutoEvents]]
     Interval = "20s"
     OnChange = false
@@ -24,13 +24,13 @@
   [DeviceList.Protocols]
     [DeviceList.Protocols.modbus-rtu]
        Address = "/tmp/slave"
-       BaudRate = "19200"
-       DataBits = "8"
-       StopBits = "1"
+       UnitID = 1
+       BaudRate = 19200
+       DataBits = 8
+       StopBits = 1
        Parity = "N"
-       UnitID = "1"
-       Timeout = "5"
-       IdleTimeout = "5"
+       Timeout = 5
+       IdleTimeout = 5
 
 # Pre-define Devices
 [[DeviceList]]
@@ -41,10 +41,10 @@
   [DeviceList.Protocols]
     [DeviceList.Protocols.modbus-tcp]
       Address = "0.0.0.0"
-      Port = "1502"
-      UnitID = "1"
-      Timeout = "5"
-      IdleTimeout = "5"
+      Port = 1502
+      UnitID = 1
+      Timeout = 5
+      IdleTimeout = 5
   [[DeviceList.AutoEvents]]
     Interval = "20s"
     OnChange = false

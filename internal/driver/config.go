@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2019-2021 IOTech Ltd
+// Copyright (C) 2019-2023 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -54,30 +54,36 @@ func createConnectionInfo(protocols map[string]models.ProtocolProperties) (info 
 	return info, nil
 }
 
-func parseIntValue(properties map[string]string, key string) (int, error) {
-	str, ok := properties[key]
+func parseIntValue(properties map[string]any, key string) (int, error) {
+	value, ok := properties[key]
 	if !ok {
 		return 0, fmt.Errorf("protocol config '%s' not exist", key)
 	}
-	val, err := strconv.Atoi(str)
-	if err != nil {
-		return 0, fmt.Errorf("fail to parse protocol config '%s', %v", key, err)
+
+	res, ok := value.(int)
+	if !ok {
+		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to int", key, value)
 	}
-	return val, nil
+
+	return res, nil
 }
 
-func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInfo, err error) {
+func createRTUConnectionInfo(rtuProtocol map[string]any) (info *ConnectionInfo, err error) {
 	errorMessage := "unable to create RTU connection info, protocol config '%s' not exist"
-	address, ok := rtuProtocol[Address]
+	value, ok := rtuProtocol[Address]
 	if !ok {
 		return nil, fmt.Errorf(errorMessage, Address)
+	}
+	address, ok := value.(string)
+	if !ok {
+		return nil, fmt.Errorf("cannot transform '%s' value %v to string", Address, value)
 	}
 
 	us, ok := rtuProtocol[UnitID]
 	if !ok {
 		return nil, fmt.Errorf(errorMessage, UnitID)
 	}
-	unitID, err := strconv.ParseUint(us, 0, 8)
+	unitID, err := strconv.ParseUint(fmt.Sprintf("%v", us), 0, 8)
 	if err != nil {
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
@@ -97,9 +103,13 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 		return nil, err
 	}
 
-	parity, ok := rtuProtocol[Parity]
+	value, ok = rtuProtocol[Parity]
 	if !ok {
 		return nil, fmt.Errorf(errorMessage, Parity)
+	}
+	parity, ok := value.(string)
+	if !ok {
+		return nil, fmt.Errorf("cannot transform '%s' value %v to string", Parity, parity)
 	}
 	if parity != "N" && parity != "O" && parity != "E" {
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
@@ -128,27 +138,31 @@ func createRTUConnectionInfo(rtuProtocol map[string]string) (info *ConnectionInf
 	}, nil
 }
 
-func createTcpConnectionInfo(tcpProtocol map[string]string) (info *ConnectionInfo, err error) {
+func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, err error) {
 	errorMessage := "unable to create TCP connection info, protocol config '%s' not exist"
-	address, ok := tcpProtocol[Address]
+	value, ok := tcpProtocol[Address]
 	if !ok {
 		return nil, fmt.Errorf(errorMessage, Address)
 	}
+	address, ok := value.(string)
+	if !ok {
+		return nil, fmt.Errorf("cannot transform '%s' value %v to string", Address, value)
+	}
 
-	portString, ok := tcpProtocol[Port]
+	value, ok = tcpProtocol[Port]
 	if !ok {
 		return nil, fmt.Errorf(errorMessage, Port)
 	}
-	port, err := strconv.ParseUint(portString, 0, 16)
+	port, err := strconv.ParseUint(fmt.Sprintf("%v", value), 0, 16)
 	if err != nil {
 		return nil, fmt.Errorf("port value out of range(0–65535). Error: %v", err)
 	}
 
-	unitIDString, ok := tcpProtocol[UnitID]
+	value, ok = tcpProtocol[UnitID]
 	if !ok {
 		return nil, fmt.Errorf(errorMessage, UnitID)
 	}
-	unitID, err := strconv.ParseUint(unitIDString, 0, 8)
+	unitID, err := strconv.ParseUint(fmt.Sprintf("%v", value), 0, 8)
 	if err != nil {
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
