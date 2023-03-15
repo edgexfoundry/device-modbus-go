@@ -1,7 +1,9 @@
 name: edgex-device-modbus
 base: core20
 license: Apache-2.0
-adopt-info: metadata
+summary: EdgeX Modbus Device Service
+description: Refer to https://snapcraft.io/edgex-device-modbus
+adopt-info: device-modbus
 
 architectures:
   - build-on: amd64
@@ -32,13 +34,10 @@ plugs:
 apps:
   device-modbus:
     adapter: full
-    command: bin/device-modbus $CONFIG_PRO_ARG $CONF_ARG $REGISTRY_ARG
+    command: bin/device-modbus --configDir $SNAP_DATA/config/device-modbus/res --configProvider --registry
     command-chain:
       - bin/source-env-file.sh
     environment:
-      CONFIG_PRO_ARG: "--cp=consul.http://localhost:8500"
-      CONF_ARG: "--configDir=$SNAP_DATA/config/device-modbus/res"
-      REGISTRY_ARG: "--registry"
       DEVICE_PROFILESDIR: "$SNAP_DATA/config/device-modbus/res/profiles"
       DEVICE_DEVICESDIR: "$SNAP_DATA/config/device-modbus/res/devices"
       SECRETSTORE_TOKENFILE: $SNAP_DATA/device-modbus/secrets-token.json
@@ -58,19 +57,27 @@ parts:
       install -DT ./helper-go $SNAPCRAFT_PART_INSTALL/bin/helper-go
 
   device-modbus:
-    after: [metadata]
     source: .
     plugin: make
-    build-packages: [git, zip, pkg-config]
+    build-packages: 
+      - git
     build-snaps:
       - go/1.20/stable
     override-build: |
       cd $SNAPCRAFT_PART_SRC
 
-      # the version is needed for the build
-      cat ./VERSION
+      if git describe ; then
+        VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
+      else
+        VERSION="0.0.0"
+      fi
+      
+      # set the version of the snap
+      snapcraftctl set-version $VERSION
+      
+      # write version to file for the build
+      echo $VERSION > VERSION
 
-      make tidy
       make build
 
       install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
@@ -92,26 +99,3 @@ parts:
     organize:
       source-env-file.sh: bin/source-env-file.sh
 
-  metadata:
-    plugin: nil
-    source: https://github.com/canonical/edgex-snap-metadata.git
-    source-branch: appstream
-    source-depth: 1
-    override-build: |
-      # install the icon at the default internal path
-      install -DT edgex-snap-icon.png \
-        $SNAPCRAFT_PART_INSTALL/meta/gui/icon.png
-      
-      # change to this project's repo to get the version
-      cd $SNAPCRAFT_PROJECT_DIR
-      if git describe ; then
-        VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
-      else
-        VERSION="0.0.0"
-      fi
-      
-      # write version to file for the build
-      echo $VERSION > ./VERSION
-      # set the version of this snap
-      snapcraftctl set-version $VERSION
-    parse-info: [edgex-device-modbus.metainfo.xml]  
