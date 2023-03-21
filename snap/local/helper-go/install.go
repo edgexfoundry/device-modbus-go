@@ -20,6 +20,7 @@ import (
 	hooks "github.com/canonical/edgex-snap-hooks/v3"
 	"github.com/canonical/edgex-snap-hooks/v3/env"
 	"github.com/canonical/edgex-snap-hooks/v3/log"
+	"github.com/canonical/edgex-snap-hooks/v3/snapctl"
 )
 
 // installConfig copies all config files from $SNAP to $SNAP_DATA
@@ -39,7 +40,14 @@ func installConfig() error {
 func install() {
 	log.SetComponentName("install")
 
-	if err := installConfig(); err != nil {
-		log.Fatalf("Error installing config files: %s", err)
+	// Install default config files only if no config provider is connected
+	isConnected, err := snapctl.IsConnected(app + "-config").Run()
+	if err != nil {
+		log.Fatalf("Error checking interface connection: %s", err)
+	}
+	if !isConnected {
+		if err := installConfig(); err != nil {
+			log.Fatalf("Error installing config files: %s", err)
+		}
 	}
 }
