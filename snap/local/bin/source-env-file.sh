@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 # convert cmdline to string array
 ARGV=($@)
