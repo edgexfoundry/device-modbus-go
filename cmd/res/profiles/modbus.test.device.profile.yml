@@ -16,7 +16,7 @@ deviceResources:
   properties:
     valueType: "Bool"
     readWrite: "RW"
-    scale: "1"
+    scale: 1
     minimum: "0"
     maximum: "1"
     defaultValue: "0"
@@ -29,7 +29,7 @@ deviceResources:
   properties:
     valueType: "Bool"
     readWrite: "RW"
-    scale: "1"
+    scale: 1
     minimum: "0"
     maximum: "1"
     defaultValue: "0"
@@ -42,7 +42,7 @@ deviceResources:
   properties:
     valueType: "Int16"
     readWrite: "RW"
-    scale: "1"
+    scale: 1
     minimum: "0"
     maximum: "11"
     defaultValue: "0"
@@ -55,7 +55,7 @@ deviceResources:
   properties:
     valueType: "Int32"
     readWrite: "RW"
-    scale: "1"
+    scale: 1
     minimum: "0"
     maximum: "9"
     defaultValue: "0"
@@ -68,7 +68,7 @@ deviceResources:
   properties:
     valueType: "Float32"
     readWrite: "R"
-    scale: "0.1"
+    scale: 0.1
 -
   name: "Temperature"
   isHidden: true
@@ -78,7 +78,7 @@ deviceResources:
   properties:
     valueType: "Float32"
     readWrite: "RW"
-    scale: "0.1"
+    scale: 0.1
 
 deviceCommands:
 -
