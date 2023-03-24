@@ -1,20 +1,20 @@
 Writable:
   LogLevel: INFO
 
-# uncomment when running from command-line in hybrid mode with -cp -o flags
-Registry:
-  Host: localhost
+# # uncomment when running from command-line in hybrid mode with -cp -o flags
+# Registry:
+#   Host: localhost
 
-Clients:
-  core-metadata:
-    Host: localhost # uncomment when running from command-line in hybrid mode
+# Clients:
+#   core-metadata:
+#     Host: localhost # uncomment when running from command-line in hybrid mode
 
 Service:
   Port: 59901
   StartupMsg: device modbus started
 
 MessageBus:
-  Host: localhost # uncomment when running from command-line in hybrid mode
+  # Host: localhost # uncomment when running from command-line in hybrid mode
   Optional:
     ClientId: device-modbus
 
