@@ -1,0 +1,25 @@
+Writable:
+  LogLevel: INFO
+
+# uncomment when running from command-line in hybrid mode with -cp -o flags
+Registry:
+  Host: localhost
+
+Clients:
+  core-metadata:
+    Host: localhost # uncomment when running from command-line in hybrid mode
+
+Service:
+  Port: 59901
+  StartupMsg: device modbus started
+
+MessageBus:
+  Host: localhost # uncomment when running from command-line in hybrid mode
+  Optional:
+    ClientId: device-modbus
+
+Device:
+  # These two overrides are so test files are not used by default
+  # Remove these two in order to use folder settings in common config resulting in use of test profile and devices
+  ProfilesDir: .
+  DevicesDir: .
