@@ -11,6 +11,8 @@ import (
 	"strconv"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v3/models"
+
+	"github.com/spf13/cast"
 )
 
 // ConnectionInfo is device connection info
@@ -60,9 +62,9 @@ func parseIntValue(properties map[string]any, key string) (int, error) {
 		return 0, fmt.Errorf("protocol config '%s' not exist", key)
 	}
 
-	res, ok := value.(int)
-	if !ok {
-		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to int", key, value)
+	res, err := cast.ToIntE(value)
+	if err != nil {
+		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to int, %v", key, value, err)
 	}
 
 	return res, nil
