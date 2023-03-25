@@ -20,16 +20,18 @@ func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	stopBits := 1
 	parity := "N"
 	unitID := uint8(255)
+	timeout := 5
+	idleTimeout := 5
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
-			UnitID:      255,
-			BaudRate:    19200,
-			DataBits:    8,
-			StopBits:    1,
-			Parity:      "N",
-			Timeout:     5,
-			IdleTimeout: 5,
+			UnitID:      unitID,
+			BaudRate:    float64(baudRate),
+			DataBits:    float64(dataBits),
+			StopBits:    float64(stopBits),
+			Parity:      parity,
+			Timeout:     float64(timeout),
+			IdleTimeout: float64(idleTimeout),
 		},
 	}
 
@@ -40,7 +42,7 @@ func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	}
 	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
 		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
-		connectionInfo.Parity != parity {
+		connectionInfo.Parity != parity || connectionInfo.Timeout != timeout || connectionInfo.IdleTimeout != idleTimeout {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
@@ -52,16 +54,18 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 	stopBits := 1
 	parity := "N"
 	unitID := uint8(0)
+	timeout := 5
+	idleTimeout := 5
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
-			UnitID:      0,
-			BaudRate:    19200,
-			DataBits:    8,
-			StopBits:    1,
-			Parity:      "N",
-			Timeout:     5,
-			IdleTimeout: 5,
+			UnitID:      unitID,
+			BaudRate:    float64(baudRate),
+			DataBits:    float64(dataBits),
+			StopBits:    float64(stopBits),
+			Parity:      parity,
+			Timeout:     float64(timeout),
+			IdleTimeout: float64(idleTimeout),
 		},
 	}
 
@@ -72,7 +76,7 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 	}
 	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
 		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
-		connectionInfo.Parity != parity {
+		connectionInfo.Parity != parity || connectionInfo.Timeout != timeout || connectionInfo.IdleTimeout != idleTimeout {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
