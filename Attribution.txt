@@ -1,8 +1,5 @@
 The following open source projects are referenced by Device Service Modbus Go:
 
-BurntSushi/toml (MIT) https://github.com/BurntSushi/toml
-https://github.com/BurntSushi/toml/blob/master/COPYING
-
 cenkalti/backoff (MIT) https://github.com/cenkalti/backoff
 https://github.com/cenkalti/backoff/blob/master/LICENSE
 
@@ -74,9 +71,6 @@ https://github.com/go-yaml/yaml/blob/v2/LICENSE
 
 google/uuid (BSD-3) https://github.com/google/uuid
 https://github.com/google/uuid/blob/master/LICENSE
-
-pelletier/go-toml (MIT) https://github.com/pelletier/go-toml
-https://github.com/pelletier/go-toml/blob/master/LICENSE
 
 pkg/errors (BSD-2) https://github.com/pkg/errors
 https://github.com/pkg/errors/blob/master/LICENSE
