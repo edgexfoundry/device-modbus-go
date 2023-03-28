@@ -2,14 +2,12 @@ Writable:
   LogLevel: INFO
 
 # uncomment when running from command-line in hybrid mode with -cp -o flags
-Registry:
-  Host: localhost
+# Registry:
+#   Host: localhost
 
-Clients:
-  core-metadata:
-    Host: localhost
-    Port: 59881		//this is important for device-onvif-camera and device-rest to run without core-metadata error
-    Protocol: http	//this is important for device-onvif-camera and device-rest to run without core-metadata error
+# Clients:
+#   core-metadata:
+#     Host: localhost
 
 Service:
   Host: localhost
@@ -17,7 +15,7 @@ Service:
   StartupMsg: device modbus started
 
 MessageBus:
-  Host: localhost # uncomment when running from command-line in hybrid mode
+  # Host: localhost # uncomment when running from command-line in hybrid mode
   Optional:
     ClientId: device-modbus
 
