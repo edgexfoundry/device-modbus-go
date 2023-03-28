@@ -1,33 +1,33 @@
 # Pre-define Devices
-DeviceList:
-  - Name: Modbus-TCP-test-device
-    ProfileName: Test-Device-Modbus-Profile
-    Description: >-
+deviceList:
+  - name: Modbus-TCP-test-device
+    profileName: Test-Device-Modbus-Profile
+    description: >-
       This device is a product for monitoring and controlling digital inputs and
       outputs over a LAN.
     labels:
       - Air conditioner
       - modbus TCP
-    Protocols:
+    protocols:
       modbus-tcp:
         Address: 0.0.0.0
         Port: 1502
         UnitID: 1
         Timeout: 5
         IdleTimeout: 5
-    AutoEvents:
+    autoEvents:
       - Interval: 20s
         OnChange: false
         SourceName: HVACValues
-  - Name: Modbus-RTU-test-device
-    ProfileName: Test-Device-Modbus-Profile
-    Description: >-
+  - name: Modbus-RTU-test-device
+    profileName: Test-Device-Modbus-Profile
+    description: >-
       This device is a product for monitoring and controlling digital inputs and
       outputs over a LAN.
     labels:
       - Air conditioner
       - modbus RTU
-    Protocols:
+    protocols:
       modbus-rtu:
         Address: /tmp/slave
         UnitID: 1
@@ -38,19 +38,19 @@ DeviceList:
         Timeout: 5
         IdleTimeout: 5
   # Pre-define Devices
-  - Name: Modbus-TCP-Read-String
-    ProfileName: Test-Device-Modbus-String-Profile
-    Description: use for auto read a string value
+  - name: Modbus-TCP-Read-String
+    profileName: Test-Device-Modbus-String-Profile
+    description: use for auto read a string value
     labels:
       - modbus TCP
-    Protocols:
+    protocols:
       modbus-tcp:
         Address: 0.0.0.0
         Port: 1502
         UnitID: 1
         Timeout: 5
         IdleTimeout: 5
-    AutoEvents:
+    autoEvents:
       - Interval: 20s
         OnChange: false
         SourceName: ReadString
