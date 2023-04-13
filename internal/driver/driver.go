@@ -270,6 +270,18 @@ func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.Pro
 	return nil
 }
 
+func (d *Driver) Discover() error {
+	return fmt.Errorf("driver's Discover function isn't implemented")
+}
+
+func (d *Driver) ValidateDevice(device models.Device) error {
+	_, err := createConnectionInfo(device.Protocols)
+	if err != nil {
+		return fmt.Errorf("invalid protocol properties, %v", err)
+	}
+	return nil
+}
+
 func NewProtocolDriver() interfaces.ProtocolDriver {
 	once.Do(func() {
 		driver = new(Driver)
