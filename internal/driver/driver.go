@@ -229,6 +229,10 @@ func (d *Driver) Initialize(sdk interfaces.DeviceServiceSDK) error {
 	return nil
 }
 
+func (d *Driver) Start() error {
+	return nil
+}
+
 func (d *Driver) Stop(force bool) error {
 	d.stopped = true
 	if !force {
