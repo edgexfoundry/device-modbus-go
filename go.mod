@@ -3,8 +3,8 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.20
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.0.0-dev.71
-	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.0.0-dev.35
+	github.com/edgexfoundry/device-sdk-go/v3 v3.0.0-dev.72
+	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.0.0-dev.36
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.5.0
 	github.com/stretchr/testify v1.8.2
