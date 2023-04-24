@@ -3,8 +3,8 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.20
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.0.0-dev.71
-	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.0.0-dev.35
+	github.com/edgexfoundry/device-sdk-go/v3 v3.0.0-dev.74
+	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.0.0-dev.37
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.5.0
 	github.com/stretchr/testify v1.8.2
@@ -17,9 +17,9 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.2 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.0.0-dev.68 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.0.0-dev.71 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v3 v3.0.0-dev.10 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v3 v3.0.0-dev.24 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v3 v3.0.0-dev.25 // indirect
 	github.com/edgexfoundry/go-mod-registry/v3 v3.0.0-dev.7 // indirect
 	github.com/edgexfoundry/go-mod-secrets/v3 v3.0.0-dev.13 // indirect
 	github.com/fatih/color v1.9.0 // indirect
