@@ -1,5 +1,5 @@
 name: edgex-device-modbus
-base: core20
+base: core22
 license: Apache-2.0
 summary: EdgeX Modbus Device Service
 description: Refer to https://snapcraft.io/edgex-device-modbus
@@ -26,14 +26,8 @@ plugs:
     interface: content
     target: $SNAP_DATA/config/device-modbus
 
-  # deprecated
-  device-config:
-    interface: content
-    target: $SNAP_DATA/config/device-modbus
-
 apps:
   device-modbus:
-    adapter: full
     command: bin/device-modbus --configDir $SNAP_DATA/config/device-modbus/res --configProvider --registry
     command-chain:
       - bin/source-env-file.sh
@@ -52,9 +46,9 @@ parts:
     build-snaps:
       - go/1.20/stable
     override-build: |
-      cd $SNAPCRAFT_PART_SRC
+      cd $CRAFT_PART_SRC
       make build
-      install -DT ./helper-go $SNAPCRAFT_PART_INSTALL/bin/helper-go
+      install -DT ./helper-go $CRAFT_PART_INSTALL/bin/helper-go
 
   device-modbus:
     source: .
@@ -64,7 +58,7 @@ parts:
     build-snaps:
       - go/1.20/stable
     override-build: |
-      cd $SNAPCRAFT_PART_SRC
+      cd $CRAFT_PART_SRC
 
       if git describe ; then
         VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')
@@ -73,22 +67,20 @@ parts:
       fi
       
       # set the version of the snap
-      snapcraftctl set-version $VERSION
+      craftctl set version=$VERSION
       
       # write version to file for the build
       echo $VERSION > VERSION
 
       make build
 
-      install -DT "./cmd/device-modbus" "$SNAPCRAFT_PART_INSTALL/bin/device-modbus"
+      install -DT "./cmd/device-modbus" "$CRAFT_PART_INSTALL/bin/device-modbus"
 
-      RES=$SNAPCRAFT_PART_INSTALL/config/device-modbus/res/
+      RES=$CRAFT_PART_INSTALL/config/device-modbus/res/
       mkdir -p $RES
-      cp    cmd/res/configuration.yaml $RES
-      cp -r cmd/res/devices $RES
-      cp -r cmd/res/profiles $RES
+      cp -r cmd/res/* $RES
       
-      DOC=$SNAPCRAFT_PART_INSTALL/usr/share/doc/device-modbus
+      DOC=$CRAFT_PART_INSTALL/usr/share/doc/device-modbus
       mkdir -p $DOC
       cp Attribution.txt $DOC/Attribution.txt
       cp LICENSE $DOC/LICENSE
