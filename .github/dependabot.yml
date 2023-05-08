@@ -6,10 +6,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-  - package-ecosystem: "gomod"
-    directory: "/snap/local/helper-go"
-    schedule:
-      interval: "daily"
     ignore:
       - dependency-name: "github.com/edgexfoundry/go-mod-core-contracts/v3"
         # Included when device-sdk-go is updated
@@ -20,4 +16,8 @@ updates:
       - dependency-name: "github.com/edgexfoundry/go-mod-secrets/v3"
         # Included when device-sdk-go is updated
       - dependency-name: "github.com/edgexfoundry/go-mod-bootstrap/v3"
-        # Included when device-sdk-go is updated      
+        # Included when device-sdk-go is updated          
+  - package-ecosystem: "gomod"
+    directory: "/snap/local/helper-go"
+    schedule:
+      interval: "daily"  
