@@ -16,9 +16,9 @@ deviceList:
         Timeout: 5
         IdleTimeout: 5
     autoEvents:
-      - Interval: 20s
-        OnChange: false
-        SourceName: HVACValues
+      - interval: 20s
+        onChange: false
+        sourceName: HVACValues
   - name: Modbus-RTU-test-device
     profileName: Test-Device-Modbus-Profile
     description: >-
@@ -51,6 +51,6 @@ deviceList:
         Timeout: 5
         IdleTimeout: 5
     autoEvents:
-      - Interval: 20s
-        OnChange: false
-        SourceName: ReadString
+      - interval: 20s
+        onChange: false
+        sourceName: ReadString
