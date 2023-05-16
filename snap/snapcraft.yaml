@@ -12,9 +12,10 @@ architectures:
 grade: stable
 confinement: strict
 
-# 1: <= hanoi
-# 2: >= ireland 
-epoch: 2
+# 1: edinburgh, geneva, hanoi
+# 2: ireland, jakarta, kamakura, levski
+# 3: minnesota
+epoch: 3
 
 slots:
   edgex-secretstore-token:
