@@ -53,7 +53,7 @@ For the snap, refer to the [snap](snap) directory.
 Users can refer to [the document](https://docs.edgexfoundry.org/2.0/examples/Ch-ExamplesAddingModbusDevice/#set-up-the-modbus-rtu-device) to set up the Modbus RTU device.
 
 ## Community
-- Chat: https://edgexfoundry.slack.com
+- Discussion: https://github.com/orgs/edgexfoundry/discussions
 - Mailing lists: https://lists.edgexfoundry.org/mailman/listinfo
 
 ## License
