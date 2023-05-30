@@ -12,6 +12,62 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [v3.0.0] Minnesota - 2023-05-31 (Only compatible with the 3.x releases)
+
+### Features ✨
+- Add device validation function ([#452](https://github.com/edgexfoundry/device-modbus-go/pull/452))
+    ```text
+    BREAKING CHANGE: Implement `ValidateDevice` function to validate device protocol properties for core-metadata  
+    ```
+- Update for common config ([#413](https://github.com/edgexfoundry/device-modbus-go/pull/413))
+    ```text
+    BREAKING CHANGE: Configuration file is changed to remove common config settings
+    ```
+- Use latest SDK for MessageBus Request API ([#408](https://github.com/edgexfoundry/device-modbus-go/pull/408))
+    ```text
+    BREAKING CHANGE: Commands via MessageBus topic configuration are changed
+    ```
+- Remove ZeroMQ MessageBus capability ([#397](https://github.com/edgexfoundry/device-modbus-go/pull/397))
+    ```text
+    BREAKING CHANGE: ZeroMQ MessageBus capability no longer available
+    ```
+
+### Bug Fixes 🐛
+- Fix protocol properties parsing error ([#261bb0a](https://github.com/edgexfoundry/device-modbus-go/commits/261bb0a))
+- **snap:** Refactor to avoid conflicts with readonly config provider directory ([#437](https://github.com/edgexfoundry/device-modbus-go/issues/437)) ([#9bc48e7](https://github.com/edgexfoundry/device-modbus-go/commits/9bc48e7))
+
+### Code Refactoring ♻
+- Use integer for minimum and maximum properties ([#450](https://github.com/edgexfoundry/device-modbus-go/pull/450))
+    ```text
+    BREAKING CHANGE: Use integer for minimum and maximum properties
+    ```
+- Change configuration and devices files format to YAML ([#445](https://github.com/edgexfoundry/device-modbus-go/pull/445))
+    ```text
+    BREAKING CHANGE: Configuration files are now in YAML format, Default file name is now configuration.yaml
+    ```
+- Change protocol properties to use typed values ([#422](https://github.com/edgexfoundry/device-modbus-go/pull/422))
+    ```text
+    BREAKING CHANGE:
+    - Update `Port`, `UnitID`, `Timeout`, `IdleTimeout` of modbus-tcp properties from string to integer
+    - Update `UnitID`, `BaudRate`, `DataBits`, `StopBits`, `Timeout`, `IdleTimeout` of modbus-rtu properties from string to integer
+    ```
+- **snap:** Update command and metadata sourcing ([#432](https://github.com/edgexfoundry/device-modbus-go/issues/432)) ([#d976059](https://github.com/edgexfoundry/device-modbus-go/commits/d976059))
+- **snap:** Drop the support for legacy snap env options ([#400](https://github.com/edgexfoundry/device-modbus-go/issues/400))
+    ```text
+    BREAKING CHANGE:
+    - Drop the support for legacy snap options with env. prefix
+    - Upgrade edgex-snap-hooks to v3
+    - Upgrade edgex-snap-testing Github action to v3
+    - Add snap's Go module to dependabot
+    - Other minor refactoring
+    ```
+
+### Documentation 📖
+- Add main branch Warning ([#478](https://github.com/edgexfoundry/device-modbus-go/issues/478)) ([#5189b6b](https://github.com/edgexfoundry/device-modbus-go/commits/5189b6b))
+
+### Build 👷
+- Update to Go 1.20, Alpine 3.17 and linter v1.51.2 ([#426](https://github.com/edgexfoundry/device-modbus-go/issues/426)) ([#7c5acbb](https://github.com/edgexfoundry/device-modbus-go/commits/7c5acbb))
+
 ## [v2.3.0] Levski - 2022-11-09  (Only compatible with the 2.x releases)
 
 ### Features ✨
