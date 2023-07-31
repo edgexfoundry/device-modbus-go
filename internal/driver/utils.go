@@ -31,6 +31,8 @@ func normalizeRawType(rawType string) (normalized string, err errors.EdgeX) {
 		normalized = common.ValueTypeUint16
 	case INT16:
 		normalized = common.ValueTypeInt16
+	case INT32:
+		normalized = common.ValueTypeInt32
 	default:
 		return "", errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("the raw type %s is not supported", rawType), nil)
 	}
