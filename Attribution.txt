@@ -72,9 +72,6 @@ https://github.com/go-yaml/yaml/blob/v2/LICENSE
 google/uuid (BSD-3) https://github.com/google/uuid
 https://github.com/google/uuid/blob/master/LICENSE
 
-pkg/errors (BSD-2) https://github.com/pkg/errors
-https://github.com/pkg/errors/blob/master/LICENSE
-
 github.com/OneOfOne/xxhash (Apache 2.0) https://github.com/OneOfOne/xxhash
 https://github.com/OneOfOne/xxhash/blob/master/LICENCE
 
