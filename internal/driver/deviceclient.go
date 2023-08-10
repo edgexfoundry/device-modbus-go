@@ -160,6 +160,10 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 			raw := binary.BigEndian.Uint16(dataBytes)
 			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT64, res, result.ValueToString())
+		case common.ValueTypeInt32:
+			raw := int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
+			res = float64(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT32, FLOAT64, res, result.ValueToString())
 		}
 	case common.ValueTypeBool:
 		res = false

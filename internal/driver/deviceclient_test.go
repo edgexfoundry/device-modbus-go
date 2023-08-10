@@ -316,6 +316,33 @@ func TestTransformDataBytesToResult_RawType_UINT16_ValueType_FLOAT64(t *testing.
 	assert.Equal(t, expected, result)
 }
 
+func TestTransformDataBytesToResult_RawType_INT32_ValueType_FLOAT64(t *testing.T) {
+
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeFloat64,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: 10,
+			RAW_TYPE:         INT32,
+		},
+	}
+
+	// Create a command info struct with the appropriate settings
+	commandInfo, err := createCommandInfo(&req)
+	require.NoError(t, err)
+	// Create some test data bytes
+	dataBytes := []byte{0x01, 0x01, 0x01, 0x01}
+	expected := float64(16843009)
+
+	// Call the function being tested
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	require.NoError(t, err)
+	result, err := commandValue.Float64Value()
+	require.NoError(t, err)
+
+	assert.Equal(t, expected, result)
+}
 func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 	req := models.CommandRequest{
 		DeviceResourceName: "light",
