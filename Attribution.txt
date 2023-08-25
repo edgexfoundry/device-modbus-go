@@ -12,9 +12,6 @@ https://github.com/edgexfoundry/go-mod-registry/blob/master/LICENSE
 edgexfoundry/device-sdk-go (Apache 2.0) https://github.com/edgexfoundry/device-sdk-go/v3
 https://github.com/edgexfoundry/device-sdk-go/blob/master/LICENSE
 
-gorilla/mux 1.6.2 (BSD-3) https://github.com/gorilla/mux
-https://github.com/gorilla/mux/blob/master/LICENSE
-
 go-kit/kit (MIT) github.com/go-kit/kit
 https://github.com/go-kit/kit/blob/master/LICENSE
 
@@ -230,3 +227,30 @@ https://github.com/golang/tools/blob/master/LICENSE
 
 github.com/go-jose/go-jose/v3 (Apache-2.0) https://github.com/go-jose/go-jose
 https://github.com/go-jose/go-jose/blob/v3/LICENSE
+
+github.com/klauspost/compress (Apache-2.0) https://github.com/klauspost/compress
+https://github.com/klauspost/compress/blob/master/LICENSE
+
+github.com/gabriel-vasile/mimetype (MIT) https://github.com/gabriel-vasile/mimetype
+https://github.com/gabriel-vasile/mimetype/blob/master/LICENSE
+
+github.com/golang-jwt/jwt (MIT) https://github.com/golang-jwt/jwt
+https://github.com/golang-jwt/jwt/blob/main/LICENSE
+
+github.com/labstack/echo/v4 (MIT) https://github.com/labstack/echo
+https://github.com/labstack/echo/blob/master/LICENSE
+
+github.com/labstack/gommon (MIT) https://github.com/labstack/gommon
+https://github.com/labstack/gommon/blob/master/LICENSE
+
+github.com/valyala/bytebufferpool (MIT) https://github.com/valyala/bytebufferpool
+https://github.com/valyala/bytebufferpool/blob/master/LICENSE
+
+github.com/valyala/fasttemplate (MIT) https://github.com/valyala/fasttemplate
+https://github.com/valyala/fasttemplate/blob/master/LICENSE
+
+golang.org/x/exp (BSD-3) https://cs.opensource.google/go/x/exp
+https://cs.opensource.google/go/x/exp/+/master:LICENSE
+
+golang.org/x/time (BSD-3) https://cs.opensource.google/go/x/time
+https://cs.opensource.google/go/x/time/+/master:LICENSE
