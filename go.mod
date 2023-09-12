@@ -1,6 +1,6 @@
 module github.com/edgexfoundry/device-modbus-go
 
-go 1.20
+go 1.21
 
 require (
 	github.com/edgexfoundry/device-sdk-go/v3 v3.1.0-dev.20

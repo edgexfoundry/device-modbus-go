@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.20-alpine3.17
+ARG BASE=golang:1.21-alpine3.18
 FROM ${BASE} AS builder
 
 ARG ADD_BUILD_TAGS=""
@@ -31,7 +31,7 @@ RUN [ ! -d "vendor" ] && go mod download all || echo "skipping..."
 COPY . .
 RUN ${MAKE}
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
       copyright='Copyright (c) 2019-2021: IoTech Ltd'
