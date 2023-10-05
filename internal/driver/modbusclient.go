@@ -8,6 +8,7 @@ package driver
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
@@ -98,7 +99,13 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 		err = fmt.Errorf("Error: DISCRETES_INPUT is Read-Only..!!")
 
 	case COILS:
-		result, err = c.client.WriteMultipleCoils(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+		driver.Logger.Info(fmt.Sprintf("modbusCommandInfo Length: %v, value: %2x", modbusCommandInfo.Length, value))
+		if modbusCommandInfo.Length == 1 {
+			bs, _ := hex.DecodeString(string(value) + "00")
+			result, err = c.client.WriteSingleCoil(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(bs[:2]))
+		} else {
+			result, err = c.client.WriteMultipleCoils(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+		}
 
 	case INPUT_REGISTERS:
 		err = fmt.Errorf("Error: INPUT_REGISTERS is Read-Only..!!")
