@@ -3,8 +3,8 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.21
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.1.0-dev.34
-	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.1.0-dev.16
+	github.com/edgexfoundry/device-sdk-go/v3 v3.1.0-dev.35
+	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.1.0-dev.17
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
@@ -17,9 +17,9 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.1.0-dev.49 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.1.0-dev.50 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v3 v3.1.0-dev.7 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v3 v3.1.0-dev.27 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v3 v3.1.0-dev.30 // indirect
 	github.com/edgexfoundry/go-mod-registry/v3 v3.1.0-dev.7 // indirect
 	github.com/edgexfoundry/go-mod-secrets/v3 v3.1.0-dev.10 // indirect
 	github.com/fatih/color v1.14.1 // indirect
@@ -46,7 +46,7 @@ require (
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/serf v0.10.1 // indirect
-	github.com/klauspost/compress v1.17.0 // indirect
+	github.com/klauspost/compress v1.17.1 // indirect
 	github.com/labstack/echo/v4 v4.11.2 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
@@ -57,7 +57,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/nats-io/nats.go v1.30.2 // indirect
+	github.com/nats-io/nats.go v1.31.0 // indirect
 	github.com/nats-io/nkeys v0.4.5 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
