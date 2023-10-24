@@ -1,3 +1,0 @@
-#!/bin/bash -e
-
-exec $SNAP/bin/helper-go install
