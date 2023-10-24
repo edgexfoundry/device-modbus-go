@@ -64,7 +64,7 @@ func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
 	var err error
 
 	switch modbusCommandInfo.PrimaryTable {
-	case DISCRETES_INPUT:
+	case DISCRETES_INPUT, DISCRETE_INPUTS:
 		response, err = c.client.ReadDiscreteInputs(modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
 	case COILS:
 		response, err = c.client.ReadCoils(modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
@@ -94,7 +94,7 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 	var err error
 
 	switch modbusCommandInfo.PrimaryTable {
-	case DISCRETES_INPUT:
+	case DISCRETES_INPUT, DISCRETE_INPUTS:
 		err = fmt.Errorf("Error: DISCRETES_INPUT is Read-Only..!!")
 
 	case COILS:
