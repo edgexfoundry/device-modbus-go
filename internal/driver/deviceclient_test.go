@@ -209,17 +209,33 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 			STARTING_ADDRESS: 10,
 		},
 	}
-	commandInfo, err := createCommandInfo(&req)
-	require.NoError(t, err)
-	dataBytes := []byte{1} // => 00000001
-	expected := true
 
-	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
-	require.NoError(t, err)
-	result, err := commandValue.BoolValue()
-	require.NoError(t, err)
+	tests := []struct {
+		name         string
+		primaryTable string
+		data         []byte
+		expected     bool
+	}{
+		{"transform true value from DISCRETES_INPUT", DISCRETES_INPUT, []byte{1}, true},
+		{"transform false value from DISCRETES_INPUT", DISCRETES_INPUT, []byte{0}, false},
+		{"transform true value from DISCRETE_INPUTS", DISCRETE_INPUTS, []byte{1}, true},
+		{"transform false value from DISCRETE_INPUTS", DISCRETE_INPUTS, []byte{0}, false},
+		{"transform true value from COILS", COILS, []byte{1}, true},
+		{"transform false value from COILS", COILS, []byte{0}, false},
+	}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			req.Attributes[PRIMARY_TABLE] = testCase.primaryTable
+			commandInfo, err := createCommandInfo(&req)
+			require.NoError(t, err)
+			commandValue, err := TransformDataBytesToResult(&req, testCase.data, commandInfo)
+			require.NoError(t, err)
+			result, err := commandValue.BoolValue()
+			require.NoError(t, err)
 
-	assert.Equal(t, expected, result)
+			assert.Equal(t, testCase.expected, result)
+		})
+	}
 }
 
 func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT32(t *testing.T) {

@@ -25,6 +25,7 @@ const (
 	FLOAT64 = "FLOAT64"
 
 	DISCRETES_INPUT   = "DISCRETES_INPUT"
+	DISCRETE_INPUTS   = "DISCRETE_INPUTS" // since DISCRETES_INPUT looks like a typo and it come from Modbus spec, so we also support DISCRETE_INPUTS as primary table
 	COILS             = "COILS"
 	INPUT_REGISTERS   = "INPUT_REGISTERS"
 	HOLDING_REGISTERS = "HOLDING_REGISTERS"
@@ -43,6 +44,7 @@ const (
 
 var PrimaryTableBitCountMap = map[string]uint16{
 	DISCRETES_INPUT:   1,
+	DISCRETE_INPUTS:   1,
 	COILS:             1,
 	INPUT_REGISTERS:   16,
 	HOLDING_REGISTERS: 16,
