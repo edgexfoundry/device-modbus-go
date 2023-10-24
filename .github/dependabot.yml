@@ -17,7 +17,3 @@ updates:
         # Included when device-sdk-go is updated
       - dependency-name: "github.com/edgexfoundry/go-mod-bootstrap/v3"
         # Included when device-sdk-go is updated          
-  - package-ecosystem: "gomod"
-    directory: "/snap/local/helper-go"
-    schedule:
-      interval: "daily"  
