@@ -12,6 +12,37 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [v3.1.0] Napa - 2023-11-15 (Only compatible with the 3.x releases)
+
+
+### ✨  Features
+
+- Remove snap packaging ([#514](https://github.com/edgexfoundry/device-modbus-go/issues/514)) ([8605cff…](https://github.com/edgexfoundry/device-modbus-go/commit/8605cffecbdc9fcb52dd0eb94cc366191c17ee41))
+```text
+
+BREAKING CHANGE: Remove snap packaging ([#514](https://github.com/edgexfoundry/device-modbus-go/issues/514))
+
+```
+- Accept DISCRETES_INPUT and DISCRETE_INPUTS as primary table ([e3f0025…](https://github.com/edgexfoundry/device-modbus-go/commit/e3f00256943a58c81974b75910b32e26900dac71))
+- RawType int32 for valueType float64 added ([17dc72f…](https://github.com/edgexfoundry/device-modbus-go/commit/17dc72f002ebf344085b9a752535fb7c34705e89))
+
+
+### ♻ Code Refactoring
+
+- Remove obsolete comments from config file ([#515](https://github.com/edgexfoundry/device-modbus-go/issues/515)) ([3673e51…](https://github.com/edgexfoundry/device-modbus-go/commit/3673e51062d5a24ca3a0eb46c133605be474e190))
+- Remove github.com/pkg/errors from Attribution.txt ([0de61a6…](https://github.com/edgexfoundry/device-modbus-go/commit/0de61a61959a654b5b3ec01b9f27533abdeab7b1))
+
+
+### 👷 Build
+
+- Upgrade to go-1.21, Linter1.54.2 and Alpine 3.18 ([#500](https://github.com/edgexfoundry/device-modbus-go/issues/500)) ([aeb07f1…](https://github.com/edgexfoundry/device-modbus-go/commit/aeb07f10ff8131d5f056bccd17568abba8c1758b))
+
+
+### 🤖 Continuous Integration
+
+- Add automated release workflow on tag creation ([a1e294c…](https://github.com/edgexfoundry/device-modbus-go/commit/a1e294ccebe5d32c658330e9975c905eff52af94))
+
+
 ## [v3.0.0] Minnesota - 2023-05-31 (Only compatible with the 3.x releases)
 
 ### Features ✨
