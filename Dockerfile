@@ -37,6 +37,8 @@ LABEL license='SPDX-License-Identifier: Apache-2.0' \
       copyright='Copyright (c) 2019-2021: IoTech Ltd'
 
 RUN apk add --update --no-cache dumb-init
+# Ensure using latest versions of all installed packages to avoid any recent CVEs
+RUN apk --no-cache upgrade
 
 COPY --from=builder /device-modbus-go/cmd /
 COPY --from=builder /device-modbus-go/LICENSE /
