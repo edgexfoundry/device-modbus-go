@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.21
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.3
+	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.4
 	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.2.0-dev.2
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.6.0
@@ -17,7 +17,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.6 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.7 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.1 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v3 v3.2.0-dev.3 // indirect
 	github.com/edgexfoundry/go-mod-registry/v3 v3.2.0-dev.1 // indirect
@@ -35,7 +35,7 @@ require (
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/consul/api v1.25.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
