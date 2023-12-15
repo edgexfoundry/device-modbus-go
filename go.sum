@@ -28,10 +28,10 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/eclipse/paho.mqtt.golang v1.4.3 h1:2kwcUGn8seMUfWndX0hGbvH8r7crgcJguQNCyp70xik=
 github.com/eclipse/paho.mqtt.golang v1.4.3/go.mod h1:CSYvoAlsMkhYOXh/oKyxa8EcBci6dVkLCbo5tTC1RIE=
-github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.3 h1:54MIkMtXg4hvjyR8sXWWjJ4Wu6ATz+V3l+g5grIFRP0=
-github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.3/go.mod h1:wlVSKWrjK8OmHEkG/YPItIybh6c1oWrM+AhuAFR1OrA=
-github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.6 h1:8W0q+EJUnSt5YkvbZKSWScaKt/yrBdITX7ga0Y/z188=
-github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.6/go.mod h1:b5OnQ9XjUIjST9ilaQwGIy5YLfJkT5xUjJZwxOIGtUE=
+github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.4 h1:aAm+MNKFpchZQVr6uoZmA36CjIAEKvWemLnAEfeShSM=
+github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.4/go.mod h1:nnwe0jhpg57txZjQCHu8j4ArMVRJumPYfCPJHwSnTaQ=
+github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.7 h1:86/LLufOdX9FVDwQ2iMy4zFrPja+6VXeTXeKMLNlDCk=
+github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.7/go.mod h1:CMvBvSoSK68P7s1U3O/uiSRfZQSEtDf8IYTKoG3N8uY=
 github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.1 h1:efuxuoKUQQ5MmX847XUm/kQE3CkO70YRsTcn1T4rfrs=
 github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.1/go.mod h1:Un2xgWH5Wf8rfuLZBUVcE0uPyFCHsVhzyOaY+WKnPB4=
 github.com/edgexfoundry/go-mod-core-contracts/v3 v3.2.0-dev.2 h1:fmeG/9Ce2uWKWbtlv5ypGKaLpqKLPFl7r6pc0OV8iFE=
@@ -98,8 +98,8 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
-github.com/google/uuid v1.4.0 h1:MtMxsa51/r9yyhkyLsVeVt0B+BGQZzpQiTQ4eHZ8bc4=
-github.com/google/uuid v1.4.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.5.0 h1:1p67kYwdtXjb0gL0BPiP1Av9wiZPo5A8z2cWkTZ+eyU=
+github.com/google/uuid v1.5.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=
 github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/hashicorp/consul/api v1.25.1 h1:CqrdhYzc8XZuPnhIYZWH45toM0LB9ZeYr/gvpLVI3PE=
