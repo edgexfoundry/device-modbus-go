@@ -72,7 +72,10 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 			return nil, errors.NewCommonEdgeX(errors.KindLimitExceeded, fmt.Sprintf("register size should be within the range of 1~123, get %v.", length), nil)
 		}
 	} else {
-		length = calculateAddressLength(primaryTable, rawType)
+		length, err = calculateAddressLength(primaryTable, rawType)
+		if err != nil {
+			return nil, errors.NewCommonEdgeXWrapper(err)
+		}
 	}
 
 	var isByteSwap = false
@@ -102,16 +105,18 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 	}, nil
 }
 
-func calculateAddressLength(primaryTable string, valueType string) uint16 {
-	var primaryTableBit = PrimaryTableBitCountMap[primaryTable]
+func calculateAddressLength(primaryTable string, valueType string) (uint16, errors.EdgeX) {
+	primaryTableBit, ok := PrimaryTableBitCountMap[primaryTable]
+	if !ok {
+		return 0, errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("primaryTable %s not supported", primaryTable), nil)
+	}
 	var valueTypeBitCount = ValueTypeBitCountMap[valueType]
 
 	var length = valueTypeBitCount / primaryTableBit
 	if length < 1 {
 		length = 1
 	}
-
-	return length
+	return length, nil
 }
 
 // TransformDataBytesToResult is used to transform the device's binary data to the specified value type as the actual result.
