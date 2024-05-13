@@ -189,8 +189,8 @@ https://github.com/grpc/grpc-go/blob/master/LICENSE
 google.golang.org/protobuf (Unspecified) https://github.com/protocolbuffers/protobuf-go
 https://github.com/protocolbuffers/protobuf-go/blob/master/LICENSE
 
-gopkg.in/square/go-jose.v2 (Apache-2.0) https://github.com/square/go-jose/tree/v2.6.0
-https://github.com/square/go-jose/blob/v2.6.0/LICENSE
+github.com/go-jose/go-jose/v4 (Apache-2.0) https://github.com/go-jose/go-jose
+https://github.com/go-jose/go-jose/blob/main/LICENSE
 
 gopkg.in/yaml.v2 (MIT) https://github.com/go-yaml/yaml/
 https://github.com/go-yaml/yaml/blob/v2/LICENSE
@@ -225,9 +225,6 @@ https://github.com/golang/mod/blob/master/LICENSE
 golang.org/x/tools (BSD-3) https://github.com/golang/tools
 https://github.com/golang/tools/blob/master/LICENSE
 
-github.com/go-jose/go-jose/v3 (Apache-2.0) https://github.com/go-jose/go-jose
-https://github.com/go-jose/go-jose/blob/v3/LICENSE
-
 github.com/klauspost/compress (Apache-2.0) https://github.com/klauspost/compress
 https://github.com/klauspost/compress/blob/master/LICENSE
 
@@ -254,3 +251,6 @@ https://cs.opensource.google/go/x/exp/+/master:LICENSE
 
 golang.org/x/time (BSD-3) https://cs.opensource.google/go/x/time
 https://cs.opensource.google/go/x/time/+/master:LICENSE
+
+google.golang.org/genproto/googleapis/rpc (Apache 2.0) https://github.com/googleapis/go-genproto
+https://github.com/googleapis/go-genproto/blob/main/LICENSE
