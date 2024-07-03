@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.21
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.19
+	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.20
 	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.2.0-dev.26
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.6.0
@@ -19,10 +19,10 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.36 // indirect
-	github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.7 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v3 v3.2.0-dev.26 // indirect
-	github.com/edgexfoundry/go-mod-registry/v3 v3.2.0-dev.8 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.40 // indirect
+	github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.9 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v3 v3.2.0-dev.28 // indirect
+	github.com/edgexfoundry/go-mod-registry/v3 v3.2.0-dev.10 // indirect
 	github.com/edgexfoundry/go-mod-secrets/v3 v3.2.0-dev.7 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/gorilla/schema v1.2.0 // indirect
+	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/hashicorp/consul/api v1.28.3 // indirect
@@ -120,7 +120,6 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/errs v1.3.0 // indirect
 	github.com/zitadel/oidc/v2 v2.12.0 // indirect
-	go.mongodb.org/mongo-driver v1.15.0 // indirect
 	go.mozilla.org/pkcs7 v0.0.0-20200128120323-432b2356ecb1 // indirect
 	go.opentelemetry.io/otel v1.27.0 // indirect
 	go.opentelemetry.io/otel/metric v1.27.0 // indirect
