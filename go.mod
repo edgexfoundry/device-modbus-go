@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.21
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.20
+	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.22
 	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.2.0-dev.26
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.6.0
@@ -102,6 +102,7 @@ require (
 	github.com/openziti/secretstream v0.1.20 // indirect
 	github.com/openziti/transport/v2 v2.0.135 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
+	github.com/panjf2000/ants/v2 v2.10.0 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
