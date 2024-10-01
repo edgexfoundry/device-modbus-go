@@ -86,8 +86,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/eclipse/paho.mqtt.golang v1.5.0 h1:EH+bUVJNgttidWFkLLVKaQPGmkTUfQQqjOsyvMGvD6o=
 github.com/eclipse/paho.mqtt.golang v1.5.0/go.mod h1:du/2qNQVqJf/Sqs4MEL77kR8QTqANF7XU7Fk0aOTAgk=
-github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.37 h1:APEulB+R9Wm3pZkRUGQQphD362NyODjQIgrc425gpPU=
-github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.37/go.mod h1:oRsTIy3hbloZERIdle/p0J06WCySsXVHOLz3Xb0EKvI=
+github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.38 h1:5wMiCnr0cD6hYeYMAisAmOR2VmMU2XgZFSPx27/oDLk=
+github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.38/go.mod h1:oRsTIy3hbloZERIdle/p0J06WCySsXVHOLz3Xb0EKvI=
 github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.57 h1:vJgmzYmodJJae4xRXA45KbP1GfGiNVVX4Ov5ioug8Ro=
 github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.57/go.mod h1:HKoNog2+02H0Eze8S4ibk9NTvH1LZrGjGPIzAhQnU2g=
 github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.17 h1:eNLGThT5fYtFLSrr6vtvHV92cm5IohJzwSRYcd5pvtg=
