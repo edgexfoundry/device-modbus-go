@@ -57,7 +57,7 @@ func (d *Driver) lockAddress(address string) error {
 		d.mutex.Unlock()
 		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
 		d.Logger.Error(errorMessage)
-		return fmt.Errorf(errorMessage)
+		return fmt.Errorf("%s", errorMessage)
 	} else {
 		d.workingAddressCount[address] = count + 1
 	}

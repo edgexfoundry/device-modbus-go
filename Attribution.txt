@@ -441,3 +441,11 @@ https://github.com/googleapis/go-genproto/blob/main/LICENSE
 nhooyr.io/websocket (ISC) https://github.com/nhooyr/websocket
 https://github.com/nhooyr/websocket/blob/master/LICENSE.txt
 
+github.com/openziti/channel/v3 (Apache 2.0) - github.com/openziti/channel/v3
+https://github.com/openziti/channel/blob/main/LICENSE
+
+gopkg.in/go-jose/go-jose.v2 (Apache 2.0) - https://github.com/go-jose/go-jose
+https://github.com/go-jose/go-jose/blob/v2.6.3/LICENSE
+
+github.com/panjf2000/ants/v2 (MIT) https://github.com/panjf2000/ants
+https://github.com/panjf2000/ants/blob/dev/LICENSE

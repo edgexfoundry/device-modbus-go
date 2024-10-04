@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2020-2021 IOTech Ltd
+# Copyright (c) 2020-2024 IOTech Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.21-alpine3.18
+ARG BASE=golang:1.23-alpine3.20
 FROM ${BASE} AS builder
 
 ARG ADD_BUILD_TAGS=""
@@ -31,10 +31,10 @@ RUN [ ! -d "vendor" ] && go mod download all || echo "skipping..."
 COPY . .
 RUN ${MAKE}
 
-FROM alpine:3.18
+FROM alpine:3.20
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
-      copyright='Copyright (c) 2019-2021: IoTech Ltd'
+      copyright='Copyright (c) 2019-2024: IoTech Ltd'
 
 RUN apk add --update --no-cache dumb-init
 # Ensure using latest versions of all installed packages to avoid any recent CVEs
