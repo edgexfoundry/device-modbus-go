@@ -28,9 +28,27 @@ type Driver struct {
 	addressMap          map[string]chan bool
 	workingAddressCount map[string]int
 	stopped             bool
+	clientMap           map[string]DeviceClient
 }
 
 var concurrentCommandLimit = 100
+
+func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+	key := info.String()
+	c, ok := d.clientMap[key]
+	if ok {
+		return c, nil
+	}
+	c, err := NewDeviceClient(info)
+	if err != nil {
+		driver.Logger.Errorf("create device client failed. err:%v \n", err)
+		return nil, err
+	}
+	d.clientMap[key] = c
+	return c, nil
+}
 
 func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
 	d.Logger.Warn("Driver's DisconnectDevice function didn't implement")
@@ -102,22 +120,14 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
 	responses = make([]*sdkModel.CommandValue, len(reqs))
-	var deviceClient DeviceClient
 
 	// create device client and open connection
-	deviceClient, err = NewDeviceClient(connectionInfo)
+	deviceClient, err := d.createDeviceClient(connectionInfo)
 	if err != nil {
-		driver.Logger.Infof("Read command NewDeviceClient failed. err:%v \n", err)
+		driver.Logger.Errorf("Read command OpenConnection failed. err:%v \n", err)
 		return responses, err
 	}
-
-	err = deviceClient.OpenConnection()
-	if err != nil {
-		driver.Logger.Infof("Read command OpenConnection failed. err:%v \n", err)
-		return responses, err
-	}
-
-	defer func() { _ = deviceClient.CloseConnection() }()
+	driver.Logger.Debugf("key = %s,client = %+v", connectionInfo.String(), deviceClient)
 
 	// handle command requests
 	for i, req := range reqs {
@@ -129,7 +139,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 
 		responses[i] = res
 	}
-
+	driver.Logger.Debugf("get response %v", responses)
 	return responses, nil
 }
 
@@ -172,20 +182,11 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	}
 	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
-	var deviceClient DeviceClient
-
 	// create device client and open connection
-	deviceClient, err = NewDeviceClient(connectionInfo)
+	deviceClient, err := d.createDeviceClient(connectionInfo)
 	if err != nil {
 		return err
 	}
-
-	err = deviceClient.OpenConnection()
-	if err != nil {
-		return err
-	}
-
-	defer func() { _ = deviceClient.CloseConnection() }()
 
 	// handle command requests
 	for i, req := range reqs {
@@ -226,6 +227,7 @@ func (d *Driver) Initialize(sdk interfaces.DeviceServiceSDK) error {
 	d.AsyncCh = sdk.AsyncValuesChannel()
 	d.addressMap = make(map[string]chan bool)
 	d.workingAddressCount = make(map[string]int)
+	d.clientMap = make(map[string]DeviceClient)
 	return nil
 }
 
@@ -234,6 +236,14 @@ func (d *Driver) Start() error {
 }
 
 func (d *Driver) Stop(force bool) error {
+	d.mutex.Lock()
+	for key, client := range d.clientMap {
+		err := client.CloseConnection()
+		if err != nil {
+			d.Logger.Errorf("device client closed,client key = %s,err = %v", key, err)
+		}
+	}
+	d.mutex.Unlock()
 	d.stopped = true
 	if !force {
 		d.waitAllCommandsToFinish()
