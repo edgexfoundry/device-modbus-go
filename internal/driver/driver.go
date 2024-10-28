@@ -24,18 +24,19 @@ var driver *Driver
 type Driver struct {
 	Logger              logger.LoggingClient
 	AsyncCh             chan<- *sdkModel.AsyncValues
-	mutex               sync.Mutex
+	addressMutex        sync.Mutex
 	addressMap          map[string]chan bool
 	workingAddressCount map[string]int
 	stopped             bool
+	clientMutex         sync.Mutex
 	clientMap           map[string]DeviceClient
 }
 
 var concurrentCommandLimit = 100
 
 func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
+	d.clientMutex.Lock()
+	defer d.clientMutex.Unlock()
 	key := info.String()
 	c, ok := d.clientMap[key]
 	if ok {
@@ -60,7 +61,7 @@ func (d *Driver) lockAddress(address string) error {
 	if d.stopped {
 		return fmt.Errorf("service attempts to stop and unable to handle new request")
 	}
-	d.mutex.Lock()
+	d.addressMutex.Lock()
 	lock, ok := d.addressMap[address]
 	if !ok {
 		lock = make(chan bool, 1)
@@ -72,7 +73,7 @@ func (d *Driver) lockAddress(address string) error {
 	if !ok {
 		d.workingAddressCount[address] = 1
 	} else if count >= concurrentCommandLimit {
-		d.mutex.Unlock()
+		d.addressMutex.Unlock()
 		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
 		d.Logger.Error(errorMessage)
 		return fmt.Errorf("%s", errorMessage)
@@ -80,7 +81,7 @@ func (d *Driver) lockAddress(address string) error {
 		d.workingAddressCount[address] = count + 1
 	}
 
-	d.mutex.Unlock()
+	d.addressMutex.Unlock()
 	lock <- true
 
 	return nil
@@ -88,10 +89,10 @@ func (d *Driver) lockAddress(address string) error {
 
 // unlockAddress remove token after command finish
 func (d *Driver) unlockAddress(address string) {
-	d.mutex.Lock()
+	d.addressMutex.Lock()
 	lock := d.addressMap[address]
 	d.workingAddressCount[address] = d.workingAddressCount[address] - 1
-	d.mutex.Unlock()
+	d.addressMutex.Unlock()
 	<-lock
 }
 
@@ -236,14 +237,14 @@ func (d *Driver) Start() error {
 }
 
 func (d *Driver) Stop(force bool) error {
-	d.mutex.Lock()
+	d.clientMutex.Lock()
 	for key, client := range d.clientMap {
 		err := client.CloseConnection()
 		if err != nil {
 			d.Logger.Errorf("device client closed,client key = %s,err = %v", key, err)
 		}
 	}
-	d.mutex.Unlock()
+	d.clientMutex.Unlock()
 	d.stopped = true
 	if !force {
 		d.waitAllCommandsToFinish()
