@@ -133,7 +133,6 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		client.IsModbusTcp = true
 	}
 	if client.IsModbusTcp {
-		//client.TCPClientHandler = *MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
 		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
 		client.TCPClientHandler.SlaveId = byte(connectionInfo.UnitID)
 		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
