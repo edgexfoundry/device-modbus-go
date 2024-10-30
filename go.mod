@@ -3,8 +3,8 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.23
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v3 v3.2.0-dev.45
-	github.com/edgexfoundry/go-mod-core-contracts/v3 v3.2.0-dev.50
+	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.1
+	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.0-dev.2
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.7.0
 	github.com/stretchr/testify v1.9.0
@@ -19,11 +19,11 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.0 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v3 v3.2.0-dev.66 // indirect
-	github.com/edgexfoundry/go-mod-configuration/v3 v3.2.0-dev.19 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v3 v3.2.0-dev.40 // indirect
-	github.com/edgexfoundry/go-mod-registry/v3 v3.2.0-dev.18 // indirect
-	github.com/edgexfoundry/go-mod-secrets/v3 v3.2.0-dev.18 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.1 // indirect
+	github.com/edgexfoundry/go-mod-configuration/v4 v4.0.0-dev.1 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v4 v4.0.0-dev.2 // indirect
+	github.com/edgexfoundry/go-mod-registry/v4 v4.0.0-dev.1 // indirect
+	github.com/edgexfoundry/go-mod-secrets/v4 v4.0.0-dev.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa // indirect

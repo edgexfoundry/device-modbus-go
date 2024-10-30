@@ -18,9 +18,9 @@ VERSION=$(shell cat ./VERSION 2>/dev/null || echo 0.0.0)
 
 GIT_SHA=$(shell git rev-parse HEAD)
 
-SDKVERSION=$(shell cat ./go.mod | grep 'github.com/edgexfoundry/device-sdk-go/v3 v' | awk '{print $$2}')
+SDKVERSION=$(shell cat ./go.mod | grep 'github.com/edgexfoundry/device-sdk-go/v4 v' | awk '{print $$2}')
 GOFLAGS=-ldflags "-s -w -X github.com/edgexfoundry/device-modbus-go.Version=$(VERSION) \
-                  -X github.com/edgexfoundry/device-sdk-go/v3/internal/common.SDKVersion=$(SDKVERSION)" \
+                  -X github.com/edgexfoundry/device-sdk-go/v4/internal/common.SDKVersion=$(SDKVERSION)" \
                    -trimpath -mod=readonly
 
 ifeq ($(ENABLE_FULL_RELRO), "true")

@@ -7,7 +7,7 @@
 package main
 
 import (
-	"github.com/edgexfoundry/device-sdk-go/v3/pkg/startup"
+	"github.com/edgexfoundry/device-sdk-go/v4/pkg/startup"
 
 	"github.com/edgexfoundry/device-modbus-go"
 	"github.com/edgexfoundry/device-modbus-go/internal/driver"
