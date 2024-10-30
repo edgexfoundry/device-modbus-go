@@ -30,19 +30,26 @@ type ModbusClient struct {
 }
 
 func (c *ModbusClient) OpenConnection() error {
-	var err error
 	var newClient MODBUS.Client
 	if c.IsModbusTcp {
-		err = c.TCPClientHandler.Connect()
+		err := c.TCPClientHandler.Connect()
+		if err != nil {
+			driver.Logger.Errorf("Failed to connect to Modbus device: %v", err)
+			return err
+		}
 		newClient = MODBUS.NewClient(&c.TCPClientHandler)
 		driver.Logger.Info("Modbus client create TCP connection.")
 	} else {
-		err = c.RTUClientHandler.Connect()
+		err := c.RTUClientHandler.Connect()
+		if err != nil {
+			driver.Logger.Errorf("Failed to connect to Modbus device: %v", err)
+			return err
+		}
 		newClient = MODBUS.NewClient(&c.RTUClientHandler)
 		driver.Logger.Info("Modbus client create RTU connection.")
 	}
 	c.client = newClient
-	return err
+	return nil
 }
 
 func (c *ModbusClient) CloseConnection() error {
@@ -122,7 +129,6 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 
 func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client := new(ModbusClient)
-	var err error
 	if connectionInfo.Protocol == ProtocolTCP {
 		client.IsModbusTcp = true
 	}
@@ -144,5 +150,9 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		client.RTUClientHandler.Parity = connectionInfo.Parity
 		client.RTUClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	}
-	return client, err
+	err := client.OpenConnection()
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }

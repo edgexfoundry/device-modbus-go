@@ -24,13 +24,32 @@ var driver *Driver
 type Driver struct {
 	Logger              logger.LoggingClient
 	AsyncCh             chan<- *sdkModel.AsyncValues
-	mutex               sync.Mutex
+	addressMutex        sync.Mutex
 	addressMap          map[string]chan bool
 	workingAddressCount map[string]int
 	stopped             bool
+	clientMutex         sync.Mutex
+	clientMap           map[string]DeviceClient
 }
 
 var concurrentCommandLimit = 100
+
+func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) {
+	d.clientMutex.Lock()
+	defer d.clientMutex.Unlock()
+	key := info.String()
+	c, ok := d.clientMap[key]
+	if ok {
+		return c, nil
+	}
+	c, err := NewDeviceClient(info)
+	if err != nil {
+		driver.Logger.Errorf("create device client failed. err:%v \n", err)
+		return nil, err
+	}
+	d.clientMap[key] = c
+	return c, nil
+}
 
 func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
 	d.Logger.Warn("Driver's DisconnectDevice function didn't implement")
@@ -42,7 +61,7 @@ func (d *Driver) lockAddress(address string) error {
 	if d.stopped {
 		return fmt.Errorf("service attempts to stop and unable to handle new request")
 	}
-	d.mutex.Lock()
+	d.addressMutex.Lock()
 	lock, ok := d.addressMap[address]
 	if !ok {
 		lock = make(chan bool, 1)
@@ -54,7 +73,7 @@ func (d *Driver) lockAddress(address string) error {
 	if !ok {
 		d.workingAddressCount[address] = 1
 	} else if count >= concurrentCommandLimit {
-		d.mutex.Unlock()
+		d.addressMutex.Unlock()
 		errorMessage := fmt.Sprintf("High-frequency command execution. There are %v commands with the same address in the queue", concurrentCommandLimit)
 		d.Logger.Error(errorMessage)
 		return fmt.Errorf("%s", errorMessage)
@@ -62,7 +81,7 @@ func (d *Driver) lockAddress(address string) error {
 		d.workingAddressCount[address] = count + 1
 	}
 
-	d.mutex.Unlock()
+	d.addressMutex.Unlock()
 	lock <- true
 
 	return nil
@@ -70,10 +89,10 @@ func (d *Driver) lockAddress(address string) error {
 
 // unlockAddress remove token after command finish
 func (d *Driver) unlockAddress(address string) {
-	d.mutex.Lock()
+	d.addressMutex.Lock()
 	lock := d.addressMap[address]
 	d.workingAddressCount[address] = d.workingAddressCount[address] - 1
-	d.mutex.Unlock()
+	d.addressMutex.Unlock()
 	<-lock
 }
 
@@ -102,22 +121,14 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
 	responses = make([]*sdkModel.CommandValue, len(reqs))
-	var deviceClient DeviceClient
 
 	// create device client and open connection
-	deviceClient, err = NewDeviceClient(connectionInfo)
+	deviceClient, err := d.createDeviceClient(connectionInfo)
 	if err != nil {
-		driver.Logger.Infof("Read command NewDeviceClient failed. err:%v \n", err)
+		driver.Logger.Errorf("Read command OpenConnection failed. err:%v \n", err)
 		return responses, err
 	}
-
-	err = deviceClient.OpenConnection()
-	if err != nil {
-		driver.Logger.Infof("Read command OpenConnection failed. err:%v \n", err)
-		return responses, err
-	}
-
-	defer func() { _ = deviceClient.CloseConnection() }()
+	driver.Logger.Debugf("key = %s,client = %+v", connectionInfo.String(), deviceClient)
 
 	// handle command requests
 	for i, req := range reqs {
@@ -129,7 +140,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 
 		responses[i] = res
 	}
-
+	driver.Logger.Debugf("get response %v", responses)
 	return responses, nil
 }
 
@@ -172,20 +183,11 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	}
 	defer d.unlockAddress(d.lockableAddress(connectionInfo))
 
-	var deviceClient DeviceClient
-
 	// create device client and open connection
-	deviceClient, err = NewDeviceClient(connectionInfo)
+	deviceClient, err := d.createDeviceClient(connectionInfo)
 	if err != nil {
 		return err
 	}
-
-	err = deviceClient.OpenConnection()
-	if err != nil {
-		return err
-	}
-
-	defer func() { _ = deviceClient.CloseConnection() }()
 
 	// handle command requests
 	for i, req := range reqs {
@@ -226,6 +228,7 @@ func (d *Driver) Initialize(sdk interfaces.DeviceServiceSDK) error {
 	d.AsyncCh = sdk.AsyncValuesChannel()
 	d.addressMap = make(map[string]chan bool)
 	d.workingAddressCount = make(map[string]int)
+	d.clientMap = make(map[string]DeviceClient)
 	return nil
 }
 
@@ -234,6 +237,14 @@ func (d *Driver) Start() error {
 }
 
 func (d *Driver) Stop(force bool) error {
+	d.clientMutex.Lock()
+	for key, client := range d.clientMap {
+		err := client.CloseConnection()
+		if err != nil {
+			d.Logger.Errorf("device client closed,client key = %s,err = %v", key, err)
+		}
+	}
+	d.clientMutex.Unlock()
 	d.stopped = true
 	if !force {
 		d.waitAllCommandsToFinish()
