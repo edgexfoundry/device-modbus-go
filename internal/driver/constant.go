@@ -7,7 +7,7 @@
 package driver
 
 import (
-	"github.com/edgexfoundry/go-mod-core-contracts/v3/common"
+	"github.com/edgexfoundry/go-mod-core-contracts/v4/common"
 )
 
 const (
