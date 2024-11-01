@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.23
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.1
+	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.2
 	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.0-dev.2
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.7.0
@@ -13,18 +13,15 @@ require (
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
-	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.0 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.1 // indirect
-	github.com/edgexfoundry/go-mod-configuration/v4 v4.0.0-dev.1 // indirect
-	github.com/edgexfoundry/go-mod-messaging/v4 v4.0.0-dev.2 // indirect
-	github.com/edgexfoundry/go-mod-registry/v4 v4.0.0-dev.1 // indirect
-	github.com/edgexfoundry/go-mod-secrets/v4 v4.0.0-dev.1 // indirect
-	github.com/fatih/color v1.16.0 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.2 // indirect
+	github.com/edgexfoundry/go-mod-configuration/v4 v4.0.0-dev.3 // indirect
+	github.com/edgexfoundry/go-mod-messaging/v4 v4.0.0-dev.3 // indirect
+	github.com/edgexfoundry/go-mod-registry/v4 v4.0.0-dev.2 // indirect
+	github.com/edgexfoundry/go-mod-secrets/v4 v4.0.0-dev.2 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
@@ -59,15 +56,8 @@ require (
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/hashicorp/consul/api v1.29.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-hclog v1.5.0 // indirect
-	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
-	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kataras/go-events v0.0.3 // indirect
 	github.com/klauspost/compress v1.17.2 // indirect
@@ -81,9 +71,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/michaelquigley/pfxlog v0.6.10 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
-	github.com/mitchellh/consulstructure v0.0.0-20190329231841-56fdc4d2da54 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
