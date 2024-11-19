@@ -37,6 +37,9 @@ build: $(MICROSERVICES)
 build-nats:
 	make -e ADD_BUILD_TAGS=include_nats_messaging build
 
+build-noziti:
+	make -e ADD_BUILD_TAGS=no_openziti build
+
 tidy:
 	go mod tidy
 
@@ -74,6 +77,9 @@ docker_device_modbus_go:
 
 docker-nats:
 	make -e ADD_BUILD_TAGS=include_nats_messaging docker
+
+docker-noziti:
+	make -e ADD_BUILD_TAGS=no_openziti docker
 
 vendor:
 	CGO_ENABLED=0 go mod vendor
