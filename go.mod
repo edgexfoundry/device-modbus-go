@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.23
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.18
+	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.19
 	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.0-dev.22
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.7.1
@@ -17,7 +17,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.0 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.19 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.20 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v4 v4.0.0-dev.10 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v4 v4.0.0-dev.10 // indirect
 	github.com/edgexfoundry/go-mod-registry/v4 v4.0.0-dev.3 // indirect
@@ -79,14 +79,14 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/openziti/channel/v3 v3.0.4 // indirect
-	github.com/openziti/edge-api v0.26.34 // indirect
-	github.com/openziti/foundation/v2 v2.0.49 // indirect
-	github.com/openziti/identity v1.0.85 // indirect
-	github.com/openziti/metrics v1.2.58 // indirect
-	github.com/openziti/sdk-golang v0.23.44 // indirect
-	github.com/openziti/secretstream v0.1.25 // indirect
-	github.com/openziti/transport/v2 v2.0.146 // indirect
+	github.com/openziti/channel/v3 v3.0.26 // indirect
+	github.com/openziti/edge-api v0.26.36 // indirect
+	github.com/openziti/foundation/v2 v2.0.56 // indirect
+	github.com/openziti/identity v1.0.94 // indirect
+	github.com/openziti/metrics v1.2.65 // indirect
+	github.com/openziti/sdk-golang v0.23.45 // indirect
+	github.com/openziti/secretstream v0.1.28 // indirect
+	github.com/openziti/transport/v2 v2.0.159 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
 	github.com/panjf2000/ants/v2 v2.11.0 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
@@ -123,7 +123,7 @@ require (
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/protobuf v1.36.2 // indirect
 	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.17 // indirect
