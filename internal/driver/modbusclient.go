@@ -19,34 +19,48 @@ import (
 
 // ModbusClient is used for connecting the device and read/write value
 type ModbusClient struct {
-	// IsModbusTcp is a value indicating the connection type
-	IsModbusTcp bool
-	// TCPClientHandler is ued for holding device TCP connection
+	// ModbusType is used for holding the connection type
+	ModbusType string
+	// TCPClientHandler is used for holding device TCP connection
 	TCPClientHandler MODBUS.TCPClientHandler
-	// TCPClientHandler is ued for holding device RTU connection
+	// TCPClientHandler is used for holding device RTU connection
 	RTUClientHandler MODBUS.RTUClientHandler
+	// ASCIIClientHandler is used for holding device ASCII connection
+	ASCIIClientHandler MODBUS.ASCIIClientHandler
 
 	client MODBUS.Client
 }
 
 func (c *ModbusClient) OpenConnection() error {
 	var newClient MODBUS.Client
-	if c.IsModbusTcp {
+	switch c.ModbusType {
+	case ProtocolTCP:
 		err := c.TCPClientHandler.Connect()
 		if err != nil {
-			driver.Logger.Errorf("Failed to connect to Modbus device: %v", err)
+			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
 			return err
 		}
 		newClient = MODBUS.NewClient(&c.TCPClientHandler)
 		driver.Logger.Info("Modbus client create TCP connection.")
-	} else {
+	case ProtocolRTU:
 		err := c.RTUClientHandler.Connect()
 		if err != nil {
-			driver.Logger.Errorf("Failed to connect to Modbus device: %v", err)
+			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
 			return err
 		}
 		newClient = MODBUS.NewClient(&c.RTUClientHandler)
 		driver.Logger.Info("Modbus client create RTU connection.")
+	case ProtocolASCII:
+		err := c.ASCIIClientHandler.Connect()
+		if err != nil {
+			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
+			return err
+		}
+		newClient = MODBUS.NewClient(&c.ASCIIClientHandler)
+		driver.Logger.Info("Modbus client create ASCII connection.")
+	default:
+		driver.Logger.Errorf("modbus connection type don't support!")
+		return fmt.Errorf("modbus connection type %v don't support", c.ModbusType)
 	}
 	c.client = newClient
 	return nil
@@ -54,11 +68,16 @@ func (c *ModbusClient) OpenConnection() error {
 
 func (c *ModbusClient) CloseConnection() error {
 	var err error
-	if c.IsModbusTcp {
+	switch c.ModbusType {
+	case ProtocolTCP:
 		err = c.TCPClientHandler.Close()
-
-	} else {
+	case ProtocolRTU:
 		err = c.RTUClientHandler.Close()
+	case ProtocolASCII:
+		err = c.ASCIIClientHandler.Close()
+	default:
+		driver.Logger.Errorf("modbus connection type don't support!")
+		return fmt.Errorf("modbus connection type %v don't support", c.ModbusType)
 	}
 	return err
 }
@@ -129,16 +148,15 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 
 func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client := new(ModbusClient)
-	if connectionInfo.Protocol == ProtocolTCP {
-		client.IsModbusTcp = true
-	}
-	if client.IsModbusTcp {
+	client.ModbusType = connectionInfo.Protocol
+	switch client.ModbusType {
+	case ProtocolTCP:
 		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
 		client.TCPClientHandler.SlaveId = byte(connectionInfo.UnitID)
 		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
-	} else {
+	case ProtocolRTU:
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.RTUClientHandler.Address = serialParams[0]
 		client.RTUClientHandler.SlaveId = byte(connectionInfo.UnitID)
@@ -149,9 +167,24 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		client.RTUClientHandler.StopBits = connectionInfo.StopBits
 		client.RTUClientHandler.Parity = connectionInfo.Parity
 		client.RTUClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
+	case ProtocolASCII:
+		serialParams := strings.Split(connectionInfo.Address, ",")
+		client.ASCIIClientHandler.Address = serialParams[0]
+		client.ASCIIClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		client.ASCIIClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
+		client.ASCIIClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
+		client.ASCIIClientHandler.BaudRate = connectionInfo.BaudRate
+		client.ASCIIClientHandler.DataBits = connectionInfo.DataBits
+		client.ASCIIClientHandler.StopBits = connectionInfo.StopBits
+		client.ASCIIClientHandler.Parity = connectionInfo.Parity
+		client.ASCIIClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
+	default:
+		driver.Logger.Errorf("modbus connection type don't support!")
+		return nil, fmt.Errorf("modbus connection type %v don't support", client.ModbusType)
 	}
 	err := client.OpenConnection()
 	if err != nil {
+		driver.Logger.Errorf("client %+v open connection failed,err:%v", client, err)
 		return nil, err
 	}
 	return client, nil
