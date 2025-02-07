@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2023 IOTech Ltd
+// Copyright (C) 2018-2025 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -134,7 +134,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	for i, req := range reqs {
 		res, err := handleReadCommandRequest(deviceClient, req)
 		if err != nil {
-			driver.Logger.Infof("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err)
+			driver.Logger.Errorf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err)
 			return responses, err
 		}
 
@@ -164,7 +164,7 @@ func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandReq
 	if err != nil {
 		return result, err
 	} else {
-		driver.Logger.Infof("Read command finished. Cmd:%v, %v \n", req.DeviceResourceName, result)
+		driver.Logger.Tracef("Read command finished. Cmd:%v, %v \n", req.DeviceResourceName, result)
 	}
 
 	return result, nil
@@ -219,7 +219,7 @@ func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRe
 		return fmt.Errorf("handle write command request failed, err: %v", err)
 	}
 
-	driver.Logger.Infof("Write command finished. Cmd:%v \n", req.DeviceResourceName)
+	driver.Logger.Tracef("Write command finished. Cmd:%v \n", req.DeviceResourceName)
 	return nil
 }
 

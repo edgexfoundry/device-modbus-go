@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2021 IOTech Ltd
+// Copyright (C) 2018-2025 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -107,7 +107,7 @@ func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
 		return response, err
 	}
 
-	driver.Logger.Info(fmt.Sprintf("Modbus client GetValue's results %v", response))
+	driver.Logger.Tracef("Modbus client GetValue's results %v", response)
 
 	return response, nil
 }
@@ -141,7 +141,7 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 	if err != nil {
 		return err
 	}
-	driver.Logger.Info(fmt.Sprintf("Modbus client SetValue successful, results: %v", result))
+	driver.Logger.Tracef("Modbus client SetValue successful, results: %v", result)
 
 	return nil
 }
