@@ -75,7 +75,7 @@ func TestDriver_createDeviceClient(t *testing.T) {
 				addressMap:          make(map[string]chan bool),
 				workingAddressCount: make(map[string]int),
 				clientMap: map[string]DeviceClient{
-					"modbus-tcp:172.0.0.1:502": &ModbusClient{},
+					"modbus-tcp:172.0.0.1:502:1": &ModbusClient{},
 				},
 			},
 			args: args{
@@ -102,7 +102,7 @@ func TestDriver_createDeviceClient(t *testing.T) {
 				addressMap:          make(map[string]chan bool),
 				workingAddressCount: make(map[string]int),
 				clientMap: map[string]DeviceClient{
-					"modbus-rtu:172.0.0.1:502:9600:8:1:N": &ModbusClient{},
+					"modbus-rtu:172.0.0.1:502:1:9600:8:1:N": &ModbusClient{},
 				},
 			},
 			args: args{
