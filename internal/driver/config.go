@@ -33,9 +33,9 @@ type ConnectionInfo struct {
 
 func (info *ConnectionInfo) String() string {
 	if info.Protocol == ProtocolTCP {
-		return fmt.Sprintf("%s:%s:%d", info.Protocol, info.Address, info.Port)
+		return fmt.Sprintf("%s:%s:%d:%d", info.Protocol, info.Address, info.Port, info.UnitID)
 	}
-	return fmt.Sprintf("%s:%s:%d:%d:%d:%d:%s", info.Protocol, info.Address, info.Port, info.BaudRate, info.DataBits, info.StopBits, info.Parity)
+	return fmt.Sprintf("%s:%s:%d:%d:%d:%d:%d:%s", info.Protocol, info.Address, info.Port, info.UnitID, info.BaudRate, info.DataBits, info.StopBits, info.Parity)
 }
 
 func createConnectionInfo(protocols map[string]models.ProtocolProperties) (info *ConnectionInfo, err error) {
