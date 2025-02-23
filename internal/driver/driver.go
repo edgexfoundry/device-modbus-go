@@ -51,6 +51,13 @@ func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) 
 	return c, nil
 }
 
+func (d *Driver) removeDeviceClient(info *ConnectionInfo) {
+	d.clientMutex.Lock()
+	defer d.clientMutex.Unlock()
+	key := info.String()
+	delete(d.clientMap, key)
+}
+
 func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
 	d.Logger.Warn("Driver's DisconnectDevice function didn't implement")
 	return nil
@@ -134,7 +141,8 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	for i, req := range reqs {
 		res, err := handleReadCommandRequest(deviceClient, req)
 		if err != nil {
-			driver.Logger.Errorf("Read command failed. Cmd:%v err:%v \n", req.DeviceResourceName, err)
+			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", req.DeviceResourceName, err)
+			d.removeDeviceClient(connectionInfo)
 			return responses, err
 		}
 
@@ -193,7 +201,8 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	for i, req := range reqs {
 		err = handleWriteCommandRequest(deviceClient, req, params[i])
 		if err != nil {
-			d.Logger.Error(err.Error())
+			driver.Logger.Errorf("Write command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", req.DeviceResourceName, err)
+			d.removeDeviceClient(connectionInfo)
 			break
 		}
 	}
