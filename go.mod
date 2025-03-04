@@ -3,8 +3,8 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.23
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.25
-	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.0-dev.28
+	github.com/edgexfoundry/device-sdk-go/v4 v4.0.0-dev.26
+	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.0-dev.30
 	github.com/goburrow/modbus v0.1.0
 	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
@@ -17,16 +17,16 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.0 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.28 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.0-dev.29 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v4 v4.0.0-dev.14 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v4 v4.0.0-dev.18 // indirect
 	github.com/edgexfoundry/go-mod-registry/v4 v4.0.0-dev.4 // indirect
-	github.com/edgexfoundry/go-mod-secrets/v4 v4.0.0-dev.10 // indirect
+	github.com/edgexfoundry/go-mod-secrets/v4 v4.0.0-dev.12 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.24.0 // indirect
+	github.com/go-playground/validator/v10 v10.25.0 // indirect
 	github.com/go-resty/resty/v2 v2.16.4 // indirect
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
