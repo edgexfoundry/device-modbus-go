@@ -12,6 +12,35 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [4.0.0] Odessa - 2025-03-12 (Only compatible with the 4.x releases)
+
+### ✨  Features
+
+- Enable Modbus ASCII support ([487d9a8…](https://github.com/edgexfoundry/device-modbus-go/commit/487d9a8596a33bf8cb167ee9758ffd227ee0e3c5))
+- Enable reuse of the Modbus client ([#581](https://github.com/edgexfoundry/device-modbus-go/issues/581)) ([35d0945…](https://github.com/edgexfoundry/device-modbus-go/commit/35d09451af1d455b7a4c4c650ff933a6ae9a5aa3))
+- Enable PIE support for ASLR and full RELRO ([62efd1d…](https://github.com/edgexfoundry/device-modbus-go/commit/62efd1dd4c397f05c839b675b24cfed764c2ffe4))
+
+### ♻ Code Refactoring
+
+- Update go module to v4 ([e533240…](https://github.com/edgexfoundry/device-modbus-go/commit/e5332404101c211199c2a52bd4ae75d54dd119a6))
+```text
+
+BREAKING CHANGE: update go module to v4
+
+```
+
+### 🐛 Bug Fixes
+
+- Apply trace log for details operations ([0963b13…](https://github.com/edgexfoundry/device-modbus-go/commit/0963b134bb935918115d5565c6ea0bfc8c4b6484))
+- Only one ldflags flag is allowed ([6ff3c2f…](https://github.com/edgexfoundry/device-modbus-go/commit/6ff3c2f363e2507abfa48683d74813bb761c41a3))
+- Fix error handling for unsupported primaryTable in resource logging ([cae1fa6…](https://github.com/edgexfoundry/device-modbus-go/commit/cae1fa6aa983ff166270eacbc29a6f56a32ff675))
+
+### 👷 Build
+
+- Upgrade to go-1.23, Linter1.61.0 and Alpine 3.20 ([740c30d…](https://github.com/edgexfoundry/device-modbus-go/commit/740c30d7b950d417d20c8a92a82ead1f4c53b564))
+- Correct Attribution.txt ([74c9693…](https://github.com/edgexfoundry/device-modbus-go/commit/74c9693bc184421cd09d4c9383402722d397ba85))
+
+
 ## [v3.1.0] Napa - 2023-11-15 (Only compatible with the 3.x releases)
 
 
