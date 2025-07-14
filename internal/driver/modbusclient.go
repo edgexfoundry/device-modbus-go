@@ -7,6 +7,7 @@
 package driver
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
 	"log"
@@ -14,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	MODBUS "github.com/goburrow/modbus"
+	MODBUS "github.com/grid-x/modbus"
 )
 
 // ModbusClient is used for connecting the device and read/write value
@@ -27,6 +28,8 @@ type ModbusClient struct {
 	RTUClientHandler MODBUS.RTUClientHandler
 	// ASCIIClientHandler is used for holding device ASCII connection
 	ASCIIClientHandler MODBUS.ASCIIClientHandler
+	// Context is used for holding the context of the client
+	ctx context.Context
 
 	client MODBUS.Client
 }
@@ -35,7 +38,7 @@ func (c *ModbusClient) OpenConnection() error {
 	var newClient MODBUS.Client
 	switch c.ModbusType {
 	case ProtocolTCP:
-		err := c.TCPClientHandler.Connect()
+		err := c.TCPClientHandler.Connect(c.ctx)
 		if err != nil {
 			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
 			return err
@@ -43,7 +46,7 @@ func (c *ModbusClient) OpenConnection() error {
 		newClient = MODBUS.NewClient(&c.TCPClientHandler)
 		driver.Logger.Info("Modbus client create TCP connection.")
 	case ProtocolRTU:
-		err := c.RTUClientHandler.Connect()
+		err := c.RTUClientHandler.Connect(c.ctx)
 		if err != nil {
 			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
 			return err
@@ -51,7 +54,7 @@ func (c *ModbusClient) OpenConnection() error {
 		newClient = MODBUS.NewClient(&c.RTUClientHandler)
 		driver.Logger.Info("Modbus client create RTU connection.")
 	case ProtocolASCII:
-		err := c.ASCIIClientHandler.Connect()
+		err := c.ASCIIClientHandler.Connect(c.ctx)
 		if err != nil {
 			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
 			return err
@@ -91,14 +94,14 @@ func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
 
 	switch modbusCommandInfo.PrimaryTable {
 	case DISCRETES_INPUT, DISCRETE_INPUTS:
-		response, err = c.client.ReadDiscreteInputs(modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
+		response, err = c.client.ReadDiscreteInputs(c.ctx, modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
 	case COILS:
-		response, err = c.client.ReadCoils(modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
+		response, err = c.client.ReadCoils(c.ctx, modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
 
 	case INPUT_REGISTERS:
-		response, err = c.client.ReadInputRegisters(modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
+		response, err = c.client.ReadInputRegisters(c.ctx, modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
 	case HOLDING_REGISTERS:
-		response, err = c.client.ReadHoldingRegisters(modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
+		response, err = c.client.ReadHoldingRegisters(c.ctx, modbusCommandInfo.StartingAddress, modbusCommandInfo.Length)
 	default:
 		driver.Logger.Error("None supported primary table! ")
 	}
@@ -124,16 +127,16 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 		err = fmt.Errorf("Error: DISCRETES_INPUT is Read-Only..!!")
 
 	case COILS:
-		result, err = c.client.WriteMultipleCoils(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+		result, err = c.client.WriteMultipleCoils(c.ctx, uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 
 	case INPUT_REGISTERS:
 		err = fmt.Errorf("Error: INPUT_REGISTERS is Read-Only..!!")
 
 	case HOLDING_REGISTERS:
 		if modbusCommandInfo.Length == 1 {
-			result, err = c.client.WriteSingleRegister(uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
+			result, err = c.client.WriteSingleRegister(c.ctx, uint16(modbusCommandInfo.StartingAddress), binary.BigEndian.Uint16(value))
 		} else {
-			result, err = c.client.WriteMultipleRegisters(uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
+			result, err = c.client.WriteMultipleRegisters(c.ctx, uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 		}
 	default:
 	}
@@ -148,18 +151,19 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 
 func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client := new(ModbusClient)
+	client.ctx = context.Background()
 	client.ModbusType = connectionInfo.Protocol
 	switch client.ModbusType {
 	case ProtocolTCP:
 		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
-		client.TCPClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		client.TCPClientHandler.SlaveID = byte(connectionInfo.UnitID)
 		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	case ProtocolRTU:
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.RTUClientHandler.Address = serialParams[0]
-		client.RTUClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		client.RTUClientHandler.SlaveID = byte(connectionInfo.UnitID)
 		client.RTUClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.RTUClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.RTUClientHandler.BaudRate = connectionInfo.BaudRate
@@ -170,7 +174,7 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	case ProtocolASCII:
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.ASCIIClientHandler.Address = serialParams[0]
-		client.ASCIIClientHandler.SlaveId = byte(connectionInfo.UnitID)
+		client.ASCIIClientHandler.SlaveID = byte(connectionInfo.UnitID)
 		client.ASCIIClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.ASCIIClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.ASCIIClientHandler.BaudRate = connectionInfo.BaudRate
