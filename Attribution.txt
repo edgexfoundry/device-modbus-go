@@ -18,11 +18,11 @@ https://github.com/go-kit/kit/blob/master/LICENSE
 go-logfmt/logfmt (MIT) https://github.com/go-logfmt/logfmt
 https://github.com/go-logfmt/logfmt/blob/master/LICENSE
 
-goburrow/modbus (BSD-3) https://github.com/goburrow/modbus
-https://github.com/goburrow/modbus/blob/master/LICENSE
+grid-x/modbus (BSD-3) https://github.com/grid-x/modbus
+https://github.com/grid-x/modbus/blob/master/LICENSE
 
-github.com/goburrow/serial (MIT) https://github.com/goburrow/serial
-https://github.com/goburrow/serial/blob/master/LICENSE
+github.com/grid-x/serial (MIT) https://github.com/grid-x/serial
+https://github.com/grid-x/serial/blob/master/LICENSE
 
 github.com/tbrandon/mbserver (MIT) https://github.com/tbrandon/mbserver
 https://github.com/tbrandon/mbserver/blob/master/LICENSE
