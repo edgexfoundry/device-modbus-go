@@ -11,6 +11,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 	"time"
 
@@ -32,6 +33,7 @@ type DeviceClient interface {
 type CommandInfo struct {
 	PrimaryTable    string
 	StartingAddress uint16
+	BitAddress      uint8
 	ValueType       string
 	// how many register need to read
 	Length     uint16
@@ -50,7 +52,29 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 	if _, ok := req.Attributes[STARTING_ADDRESS]; !ok {
 		return nil, errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("attribute %s not exists", STARTING_ADDRESS), nil)
 	}
-	startingAddress, err := castStartingAddress(req.Attributes[STARTING_ADDRESS])
+	var startingAddressStr string
+	switch v := req.Attributes[STARTING_ADDRESS].(type) {
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		startingAddressStr = fmt.Sprintf("%d", v)
+	case float32, float64:
+		startingAddressStr = fmt.Sprintf("%.2f", v)
+	default:
+		startingAddressStr = fmt.Sprintf("%v", v)
+	}
+
+	addressParts := strings.Split(startingAddressStr, ".")
+	var bitAddress uint8
+	if len(addressParts) > 2 {
+		return nil, errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("invaliade startingAddress %s", startingAddressStr), nil)
+	} else if len(addressParts) == 2 {
+		num, err := strconv.ParseUint(addressParts[1], 10, 8)
+		if err != nil {
+			return nil, errors.NewCommonEdgeX(errors.Kind(err), "fail to parse bitAddress", err)
+		}
+		bitAddress = uint8(num)
+	}
+	startingAddressStr = addressParts[0]
+	startingAddress, err := castStartingAddress(startingAddressStr)
 	if err != nil {
 		return nil, errors.NewCommonEdgeX(errors.Kind(err), fmt.Sprintf("fail to cast %s", STARTING_ADDRESS), err)
 	}
@@ -97,6 +121,7 @@ func createCommandInfo(req *models.CommandRequest) (*CommandInfo, error) {
 	return &CommandInfo{
 		PrimaryTable:    primaryTable,
 		StartingAddress: startingAddress,
+		BitAddress:      bitAddress,
 		ValueType:       req.Type,
 		Length:          length,
 		IsByteSwap:      isByteSwap,
@@ -173,7 +198,14 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 	case common.ValueTypeBool:
 		res = false
 		// to find the 1st bit of the dataBytes by mask it with 2^0 = 1 (00000001)
-		if (dataBytes[0] & 1) > 0 {
+		totalBits := len(dataBytes) * 8
+		if int(commandInfo.BitAddress) >= totalBits {
+			driver.Logger.Errorf("Error: Bit index% d is out of range (total bits:% d)", commandInfo.BitAddress, totalBits)
+			return nil, fmt.Errorf("error: Bit index% d is out of range (total bits:% d)", commandInfo.BitAddress, totalBits)
+		}
+		byteIndex := (totalBits - 1 - int(commandInfo.BitAddress)) / 8
+		bitOffset := commandInfo.BitAddress % 8
+		if ((dataBytes[byteIndex] >> bitOffset) & 1) > 0 {
 			res = true
 		}
 	case common.ValueTypeString:
