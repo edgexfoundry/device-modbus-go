@@ -238,6 +238,42 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 	}
 }
 
+func TestTransformDataBytesToResult_BOOL_REGISTER_Bit_Decomposition(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeBool,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: 10.01,
+		},
+	}
+
+	tests := []struct {
+		name         string
+		primaryTable string
+		data         []byte
+		expected     bool
+	}{
+		{"transform true value from HOLDING_REGISTERS", HOLDING_REGISTERS, []byte{0, 2}, true},
+		{"transform false value fromHOLDING_REGISTERS", HOLDING_REGISTERS, []byte{0, 0}, false},
+		{"transform true value from INPUT_REGISTERS", INPUT_REGISTERS, []byte{0, 2}, true},
+		{"transform false value from INPUT_REGISTERS", INPUT_REGISTERS, []byte{0, 0}, false},
+	}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			req.Attributes[PRIMARY_TABLE] = testCase.primaryTable
+			commandInfo, err := createCommandInfo(&req)
+			require.NoError(t, err)
+			commandValue, err := TransformDataBytesToResult(&req, testCase.data, commandInfo)
+			require.NoError(t, err)
+			result, err := commandValue.BoolValue()
+			require.NoError(t, err)
+
+			assert.Equal(t, testCase.expected, result)
+		})
+	}
+}
+
 func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT32(t *testing.T) {
 	req := models.CommandRequest{
 		DeviceResourceName: "light",
