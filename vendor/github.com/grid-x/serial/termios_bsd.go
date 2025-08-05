@@ -1,4 +1,4 @@
-// +build freebsd openbsd netbsd
+// +build freebsd netbsd
 
 package serial
 
