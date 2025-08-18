@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.23.7
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.30
+	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.31
 	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.12
 	github.com/grid-x/modbus v0.0.0-20250714121349-f7cc8b80d85c
 	github.com/spf13/cast v1.9.2
@@ -17,7 +17,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.0 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.29 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.30 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v4 v4.1.0-dev.12 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v4 v4.1.0-dev.13 // indirect
 	github.com/edgexfoundry/go-mod-registry/v4 v4.1.0-dev.4 // indirect
@@ -78,12 +78,12 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/openziti/channel/v4 v4.2.19 // indirect
+	github.com/openziti/channel/v4 v4.2.21 // indirect
 	github.com/openziti/edge-api v0.26.47 // indirect
 	github.com/openziti/foundation/v2 v2.0.70 // indirect
 	github.com/openziti/identity v1.0.109 // indirect
 	github.com/openziti/metrics v1.4.2 // indirect
-	github.com/openziti/sdk-golang v1.2.2 // indirect
+	github.com/openziti/sdk-golang v1.2.3 // indirect
 	github.com/openziti/secretstream v0.1.38 // indirect
 	github.com/openziti/transport/v2 v2.0.183 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
