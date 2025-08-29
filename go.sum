@@ -72,10 +72,10 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/eclipse/paho.mqtt.golang v1.5.0 h1:EH+bUVJNgttidWFkLLVKaQPGmkTUfQQqjOsyvMGvD6o=
 github.com/eclipse/paho.mqtt.golang v1.5.0/go.mod h1:du/2qNQVqJf/Sqs4MEL77kR8QTqANF7XU7Fk0aOTAgk=
-github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.31 h1:cmx6e6g4jQ/I0tLy2R6opTaBzjmnQdbH9nXlLFdBYSU=
-github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.31/go.mod h1:MzGccSAlqXUQQAbSYtteIUM8KrUwTnwvnvR/6FBH+j8=
-github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.30 h1:3Onz1+oxAlRlMchjfL0bO+XTP63lMqmlpjobQNP8Bn0=
-github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.30/go.mod h1:sQKOtdQlVuRzo06mDgNbJeyT/9QV94LlaY5wO1MsycU=
+github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.33 h1:CbxiJrTQP+rEcqjEwnJoo6LqoNkB+IhXv4CSdfID6Ac=
+github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.33/go.mod h1:5vzvJdkrzMeaFGz2fbUYmodjKvSSYYmSdDEPyiIDQFc=
+github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.32 h1:tRD++9cHQ/+B+1V6udsMer3EmolL/3/JvshGw1hxj0A=
+github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.32/go.mod h1:Nn9DmMDrsJtHn6eO1W4/tk5uVrdAfBKtD2djPFsOIbg=
 github.com/edgexfoundry/go-mod-configuration/v4 v4.1.0-dev.12 h1:sW0dy9juPYPOwgwZAq1riDhJ96ivZBV9bdn+qWeeWO0=
 github.com/edgexfoundry/go-mod-configuration/v4 v4.1.0-dev.12/go.mod h1:8av7ex+XGeQHXQe/qyCdZ6g9AYWAYGRkkeFK0TKbiOQ=
 github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.12 h1:y5DmnfDWSzkil3n/mOM3geNlObQw59U75901R4s0a94=
@@ -447,8 +447,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
-github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
+github.com/stretchr/testify v1.11.0 h1:ib4sjIrwZKxE5u/Japgo/7SJV3PvgjGiRNAvTVGqQl8=
+github.com/stretchr/testify v1.11.0/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tklauser/go-sysconf v0.3.12 h1:0QaGUFOdQaIVdPgfITYzaTegZvdCjmYO52cSFAEVmqU=
 github.com/tklauser/go-sysconf v0.3.12/go.mod h1:Ho14jnntGE1fpdOqQEEaiKRpvIavV0hSfmBq8nJbHYI=
