@@ -155,14 +155,14 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client.ModbusType = connectionInfo.Protocol
 	switch client.ModbusType {
 	case ProtocolTCP:
-		client.TCPClientHandler.Address = fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port)
+		client.TCPClientHandler = *MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
 		client.TCPClientHandler.SlaveID = byte(connectionInfo.UnitID)
 		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	case ProtocolRTU:
 		serialParams := strings.Split(connectionInfo.Address, ",")
-		client.RTUClientHandler.Address = serialParams[0]
+		client.RTUClientHandler = *MODBUS.NewRTUClientHandler(serialParams[0])
 		client.RTUClientHandler.SlaveID = byte(connectionInfo.UnitID)
 		client.RTUClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.RTUClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
@@ -173,7 +173,7 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		client.RTUClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	case ProtocolASCII:
 		serialParams := strings.Split(connectionInfo.Address, ",")
-		client.ASCIIClientHandler.Address = serialParams[0]
+		client.ASCIIClientHandler = *MODBUS.NewASCIIClientHandler(serialParams[0])
 		client.ASCIIClientHandler.SlaveID = byte(connectionInfo.UnitID)
 		client.ASCIIClientHandler.Timeout = time.Duration(connectionInfo.Timeout) * time.Second
 		client.ASCIIClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout) * time.Second
