@@ -238,6 +238,153 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 	}
 }
 
+// test added for bit decomposition
+func TestTransformDataBytesToResult_BOOL_REGISTER_Bit_Decomposition(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeBool,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: 10.01,
+		},
+	}
+
+	tests := []struct {
+		name         string
+		primaryTable string
+		data         []byte
+		expected     bool
+	}{
+		{"transform true value from HOLDING_REGISTERS", HOLDING_REGISTERS, []byte{0, 2}, true},
+		{"transform false value fromHOLDING_REGISTERS", HOLDING_REGISTERS, []byte{0, 0}, false},
+		{"transform true value from INPUT_REGISTERS", INPUT_REGISTERS, []byte{0, 2}, true},
+		{"transform false value from INPUT_REGISTERS", INPUT_REGISTERS, []byte{0, 0}, false},
+	}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			req.Attributes[PRIMARY_TABLE] = testCase.primaryTable
+			commandInfo, err := createCommandInfo(&req)
+			require.NoError(t, err)
+			commandValue, err := TransformDataBytesToResult(&req, testCase.data, commandInfo)
+			require.NoError(t, err)
+			result, err := commandValue.BoolValue()
+			require.NoError(t, err)
+
+			assert.Equal(t, testCase.expected, result)
+		})
+	}
+}
+
+func TestCreateCommandInfo_MissingStartingAddress(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeInt16,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE: INPUT_REGISTERS,
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestCreateCommandInfo_InvalidStartingAddressTooManyDots(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeInt16,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10.1.2",
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestCreateCommandInfo_InvalidStartingAddressBitParse(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeInt16,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: "10.bad",
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestCreateCommandInfo_InvalidByteSwapAttr(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeInt16,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: 10,
+			IS_BYTE_SWAP:     "not-bool",
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestCreateCommandInfo_InvalidWordSwapAttr(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeInt16,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: 10,
+			IS_WORD_SWAP:     "not-bool",
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestCreateCommandInfo_StringMissingRegisterSize(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeString,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: 10,
+			// STRING_REGISTER_SIZE intentionally omitted
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestCreateCommandInfo_InvalidRawType(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeFloat32,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: 10,
+			RAW_TYPE:         "foo",
+		},
+	}
+	_, err := createCommandInfo(&req)
+	require.Error(t, err)
+}
+
+func TestTransformDataBytesToResult_BOOL_BitIndexOutOfRange(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeBool,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: 10.16, // bit index 16 over 2-byte (16-bit) data
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	require.NoError(t, err)
+	// 2 bytes -> 16 bits, bit index 16 is out of range
+	_, err = TransformDataBytesToResult(&req, []byte{0, 0}, commandInfo)
+	require.Error(t, err)
+}
+
 func TestTransformDataBytesToResult_RawType_INT16_ValueType_FLOAT32(t *testing.T) {
 	req := models.CommandRequest{
 		DeviceResourceName: "light",

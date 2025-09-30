@@ -47,6 +47,19 @@ deviceResources:
     maximum: 11
     defaultValue: "0"
 -
+  name: "CommunicationFailure"
+  isHidden: true
+  description: "0-normal 1-fault"
+  attributes:
+    { primaryTable: "HOLDING_REGISTERS", startingAddress: "5.1" }
+  properties:
+    valueType: "Bool"
+    readWrite: "R"
+    scale: 1
+    minimum: 0
+    maximum: 1
+    defaultValue: "0"
+-
   name: "FanSpeed"
   isHidden: true
   description: "0-Low 1-Med 2-High 3-Auto 4-Top 5-Very Lo 7-VAM Super Hi 8-VAM Lo FreshUp 9-VAMHiFreshUp"
