@@ -238,7 +238,6 @@ func TestTransformDataBytesToResult_BOOL(t *testing.T) {
 	}
 }
 
-// test added for bit decomposition
 func TestTransformDataBytesToResult_BOOL_REGISTER_Bit_Decomposition(t *testing.T) {
 	req := models.CommandRequest{
 		DeviceResourceName: "light",
