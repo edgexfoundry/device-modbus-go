@@ -201,12 +201,6 @@ github.com/go-playground/validator/v10
 ## explicit; go 1.20
 github.com/go-resty/resty/v2
 github.com/go-resty/resty/v2/shellescape
-# github.com/goburrow/modbus v0.1.0
-## explicit
-github.com/goburrow/modbus
-# github.com/goburrow/serial v0.1.0
-## explicit
-github.com/goburrow/serial
 # github.com/golang-jwt/jwt/v5 v5.2.1
 ## explicit; go 1.18
 github.com/golang-jwt/jwt/v5
@@ -225,6 +219,12 @@ github.com/gorilla/securecookie
 # github.com/gorilla/websocket v1.5.3
 ## explicit; go 1.12
 github.com/gorilla/websocket
+# github.com/grid-x/modbus v0.0.0-20250714121349-f7cc8b80d85c
+## explicit; go 1.21
+github.com/grid-x/modbus
+# github.com/grid-x/serial v0.0.0-20211107191517-583c7356b3aa
+## explicit; go 1.13
+github.com/grid-x/serial
 # github.com/hashicorp/errwrap v1.1.0
 ## explicit
 github.com/hashicorp/errwrap

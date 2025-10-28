@@ -5,12 +5,13 @@
 package modbus
 
 import (
+	"context"
+	"fmt"
 	"io"
-	"log"
 	"sync"
 	"time"
 
-	"github.com/goburrow/serial"
+	"github.com/grid-x/serial"
 )
 
 const (
@@ -24,7 +25,7 @@ type serialPort struct {
 	// Serial port configuration.
 	serial.Config
 
-	Logger      *log.Logger
+	Logger      Logger
 	IdleTimeout time.Duration
 
 	mu sync.Mutex
@@ -34,19 +35,24 @@ type serialPort struct {
 	closeTimer   *time.Timer
 }
 
-func (mb *serialPort) Connect() (err error) {
+func (mb *serialPort) Connect(ctx context.Context) (err error) {
 	mb.mu.Lock()
 	defer mb.mu.Unlock()
 
-	return mb.connect()
+	return mb.connect(ctx)
 }
 
 // connect connects to the serial port if it is not connected. Caller must hold the mutex.
-func (mb *serialPort) connect() error {
+func (mb *serialPort) connect(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
 	if mb.port == nil {
 		port, err := serial.Open(&mb.Config)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not open %s: %w", mb.Config.Address, err)
 		}
 		mb.port = port
 	}
@@ -94,8 +100,8 @@ func (mb *serialPort) closeIdle() {
 	if mb.IdleTimeout <= 0 {
 		return
 	}
-	idle := time.Now().Sub(mb.lastActivity)
-	if idle >= mb.IdleTimeout {
+
+	if idle := time.Since(mb.lastActivity); idle >= mb.IdleTimeout {
 		mb.logf("modbus: closing connection due to idle timeout: %v", idle)
 		mb.close()
 	}
