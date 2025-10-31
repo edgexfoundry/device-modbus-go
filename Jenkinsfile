@@ -15,5 +15,6 @@
 //
 
 edgeXBuildGoApp (
-    project: 'device-modbus-go'
+    project: 'device-modbus-go',
+    goVersion: '1.23'
 )
