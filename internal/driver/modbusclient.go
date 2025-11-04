@@ -124,13 +124,13 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 
 	switch modbusCommandInfo.PrimaryTable {
 	case DISCRETES_INPUT, DISCRETE_INPUTS:
-		err = fmt.Errorf("Error: DISCRETES_INPUT is Read-Only..!!")
+		err = fmt.Errorf("error: DISCRETES_INPUT is Read-Only")
 
 	case COILS:
 		result, err = c.client.WriteMultipleCoils(c.ctx, uint16(modbusCommandInfo.StartingAddress), modbusCommandInfo.Length, value)
 
 	case INPUT_REGISTERS:
-		err = fmt.Errorf("Error: INPUT_REGISTERS is Read-Only..!!")
+		err = fmt.Errorf("error: INPUT_REGISTERS is Read-Only")
 
 	case HOLDING_REGISTERS:
 		if modbusCommandInfo.Length == 1 {

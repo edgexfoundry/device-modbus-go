@@ -158,18 +158,18 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 	case common.ValueTypeUint64:
 		res = binary.BigEndian.Uint64(dataBytes)
 	case common.ValueTypeInt16:
-		res = int16(binary.BigEndian.Uint16(dataBytes))
+		res = int16(binary.BigEndian.Uint16(dataBytes)) // #nosec G115
 	case common.ValueTypeInt32:
-		res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
+		res = int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))) // #nosec G115
 	case common.ValueTypeInt64:
-		res = int64(binary.BigEndian.Uint64(dataBytes))
+		res = int64(binary.BigEndian.Uint64(dataBytes)) // #nosec G115
 	case common.ValueTypeFloat32:
 		switch commandInfo.RawType {
 		case common.ValueTypeFloat32:
 			raw := binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
 			res = math.Float32frombits(raw)
 		case common.ValueTypeInt16:
-			raw := int16(binary.BigEndian.Uint16(dataBytes))
+			raw := int16(binary.BigEndian.Uint16(dataBytes)) // #nosec G115
 			res = float32(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT32, res, result.ValueToString())
 		case common.ValueTypeUint16:
@@ -183,7 +183,7 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 			raw := binary.BigEndian.Uint64(dataBytes)
 			res = math.Float64frombits(raw)
 		case common.ValueTypeInt16:
-			raw := int16(binary.BigEndian.Uint16(dataBytes))
+			raw := int16(binary.BigEndian.Uint16(dataBytes)) // #nosec G115
 			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT16, FLOAT64, res, result.ValueToString())
 		case common.ValueTypeUint16:
@@ -191,7 +191,7 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT16, FLOAT64, res, result.ValueToString())
 		case common.ValueTypeInt32:
-			raw := int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)))
+			raw := int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))) // #nosec G115
 			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT32, FLOAT64, res, result.ValueToString())
 		}
@@ -237,13 +237,13 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.Co
 		}
 
 		numericValue := buf.Bytes()
-		var maxSize = uint16(len(numericValue))
+		var maxSize = uint16(len(numericValue)) // #nosec G115
 		dataBytes = numericValue[maxSize-byteCount : maxSize]
 	}
 
 	_, ok := ValueTypeBitCountMap[commandInfo.ValueType]
 	if !ok {
-		err = fmt.Errorf("none supported value type : %v \n", commandInfo.ValueType)
+		err = fmt.Errorf("none supported value type : %v", commandInfo.ValueType)
 		return dataBytes, err
 	}
 
@@ -252,39 +252,42 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.Co
 	}
 
 	// Cast value according to the rawType, this feature converts float value to integer 32bit value
-	if commandInfo.ValueType == common.ValueTypeFloat32 {
+	switch commandInfo.ValueType {
+	case common.ValueTypeFloat32:
 		val, edgexErr := value.Float32Value()
 		if edgexErr != nil {
 			return dataBytes, edgexErr
 		}
-		if commandInfo.RawType == common.ValueTypeInt16 {
+		switch commandInfo.RawType {
+		case common.ValueTypeInt16:
 			dataBytes, err = getBinaryData(int16(val))
 			if err != nil {
 				return dataBytes, err
 			}
-		} else if commandInfo.RawType == common.ValueTypeUint16 {
+		case common.ValueTypeUint16:
 			dataBytes, err = getBinaryData(uint16(val))
 			if err != nil {
 				return dataBytes, err
 			}
 		}
-	} else if commandInfo.ValueType == common.ValueTypeFloat64 {
+	case common.ValueTypeFloat64:
 		val, edgexErr := value.Float64Value()
 		if edgexErr != nil {
 			return dataBytes, edgexErr
 		}
-		if commandInfo.RawType == common.ValueTypeInt16 {
+		switch commandInfo.RawType {
+		case common.ValueTypeInt16:
 			dataBytes, err = getBinaryData(int16(val))
 			if err != nil {
 				return dataBytes, err
 			}
-		} else if commandInfo.RawType == common.ValueTypeUint16 {
+		case common.ValueTypeUint16:
 			dataBytes, err = getBinaryData(uint16(val))
 			if err != nil {
 				return dataBytes, err
 			}
 		}
-	} else if commandInfo.ValueType == common.ValueTypeString {
+	case common.ValueTypeString:
 		// Cast value of string type
 		oriStr := value.ValueToString()
 		tempBytes := []byte(oriStr)
