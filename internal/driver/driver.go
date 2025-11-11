@@ -51,16 +51,40 @@ func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) 
 	return c, nil
 }
 
+func (d *Driver) disconnectDeviceClient(info *ConnectionInfo) error {
+	d.clientMutex.Lock()
+	defer d.clientMutex.Unlock()
+	key := info.String()
+	if _, ok := d.clientMap[key]; ok {
+		client := d.clientMap[key]
+		return client.CloseConnection()
+	}
+	return nil
+}
+
 func (d *Driver) removeDeviceClient(info *ConnectionInfo) {
 	d.clientMutex.Lock()
 	defer d.clientMutex.Unlock()
 	key := info.String()
-	delete(d.clientMap, key)
+	if _, ok := d.clientMap[key]; ok {
+		client := d.clientMap[key]
+		err := client.CloseConnection()
+		if err != nil {
+			driver.Logger.Errorf("Device client close error, client key = %s, err = %v", key, err)
+		} else {
+			driver.Logger.Infof("device client closed,client key = %s", key)
+		}
+		delete(d.clientMap, key)
+	}
 }
 
 func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
-	d.Logger.Warn("Driver's DisconnectDevice function didn't implement")
-	return nil
+	connectionInfo, err := createConnectionInfo(protocols)
+	if err != nil {
+		driver.Logger.Errorf("Fail to create disconnect device connection info. err:%v \n", err)
+		return err
+	}
+	return d.disconnectDeviceClient(connectionInfo)
 }
 
 // lockAddress mark address is unavailable because real device handle one request at a time
@@ -290,6 +314,12 @@ func (d *Driver) UpdateDevice(deviceName string, protocols map[string]models.Pro
 }
 
 func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
+	connectionInfo, err := createConnectionInfo(protocols)
+	if err != nil {
+		driver.Logger.Errorf("Fail to create remove device connection info. err:%v \n", err)
+		return err
+	}
+	d.removeDeviceClient(connectionInfo)
 	d.Logger.Debugf("Device %s is removed", deviceName)
 	return nil
 }
