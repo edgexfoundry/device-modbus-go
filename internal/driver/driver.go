@@ -51,17 +51,6 @@ func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) 
 	return c, nil
 }
 
-func (d *Driver) disconnectDeviceClient(info *ConnectionInfo) error {
-	d.clientMutex.Lock()
-	defer d.clientMutex.Unlock()
-	key := info.String()
-	if _, ok := d.clientMap[key]; ok {
-		client := d.clientMap[key]
-		return client.CloseConnection()
-	}
-	return nil
-}
-
 func (d *Driver) removeDeviceClient(info *ConnectionInfo) {
 	d.clientMutex.Lock()
 	defer d.clientMutex.Unlock()
@@ -76,15 +65,6 @@ func (d *Driver) removeDeviceClient(info *ConnectionInfo) {
 		}
 		delete(d.clientMap, key)
 	}
-}
-
-func (d *Driver) DisconnectDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
-	connectionInfo, err := createConnectionInfo(protocols)
-	if err != nil {
-		driver.Logger.Errorf("Fail to create disconnect device connection info. err:%v \n", err)
-		return err
-	}
-	return d.disconnectDeviceClient(connectionInfo)
 }
 
 // lockAddress mark address is unavailable because real device handle one request at a time
