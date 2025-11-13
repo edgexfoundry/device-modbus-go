@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.25.0
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.42
+	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.44
 	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.21
 	github.com/grid-x/modbus v0.0.0-20250714121349-f7cc8b80d85c
 	github.com/spf13/cast v1.10.0
@@ -17,7 +17,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.1 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.42 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.43 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v4 v4.1.0-dev.17 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v4 v4.1.0-dev.18 // indirect
 	github.com/edgexfoundry/go-mod-registry/v4 v4.1.0-dev.7 // indirect
