@@ -20,8 +20,8 @@ func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	stopBits := 1
 	parity := "N"
 	unitID := uint8(255)
-	timeout := 5
-	idleTimeout := 5
+	timeout := 5.0
+	idleTimeout := 5.0
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
@@ -54,8 +54,8 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 	stopBits := 1
 	parity := "N"
 	unitID := uint8(0)
-	timeout := 5
-	idleTimeout := 5
+	timeout := 5.0
+	idleTimeout := 5.0
 	protocols := map[string]models.ProtocolProperties{
 		ProtocolRTU: {
 			Address:     address,
@@ -136,7 +136,7 @@ func TestCreateTCPConnectionInfo(t *testing.T) {
 			Address:     address,
 			Port:        502,
 			UnitID:      255,
-			Timeout:     5,
+			Timeout:     5.0,
 			IdleTimeout: 5,
 		},
 	}
@@ -160,8 +160,8 @@ func TestCreateTCPConnectionInfo_unitIdOutOfRange(t *testing.T) {
 			Address:     address,
 			Port:        502,
 			UnitID:      unitID,
-			Timeout:     5,
-			IdleTimeout: 5,
+			Timeout:     5.0,
+			IdleTimeout: 5.0,
 		},
 	}
 

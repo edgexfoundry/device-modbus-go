@@ -26,9 +26,11 @@ type ConnectionInfo struct {
 	Parity   string
 	UnitID   uint8
 	// Connect & Read timeout(seconds)
-	Timeout int
-	// Idle timeout(seconds) to close the connection
-	IdleTimeout int
+	Timeout float64
+	// Idle timeout(seconds) to close the connection. If negative, cached connections do not time out. If zero, disables the caching of TCP connections
+	IdleTimeout float64
+	// Recovery timeout(seconds) for tcp only. useful for network glitch recovery
+	LinkRecoveryTimeout *float64
 }
 
 func (info *ConnectionInfo) String() string {
@@ -88,6 +90,20 @@ func parseIntValue(properties map[string]any, key string) (int, error) {
 	return res, nil
 }
 
+func parseFloatValue(properties map[string]any, key string) (float64, error) {
+	value, ok := properties[key]
+	if !ok {
+		return 0, fmt.Errorf("protocol config '%s' not exist", key)
+	}
+
+	res, err := cast.ToFloat64E(value)
+	if err != nil {
+		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to float64, %v", key, value, err)
+	}
+
+	return res, nil
+}
+
 func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, err error) {
 	errorMessage := "unable to create RTU connection info, protocol config '%s' not exist"
 	value, ok := protocol[Address]
@@ -135,12 +151,12 @@ func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, 
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
-	timeout, err := parseIntValue(protocol, Timeout)
+	timeout, err := parseFloatValue(protocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseIntValue(protocol, IdleTimeout)
+	idleTimeout, err := parseFloatValue(protocol, IdleTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -222,22 +238,28 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
-	timeout, err := parseIntValue(tcpProtocol, Timeout)
+	timeout, err := parseFloatValue(tcpProtocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseIntValue(tcpProtocol, IdleTimeout)
+	idleTimeout, err := parseFloatValue(tcpProtocol, IdleTimeout)
 	if err != nil {
 		return nil, err
+	}
+	var linkRecoveryTimeout *float64
+	linkRecoveryTimeoutFloatVal, err := parseFloatValue(tcpProtocol, LinkRecoveryTimeout)
+	if err == nil {
+		linkRecoveryTimeout = &linkRecoveryTimeoutFloatVal
 	}
 
 	return &ConnectionInfo{
-		Protocol:    ProtocolTCP,
-		Address:     address,
-		Port:        int(port),
-		UnitID:      byte(unitID),
-		Timeout:     timeout,
-		IdleTimeout: idleTimeout,
+		Protocol:            ProtocolTCP,
+		Address:             address,
+		Port:                int(port),
+		UnitID:              byte(unitID),
+		Timeout:             timeout,
+		IdleTimeout:         idleTimeout,
+		LinkRecoveryTimeout: linkRecoveryTimeout,
 	}, nil
 }
