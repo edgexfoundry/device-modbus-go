@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.42
 	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.21
-	github.com/grid-x/modbus v0.0.0-20250714121349-f7cc8b80d85c
+	github.com/grid-x/modbus v0.0.0-20251101080009-99e372e638c1
 	github.com/spf13/cast v1.10.0
 	github.com/stretchr/testify v1.11.1
 )
