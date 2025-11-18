@@ -162,6 +162,9 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		if connectionInfo.LinkRecoveryTimeout != nil {
 			client.TCPClientHandler.LinkRecoveryTimeout = time.Duration(*connectionInfo.LinkRecoveryTimeout) * time.Second
 		}
+		if connectionInfo.ProtocolRecoveryTimeout != nil {
+			client.TCPClientHandler.ProtocolRecoveryTimeout = time.Duration(*connectionInfo.ProtocolRecoveryTimeout) * time.Second
+		}
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	case ProtocolRTU:
 		serialParams := strings.Split(connectionInfo.Address, ",")

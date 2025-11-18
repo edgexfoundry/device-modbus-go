@@ -20,7 +20,8 @@ const (
 	// Parity: N - None, O - Odd, E - Even
 	Parity = "Parity"
 
-	Timeout             = "Timeout"
-	IdleTimeout         = "IdleTimeout"
-	LinkRecoveryTimeout = "LinkRecoveryTimeout"
+	Timeout                 = "Timeout"
+	IdleTimeout             = "IdleTimeout"
+	LinkRecoveryTimeout     = "LinkRecoveryTimeout"
+	ProtocolRecoveryTimeout = "ProtocolRecoveryTimeout"
 )

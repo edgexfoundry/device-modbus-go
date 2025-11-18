@@ -31,6 +31,8 @@ type ConnectionInfo struct {
 	IdleTimeout float64
 	// Recovery timeout(seconds) for tcp only. useful for network glitch recovery
 	LinkRecoveryTimeout *float64
+	// Recovery timeout(seconds) for tcp only. useful for protocol error recovery such as TCP Header Error
+	ProtocolRecoveryTimeout *float64
 }
 
 func (info *ConnectionInfo) String() string {
@@ -252,14 +254,20 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 	if err == nil {
 		linkRecoveryTimeout = &linkRecoveryTimeoutFloatVal
 	}
+	var protocolRecoveryTimeout *float64
+	protocolRecoveryTimeoutFloatVal, err := parseFloatValue(tcpProtocol, ProtocolRecoveryTimeout)
+	if err == nil {
+		protocolRecoveryTimeout = &protocolRecoveryTimeoutFloatVal
+	}
 
 	return &ConnectionInfo{
-		Protocol:            ProtocolTCP,
-		Address:             address,
-		Port:                int(port),
-		UnitID:              byte(unitID),
-		Timeout:             timeout,
-		IdleTimeout:         idleTimeout,
-		LinkRecoveryTimeout: linkRecoveryTimeout,
+		Protocol:                ProtocolTCP,
+		Address:                 address,
+		Port:                    int(port),
+		UnitID:                  byte(unitID),
+		Timeout:                 timeout,
+		IdleTimeout:             idleTimeout,
+		LinkRecoveryTimeout:     linkRecoveryTimeout,
+		ProtocolRecoveryTimeout: protocolRecoveryTimeout,
 	}, nil
 }
