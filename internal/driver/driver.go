@@ -143,80 +143,13 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	}
 	driver.Logger.Debugf("key = %s,client = %+v", connectionInfo.String(), deviceClient)
 
-	// only group requests with same register type and value type, and contiguous addresses
-	type reqWithMeta struct {
-		idx         int
-		req         sdkModel.CommandRequest
-		primaryType string
-		valueType   string
-		startAddr   uint16
-		length      uint16
+	reqsMeta, reqsAct, err := aggregateReadRequests(reqs)
+	if err != nil {
+		return responses, err
 	}
-	reqsMeta := make([]reqWithMeta, len(reqs))
-	for i, r := range reqs {
-		cmdInfo, err := createCommandInfo(&r)
-		if err != nil {
-			return responses, err
-		}
-		reqsMeta[i] = reqWithMeta{
-			idx:         i,
-			req:         r,
-			primaryType: cmdInfo.PrimaryTable,
-			valueType:   cmdInfo.ValueType,
-			startAddr:   cmdInfo.StartingAddress,
-			length:      cmdInfo.Length,
-		}
-	}
-	// Sort by primaryType, valueType, startAddr
-	for i := 0; i < len(reqsMeta)-1; i++ {
-		for j := 0; j < len(reqsMeta)-i-1; j++ {
-			a, b := reqsMeta[j], reqsMeta[j+1]
-			if a.primaryType > b.primaryType || (a.primaryType == b.primaryType && (a.valueType > b.valueType || (a.valueType == b.valueType && a.startAddr > b.startAddr))) {
-				reqsMeta[j], reqsMeta[j+1] = reqsMeta[j+1], reqsMeta[j]
-			}
-		}
-	}
-	// Grouping
-	type group struct {
-		startIdx    int
-		endIdx      int
-		primaryType string
-		valueType   string
-		startAddr   uint16
-		totalLen    uint16
-	}
-	groups := []group{}
-	i := 0
-	for i < len(reqsMeta) {
-		g := group{
-			startIdx:    i,
-			endIdx:      i,
-			primaryType: reqsMeta[i].primaryType,
-			valueType:   reqsMeta[i].valueType,
-			startAddr:   reqsMeta[i].startAddr,
-			totalLen:    reqsMeta[i].length,
-		}
-		lastAddr := reqsMeta[i].startAddr
-		lastLen := reqsMeta[i].length
-		for j := i + 1; j < len(reqsMeta); j++ {
-			cur := reqsMeta[j]
-			// Only group if same register type, value type, and contiguous
-			if cur.primaryType == g.primaryType && cur.valueType == g.valueType && cur.startAddr == lastAddr+lastLen {
-				g.endIdx = j
-				g.totalLen += cur.length
-				lastAddr = cur.startAddr
-				lastLen = cur.length
-			} else {
-				break
-			}
-		}
-		groups = append(groups, g)
-		i = g.endIdx + 1
-	}
-	d.Logger.Infof("Actual Read requests: %+v", groups)
-
+	d.Logger.Infof("Actual Read requests: %+v", reqsAct)
 	// For each group, do a single read and split
-	for _, g := range groups {
+	for _, g := range reqsAct {
 		baseReq := reqsMeta[g.startIdx].req
 		baseCmdInfo, err := createCommandInfo(&baseReq)
 		if err != nil {
@@ -422,4 +355,82 @@ func NewProtocolDriver() interfaces.ProtocolDriver {
 		driver = new(Driver)
 	})
 	return driver
+}
+
+// ReqWithMeta holds metadata for grouping read requests
+type ReqWithMeta struct {
+	idx         int
+	req         sdkModel.CommandRequest
+	primaryType string
+	dataType    string
+	startAddr   uint16
+	length      uint16
+}
+
+// DeviceAddressRange represents a DeviceAddressRange of contiguous, compatible read requests
+type DeviceAddressRange struct {
+	startIdx    int
+	endIdx      int
+	primaryType string
+	rawType     string
+	startAddr   uint16
+	totalLen    uint16
+}
+
+// aggregateReadRequests groups read requests by register type, value type, and contiguous addresses
+func aggregateReadRequests(reqs []sdkModel.CommandRequest) ([]ReqWithMeta, []DeviceAddressRange, error) {
+	reqsMeta := make([]ReqWithMeta, len(reqs))
+	for i, r := range reqs {
+		cmdInfo, err := createCommandInfo(&r)
+		if err != nil {
+			return nil, nil, err
+		}
+		reqsMeta[i] = ReqWithMeta{
+			idx:         i,
+			req:         r,
+			primaryType: cmdInfo.PrimaryTable,
+			dataType:    cmdInfo.ValueType,
+			startAddr:   cmdInfo.StartingAddress,
+			length:      cmdInfo.Length,
+		}
+	}
+	// Sort by primaryType, valueType, startAddr
+	for i := 0; i < len(reqsMeta)-1; i++ {
+		for j := 0; j < len(reqsMeta)-i-1; j++ {
+			a, b := reqsMeta[j], reqsMeta[j+1]
+			if a.primaryType > b.primaryType || (a.primaryType == b.primaryType && (a.dataType > b.dataType || (a.dataType == b.dataType && a.startAddr > b.startAddr))) {
+				reqsMeta[j], reqsMeta[j+1] = reqsMeta[j+1], reqsMeta[j]
+			}
+		}
+	}
+	// Grouping
+	groups := []DeviceAddressRange{}
+	i := 0
+	for i < len(reqsMeta) {
+		g := DeviceAddressRange{
+			startIdx:    i,
+			endIdx:      i,
+			primaryType: reqsMeta[i].primaryType,
+			rawType:     reqsMeta[i].dataType,
+			startAddr:   reqsMeta[i].startAddr,
+			totalLen:    reqsMeta[i].length,
+		}
+		lastAddr := reqsMeta[i].startAddr
+		lastLen := reqsMeta[i].length
+		for j := i + 1; j < len(reqsMeta); j++ {
+			cur := reqsMeta[j]
+			// Only group if same register type, type, and contiguous
+			if cur.primaryType == g.primaryType && cur.dataType == g.rawType && cur.startAddr == lastAddr+lastLen {
+				g.endIdx = j
+				g.totalLen += cur.length
+				lastAddr = cur.startAddr
+				lastLen = cur.length
+			} else {
+				break
+			}
+		}
+		groups = append(groups, g)
+		i = g.endIdx + 1
+	}
+	return reqsMeta, groups, nil
 }
