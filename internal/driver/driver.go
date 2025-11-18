@@ -119,6 +119,8 @@ func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 }
 
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
+	d.Logger.Debugf("HandleReadCommands called for device %s", deviceName)
+	d.Logger.Debugf("Read command requests: %+v", reqs)
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
 		driver.Logger.Errorf("Fail to create read command connection info. err:%v \n", err)
@@ -141,23 +143,127 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	}
 	driver.Logger.Debugf("key = %s,client = %+v", connectionInfo.String(), deviceClient)
 
-	// handle command requests
-	for i, req := range reqs {
-		res, err := handleReadCommandRequest(deviceClient, req)
+	// only group requests with same register type and value type, and contiguous addresses
+	type reqWithMeta struct {
+		idx         int
+		req         sdkModel.CommandRequest
+		primaryType string
+		valueType   string
+		startAddr   uint16
+		length      uint16
+	}
+	reqsMeta := make([]reqWithMeta, len(reqs))
+	for i, r := range reqs {
+		cmdInfo, err := createCommandInfo(&r)
 		if err != nil {
-			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", req.DeviceResourceName, err)
+			return responses, err
+		}
+		reqsMeta[i] = reqWithMeta{
+			idx:         i,
+			req:         r,
+			primaryType: cmdInfo.PrimaryTable,
+			valueType:   cmdInfo.ValueType,
+			startAddr:   cmdInfo.StartingAddress,
+			length:      cmdInfo.Length,
+		}
+	}
+	// Sort by primaryType, valueType, startAddr
+	for i := 0; i < len(reqsMeta)-1; i++ {
+		for j := 0; j < len(reqsMeta)-i-1; j++ {
+			a, b := reqsMeta[j], reqsMeta[j+1]
+			if a.primaryType > b.primaryType || (a.primaryType == b.primaryType && (a.valueType > b.valueType || (a.valueType == b.valueType && a.startAddr > b.startAddr))) {
+				reqsMeta[j], reqsMeta[j+1] = reqsMeta[j+1], reqsMeta[j]
+			}
+		}
+	}
+	// Grouping
+	type group struct {
+		startIdx    int
+		endIdx      int
+		primaryType string
+		valueType   string
+		startAddr   uint16
+		totalLen    uint16
+	}
+	groups := []group{}
+	i := 0
+	for i < len(reqsMeta) {
+		g := group{
+			startIdx:    i,
+			endIdx:      i,
+			primaryType: reqsMeta[i].primaryType,
+			valueType:   reqsMeta[i].valueType,
+			startAddr:   reqsMeta[i].startAddr,
+			totalLen:    reqsMeta[i].length,
+		}
+		lastAddr := reqsMeta[i].startAddr
+		lastLen := reqsMeta[i].length
+		for j := i + 1; j < len(reqsMeta); j++ {
+			cur := reqsMeta[j]
+			// Only group if same register type, value type, and contiguous
+			if cur.primaryType == g.primaryType && cur.valueType == g.valueType && cur.startAddr == lastAddr+lastLen {
+				g.endIdx = j
+				g.totalLen += cur.length
+				lastAddr = cur.startAddr
+				lastLen = cur.length
+			} else {
+				break
+			}
+		}
+		groups = append(groups, g)
+		i = g.endIdx + 1
+	}
+	d.Logger.Infof("Actual Read requests: %+v", groups)
+
+	// For each group, do a single read and split
+	for _, g := range groups {
+		baseReq := reqsMeta[g.startIdx].req
+		baseCmdInfo, err := createCommandInfo(&baseReq)
+		if err != nil {
+			return responses, err
+		}
+		baseCmdInfo.Length = g.totalLen
+		data, err := deviceClient.GetValue(baseCmdInfo)
+		if err != nil {
+			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", baseReq.DeviceResourceName, err)
 			d.removeDeviceClient(connectionInfo)
 			return responses, err
 		}
-
-		responses[i] = res
+		offset := uint16(0)
+		for k := g.startIdx; k <= g.endIdx; k++ {
+			meta := reqsMeta[k]
+			idx := meta.idx
+			cmdInfo, err := createCommandInfo(&meta.req)
+			if err != nil {
+				return responses, err
+			}
+			var byteLen uint16
+			if cmdInfo.PrimaryTable == "HOLDING_REGISTERS" || cmdInfo.PrimaryTable == "INPUT_REGISTERS" {
+				byteLen = cmdInfo.Length * 2
+			} else {
+				byteLen = cmdInfo.Length
+			}
+			dataStart := offset
+			dataEnd := offset + byteLen
+			if int(dataEnd) > len(data) {
+				return responses, fmt.Errorf("data out of range for split")
+			}
+			reqData := data[dataStart:dataEnd]
+			res, err := handleReadRequestAndTransformData(meta.req, reqData)
+			if err != nil {
+				driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", meta.req.DeviceResourceName, err)
+				d.removeDeviceClient(connectionInfo)
+				return responses, err
+			}
+			responses[idx] = res
+			offset += byteLen
+		}
 	}
 	driver.Logger.Debugf("get response %v", responses)
 	return responses, nil
 }
 
-func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
-	var response []byte
+func handleReadRequestAndTransformData(req sdkModel.CommandRequest, data []byte) (*sdkModel.CommandValue, error) {
 	var result = &sdkModel.CommandValue{}
 	var err error
 
@@ -166,12 +272,7 @@ func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandReq
 		return nil, err
 	}
 
-	response, err = deviceClient.GetValue(commandInfo)
-	if err != nil {
-		return result, err
-	}
-
-	result, err = TransformDataBytesToResult(&req, response, commandInfo)
+	result, err = TransformDataBytesToResult(&req, data, commandInfo)
 
 	if err != nil {
 		return result, err
