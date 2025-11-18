@@ -197,7 +197,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 }
 
 func handleReadRequestAndTransformData(req sdkModel.CommandRequest, data []byte) (*sdkModel.CommandValue, error) {
-	var result = &sdkModel.CommandValue{}
+	var result *sdkModel.CommandValue
 	var err error
 
 	commandInfo, err := createCommandInfo(&req)
