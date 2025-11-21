@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2018-2023 IOTech Ltd
+// Copyright (C) 2018-2025 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,12 +8,16 @@ package transformer
 
 import (
 	"fmt"
+
+	"github.com/edgexfoundry/go-mod-core-contracts/v4/common"
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/errors"
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/models"
 
 	dsModels "github.com/edgexfoundry/device-sdk-go/v4/pkg/models"
 )
 
+// TransformWriteParameter performs the data transformation on incoming data
+// the incoming data transformations order can refer to https://docs.edgexfoundry.org/4.0/design/adr/device-service/0011-DeviceService-Rest-API/#data-transformations
 func TransformWriteParameter(cv *dsModels.CommandValue, pv models.ResourceProperties) errors.EdgeX {
 	if cv.Value == nil {
 		return nil
@@ -57,6 +61,17 @@ func TransformWriteParameter(cv *dsModels.CommandValue, pv models.ResourceProper
 		if err != nil {
 			return errors.NewCommonEdgeXWrapper(err)
 		}
+	}
+	if pv.Shift != nil && *pv.Shift != defaultShift &&
+		(cv.Type == common.ValueTypeUint8 || cv.Type == common.ValueTypeUint16 || cv.Type == common.ValueTypeUint32 || cv.Type == common.ValueTypeUint64 ||
+			cv.Type == common.ValueTypeInt8 || cv.Type == common.ValueTypeInt16 || cv.Type == common.ValueTypeInt32 || cv.Type == common.ValueTypeInt64) {
+		// use negative value to reuse the shift function to perform reversed operation
+		newValue = transformShift(newValue, -*pv.Shift)
+	}
+	if pv.Mask != nil && *pv.Mask != defaultMask &&
+		(cv.Type == common.ValueTypeUint8 || cv.Type == common.ValueTypeUint16 || cv.Type == common.ValueTypeUint32 || cv.Type == common.ValueTypeUint64 ||
+			cv.Type == common.ValueTypeInt8 || cv.Type == common.ValueTypeInt16 || cv.Type == common.ValueTypeInt32 || cv.Type == common.ValueTypeInt64) {
+		newValue = transformMask(newValue, *pv.Mask)
 	}
 
 	if value != newValue {

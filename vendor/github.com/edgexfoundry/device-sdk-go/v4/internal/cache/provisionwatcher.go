@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2021 IOTech Ltd
+// Copyright (C) 2021-2025 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -51,7 +51,9 @@ func (p *provisionWatcherCache) ForName(name string) (models.ProvisionWatcher, b
 	if !ok {
 		return models.ProvisionWatcher{}, false
 	}
-	return *watcher, ok
+	// As the cache provisionWatcher contains pointer fields(map and slice), directly return watcher may cause concurrent map read
+	// or write if the invoker spawn another goroutine to manipulate the provisionWatcher, so returning the clone of provisionWatcher here
+	return watcher.Clone(), ok
 }
 
 // All returns the current list of provision watchers in the cache.
@@ -62,7 +64,7 @@ func (p *provisionWatcherCache) All() []models.ProvisionWatcher {
 	i := 0
 	watchers := make([]models.ProvisionWatcher, len(p.pwMap))
 	for _, watcher := range p.pwMap {
-		watchers[i] = *watcher
+		watchers[i] = watcher.Clone()
 		i++
 	}
 	return watchers

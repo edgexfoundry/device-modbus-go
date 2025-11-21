@@ -38,6 +38,8 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/openziti/edge-api/rest_model"
 )
 
 // NewEnrollParams creates a new EnrollParams object,
@@ -82,6 +84,9 @@ func NewEnrollParamsWithHTTPClient(client *http.Client) *EnrollParams {
    Typically these are written to a http.Request.
 */
 type EnrollParams struct {
+
+	// Body.
+	Body *rest_model.GenericEnroll
 
 	// Method.
 	Method *string
@@ -144,6 +149,17 @@ func (o *EnrollParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithBody adds the body to the enroll params
+func (o *EnrollParams) WithBody(body *rest_model.GenericEnroll) *EnrollParams {
+	o.SetBody(body)
+	return o
+}
+
+// SetBody adds the body to the enroll params
+func (o *EnrollParams) SetBody(body *rest_model.GenericEnroll) {
+	o.Body = body
+}
+
 // WithMethod adds the method to the enroll params
 func (o *EnrollParams) WithMethod(method *string) *EnrollParams {
 	o.SetMethod(method)
@@ -173,6 +189,11 @@ func (o *EnrollParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 		return err
 	}
 	var res []error
+	if o.Body != nil {
+		if err := r.SetBodyParam(o.Body); err != nil {
+			return err
+		}
+	}
 
 	if o.Method != nil {
 

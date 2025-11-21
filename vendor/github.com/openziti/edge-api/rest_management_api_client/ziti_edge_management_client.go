@@ -57,6 +57,7 @@ import (
 	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/session"
+	"github.com/openziti/edge-api/rest_management_api_client/settings"
 	"github.com/openziti/edge-api/rest_management_api_client/terminator"
 	"github.com/openziti/edge-api/rest_management_api_client/well_known"
 )
@@ -126,6 +127,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *ZitiEdgeMa
 	cli.ServiceEdgeRouterPolicy = service_edge_router_policy.New(transport, formats)
 	cli.ServicePolicy = service_policy.New(transport, formats)
 	cli.Session = session.New(transport, formats)
+	cli.Settings = settings.New(transport, formats)
 	cli.Terminator = terminator.New(transport, formats)
 	cli.WellKnown = well_known.New(transport, formats)
 	return cli
@@ -218,6 +220,8 @@ type ZitiEdgeManagement struct {
 
 	Session session.ClientService
 
+	Settings settings.ClientService
+
 	Terminator terminator.ClientService
 
 	WellKnown well_known.ClientService
@@ -251,6 +255,7 @@ func (c *ZitiEdgeManagement) SetTransport(transport runtime.ClientTransport) {
 	c.ServiceEdgeRouterPolicy.SetTransport(transport)
 	c.ServicePolicy.SetTransport(transport)
 	c.Session.SetTransport(transport)
+	c.Settings.SetTransport(transport)
 	c.Terminator.SetTransport(transport)
 	c.WellKnown.SetTransport(transport)
 }

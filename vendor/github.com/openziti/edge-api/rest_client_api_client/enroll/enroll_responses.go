@@ -53,6 +53,12 @@ func (o *EnrollReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewEnrollBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewEnrollNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -83,23 +89,57 @@ func NewEnrollOK() *EnrollOK {
 
 /* EnrollOK describes a response with status code 200, with default header values.
 
-A response for multi-format legacy enrollment.
+A response containing and identities client certificate chains
 */
 type EnrollOK struct {
-	Payload string
+	Payload *rest_model.EnrollmentCertsEnvelope
 }
 
 func (o *EnrollOK) Error() string {
 	return fmt.Sprintf("[POST /enroll][%d] enrollOK  %+v", 200, o.Payload)
 }
-func (o *EnrollOK) GetPayload() string {
+func (o *EnrollOK) GetPayload() *rest_model.EnrollmentCertsEnvelope {
 	return o.Payload
 }
 
 func (o *EnrollOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(rest_model.EnrollmentCertsEnvelope)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewEnrollBadRequest creates a EnrollBadRequest with default headers values
+func NewEnrollBadRequest() *EnrollBadRequest {
+	return &EnrollBadRequest{}
+}
+
+/* EnrollBadRequest describes a response with status code 400, with default header values.
+
+The supplied request contains invalid fields or could not be parsed (json and non-json bodies). The error's code, message, and cause fields can be inspected for further information
+*/
+type EnrollBadRequest struct {
+	Payload *rest_model.APIErrorEnvelope
+}
+
+func (o *EnrollBadRequest) Error() string {
+	return fmt.Sprintf("[POST /enroll][%d] enrollBadRequest  %+v", 400, o.Payload)
+}
+func (o *EnrollBadRequest) GetPayload() *rest_model.APIErrorEnvelope {
+	return o.Payload
+}
+
+func (o *EnrollBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(rest_model.APIErrorEnvelope)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

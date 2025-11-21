@@ -53,6 +53,12 @@ func (o *EnrollOttReader) ReadResponse(response runtime.ClientResponse, consumer
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewEnrollOttBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewEnrollOttNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -99,6 +105,38 @@ func (o *EnrollOttOK) GetPayload() *rest_model.EnrollmentCertsEnvelope {
 func (o *EnrollOttOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(rest_model.EnrollmentCertsEnvelope)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewEnrollOttBadRequest creates a EnrollOttBadRequest with default headers values
+func NewEnrollOttBadRequest() *EnrollOttBadRequest {
+	return &EnrollOttBadRequest{}
+}
+
+/* EnrollOttBadRequest describes a response with status code 400, with default header values.
+
+The supplied request contains invalid fields or could not be parsed (json and non-json bodies). The error's code, message, and cause fields can be inspected for further information
+*/
+type EnrollOttBadRequest struct {
+	Payload *rest_model.APIErrorEnvelope
+}
+
+func (o *EnrollOttBadRequest) Error() string {
+	return fmt.Sprintf("[POST /enroll/ott][%d] enrollOttBadRequest  %+v", 400, o.Payload)
+}
+func (o *EnrollOttBadRequest) GetPayload() *rest_model.APIErrorEnvelope {
+	return o.Payload
+}
+
+func (o *EnrollOttBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(rest_model.APIErrorEnvelope)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

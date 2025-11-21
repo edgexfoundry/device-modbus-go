@@ -56,6 +56,12 @@ func (o *EnrollUpdbReader) ReadResponse(response runtime.ClientResponse, consume
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewEnrollUpdbBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewEnrollUpdbNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -102,6 +108,38 @@ func (o *EnrollUpdbOK) GetPayload() *rest_model.Empty {
 func (o *EnrollUpdbOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(rest_model.Empty)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewEnrollUpdbBadRequest creates a EnrollUpdbBadRequest with default headers values
+func NewEnrollUpdbBadRequest() *EnrollUpdbBadRequest {
+	return &EnrollUpdbBadRequest{}
+}
+
+/* EnrollUpdbBadRequest describes a response with status code 400, with default header values.
+
+The supplied request contains invalid fields or could not be parsed (json and non-json bodies). The error's code, message, and cause fields can be inspected for further information
+*/
+type EnrollUpdbBadRequest struct {
+	Payload *rest_model.APIErrorEnvelope
+}
+
+func (o *EnrollUpdbBadRequest) Error() string {
+	return fmt.Sprintf("[POST /enroll/updb][%d] enrollUpdbBadRequest  %+v", 400, o.Payload)
+}
+func (o *EnrollUpdbBadRequest) GetPayload() *rest_model.APIErrorEnvelope {
+	return o.Payload
+}
+
+func (o *EnrollUpdbBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(rest_model.APIErrorEnvelope)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

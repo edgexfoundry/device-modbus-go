@@ -21,8 +21,8 @@ github.com/davecgh/go-spew/spew
 ## explicit; go 1.20
 github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
-# github.com/edgexfoundry/device-sdk-go/v4 v4.0.0
-## explicit; go 1.23
+# github.com/edgexfoundry/device-sdk-go/v4 v4.0.1
+## explicit; go 1.23.0
 github.com/edgexfoundry/device-sdk-go/v4/internal/application
 github.com/edgexfoundry/device-sdk-go/v4/internal/autodiscovery
 github.com/edgexfoundry/device-sdk-go/v4/internal/autoevent
@@ -40,7 +40,7 @@ github.com/edgexfoundry/device-sdk-go/v4/pkg/interfaces
 github.com/edgexfoundry/device-sdk-go/v4/pkg/models
 github.com/edgexfoundry/device-sdk-go/v4/pkg/service
 github.com/edgexfoundry/device-sdk-go/v4/pkg/startup
-# github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.3
+# github.com/edgexfoundry/go-mod-bootstrap/v4 v4.0.4
 ## explicit; go 1.23
 github.com/edgexfoundry/go-mod-bootstrap/v4/bootstrap
 github.com/edgexfoundry/go-mod-bootstrap/v4/bootstrap/config
@@ -61,12 +61,12 @@ github.com/edgexfoundry/go-mod-bootstrap/v4/bootstrap/utils
 github.com/edgexfoundry/go-mod-bootstrap/v4/bootstrap/zerotrust
 github.com/edgexfoundry/go-mod-bootstrap/v4/config
 github.com/edgexfoundry/go-mod-bootstrap/v4/di
-# github.com/edgexfoundry/go-mod-configuration/v4 v4.0.1
+# github.com/edgexfoundry/go-mod-configuration/v4 v4.0.2
 ## explicit; go 1.23
 github.com/edgexfoundry/go-mod-configuration/v4/configuration
 github.com/edgexfoundry/go-mod-configuration/v4/internal/pkg/keeper
 github.com/edgexfoundry/go-mod-configuration/v4/pkg/types
-# github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.1
+# github.com/edgexfoundry/go-mod-core-contracts/v4 v4.0.2
 ## explicit; go 1.23
 github.com/edgexfoundry/go-mod-core-contracts/v4/clients
 github.com/edgexfoundry/go-mod-core-contracts/v4/clients/http
@@ -80,7 +80,7 @@ github.com/edgexfoundry/go-mod-core-contracts/v4/dtos/requests
 github.com/edgexfoundry/go-mod-core-contracts/v4/dtos/responses
 github.com/edgexfoundry/go-mod-core-contracts/v4/errors
 github.com/edgexfoundry/go-mod-core-contracts/v4/models
-# github.com/edgexfoundry/go-mod-messaging/v4 v4.0.1
+# github.com/edgexfoundry/go-mod-messaging/v4 v4.0.2
 ## explicit; go 1.23
 github.com/edgexfoundry/go-mod-messaging/v4/clients
 github.com/edgexfoundry/go-mod-messaging/v4/internal/pkg
@@ -104,9 +104,10 @@ github.com/edgexfoundry/go-mod-secrets/v4/pkg/token/fileioperformer
 github.com/edgexfoundry/go-mod-secrets/v4/pkg/token/runtimetokenprovider
 github.com/edgexfoundry/go-mod-secrets/v4/pkg/types
 github.com/edgexfoundry/go-mod-secrets/v4/secrets
-# github.com/fsnotify/fsnotify v1.7.0
+# github.com/fsnotify/fsnotify v1.8.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
+github.com/fsnotify/fsnotify/internal
 # github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 ## explicit
 github.com/fullsailor/pkcs7
@@ -197,11 +198,11 @@ github.com/go-playground/universal-translator
 # github.com/go-playground/validator/v10 v10.25.0
 ## explicit; go 1.20
 github.com/go-playground/validator/v10
-# github.com/go-resty/resty/v2 v2.16.4
+# github.com/go-resty/resty/v2 v2.16.5
 ## explicit; go 1.20
 github.com/go-resty/resty/v2
 github.com/go-resty/resty/v2/shellescape
-# github.com/golang-jwt/jwt/v5 v5.2.1
+# github.com/golang-jwt/jwt/v5 v5.2.2
 ## explicit; go 1.18
 github.com/golang-jwt/jwt/v5
 # github.com/google/uuid v1.6.0
@@ -237,9 +238,10 @@ github.com/josharian/intern
 # github.com/kataras/go-events v0.0.3
 ## explicit; go 1.17
 github.com/kataras/go-events
-# github.com/klauspost/compress v1.17.9
-## explicit; go 1.20
+# github.com/klauspost/compress v1.18.0
+## explicit; go 1.22
 github.com/klauspost/compress/flate
+github.com/klauspost/compress/internal/le
 # github.com/labstack/echo/v4 v4.13.3
 ## explicit; go 1.20
 github.com/labstack/echo/v4
@@ -291,8 +293,8 @@ github.com/mitchellh/reflectwalk
 # github.com/muhlemmer/gu v0.3.1
 ## explicit; go 1.18
 github.com/muhlemmer/gu
-# github.com/nats-io/nats.go v1.39.1
-## explicit; go 1.22.0
+# github.com/nats-io/nats.go v1.40.1
+## explicit; go 1.23.0
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
 github.com/nats-io/nats.go/internal/parser
@@ -311,13 +313,13 @@ github.com/oklog/ulid
 github.com/opentracing/opentracing-go
 github.com/opentracing/opentracing-go/ext
 github.com/opentracing/opentracing-go/log
-# github.com/openziti/channel/v3 v3.0.27
-## explicit; go 1.21
+# github.com/openziti/channel/v3 v3.0.39
+## explicit; go 1.23.0
 github.com/openziti/channel/v3
 github.com/openziti/channel/v3/latency
 github.com/openziti/channel/v3/trace
 github.com/openziti/channel/v3/trace/pb
-# github.com/openziti/edge-api v0.26.38
+# github.com/openziti/edge-api v0.26.42
 ## explicit; go 1.21
 github.com/openziti/edge-api/rest_client_api_client
 github.com/openziti/edge-api/rest_client_api_client/authentication
@@ -356,12 +358,13 @@ github.com/openziti/edge-api/rest_management_api_client/service
 github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy
 github.com/openziti/edge-api/rest_management_api_client/service_policy
 github.com/openziti/edge-api/rest_management_api_client/session
+github.com/openziti/edge-api/rest_management_api_client/settings
 github.com/openziti/edge-api/rest_management_api_client/terminator
 github.com/openziti/edge-api/rest_management_api_client/well_known
 github.com/openziti/edge-api/rest_model
 github.com/openziti/edge-api/rest_util
-# github.com/openziti/foundation/v2 v2.0.56
-## explicit; go 1.19
+# github.com/openziti/foundation/v2 v2.0.59
+## explicit; go 1.23.0
 github.com/openziti/foundation/v2/concurrenz
 github.com/openziti/foundation/v2/errorz
 github.com/openziti/foundation/v2/genext
@@ -374,19 +377,19 @@ github.com/openziti/foundation/v2/stringz
 github.com/openziti/foundation/v2/tlz
 github.com/openziti/foundation/v2/uuidz
 github.com/openziti/foundation/v2/versions
-# github.com/openziti/identity v1.0.94
+# github.com/openziti/identity v1.0.100
 ## explicit; go 1.19
 github.com/openziti/identity
 github.com/openziti/identity/certtools
 github.com/openziti/identity/engines
 github.com/openziti/identity/engines/parsec
 github.com/openziti/identity/engines/pkcs11
-# github.com/openziti/metrics v1.2.65
-## explicit; go 1.19
+# github.com/openziti/metrics v1.3.0
+## explicit; go 1.23
 github.com/openziti/metrics
 github.com/openziti/metrics/metrics_pb
-# github.com/openziti/sdk-golang v0.24.1
-## explicit; go 1.21
+# github.com/openziti/sdk-golang v0.25.1
+## explicit; go 1.23.0
 github.com/openziti/sdk-golang/edge-apis
 github.com/openziti/sdk-golang/pb/edge_client_pb
 github.com/openziti/sdk-golang/ziti
@@ -395,12 +398,12 @@ github.com/openziti/sdk-golang/ziti/edge/network
 github.com/openziti/sdk-golang/ziti/edge/posture
 github.com/openziti/sdk-golang/ziti/sdkinfo
 github.com/openziti/sdk-golang/ziti/signing
-# github.com/openziti/secretstream v0.1.28
-## explicit; go 1.21
+# github.com/openziti/secretstream v0.1.32
+## explicit; go 1.23.0
 github.com/openziti/secretstream
 github.com/openziti/secretstream/kx
-# github.com/openziti/transport/v2 v2.0.160
-## explicit; go 1.21
+# github.com/openziti/transport/v2 v2.0.167
+## explicit; go 1.23.0
 github.com/openziti/transport/v2
 github.com/openziti/transport/v2/proxies
 github.com/openziti/transport/v2/tls
@@ -568,8 +571,8 @@ go.opentelemetry.io/otel/metric/embedded
 ## explicit; go 1.22
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
-# golang.org/x/crypto v0.33.0
-## explicit; go 1.20
+# golang.org/x/crypto v0.36.0
+## explicit; go 1.23.0
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
 golang.org/x/crypto/blake2b
@@ -586,13 +589,13 @@ golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/sha3
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
+# golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 ## explicit; go 1.20
 golang.org/x/exp/constraints
 golang.org/x/exp/rand
 golang.org/x/exp/slices
-# golang.org/x/net v0.35.0
-## explicit; go 1.18
+# golang.org/x/net v0.37.0
+## explicit; go 1.23.0
 golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
@@ -607,25 +610,25 @@ golang.org/x/net/internal/timeseries
 golang.org/x/net/proxy
 golang.org/x/net/publicsuffix
 golang.org/x/net/trace
-# golang.org/x/oauth2 v0.25.0
-## explicit; go 1.18
+# golang.org/x/oauth2 v0.28.0
+## explicit; go 1.23.0
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.11.0
-## explicit; go 1.18
+# golang.org/x/sync v0.12.0
+## explicit; go 1.23.0
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.30.0
-## explicit; go 1.18
+# golang.org/x/sys v0.31.0
+## explicit; go 1.23.0
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.29.0
-## explicit; go 1.18
+# golang.org/x/term v0.30.0
+## explicit; go 1.23.0
 golang.org/x/term
-# golang.org/x/text v0.22.0
-## explicit; go 1.18
+# golang.org/x/text v0.23.0
+## explicit; go 1.23.0
 golang.org/x/text/internal/language
 golang.org/x/text/internal/language/compact
 golang.org/x/text/internal/tag
@@ -699,8 +702,8 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.36.3
-## explicit; go 1.21
+# google.golang.org/protobuf v1.36.6
+## explicit; go 1.22
 google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire

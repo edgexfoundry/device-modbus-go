@@ -41,6 +41,23 @@ func NewCaPool(certs []*x509.Certificate) *CaPool {
 	return result
 }
 
+func (self *CaPool) Clone() *CaPool {
+	result := &CaPool{
+		roots:         make(map[string]*x509.Certificate),
+		intermediates: make(map[string]*x509.Certificate),
+	}
+
+	for name, cert := range self.roots {
+		result.roots[name] = cert
+	}
+
+	for name, cert := range self.intermediates {
+		result.intermediates[name] = cert
+	}
+
+	return result
+}
+
 // AddCa adds a CA (root or intermediate) certificate to the current pool. It returns an error if the
 // certificate is not CA.
 func (self *CaPool) AddCa(cert *x509.Certificate) error {

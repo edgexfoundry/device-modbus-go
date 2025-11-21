@@ -2,12 +2,20 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/metrics/metrics_pb"
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"reflect"
 	"sort"
 	"sync"
 	"time"
+)
+
+const (
+	DefaultIntervalAgeThreshold = 80 * time.Second
+
+	MinEventQueueSize     = 16
+	DefaultEventQueueSize = 256
 )
 
 // Handler represents a sink for metric events
@@ -26,27 +34,45 @@ type UsageRegistry interface {
 	StartReporting(eventSink Handler, reportInterval time.Duration, msgQueueSize int)
 }
 
-func NewUsageRegistry(sourceId string, tags map[string]string, closeNotify <-chan struct{}) UsageRegistry {
+type UsageRegistryConfig struct {
+	SourceId             string
+	Tags                 map[string]string
+	EventQueueSize       int
+	CloseNotify          <-chan struct{}
+	IntervalAgeThreshold time.Duration
+}
+
+func DefaultUsageRegistryConfig(sourceId string, closeNotify <-chan struct{}) UsageRegistryConfig {
+	return UsageRegistryConfig{
+		SourceId:             sourceId,
+		Tags:                 map[string]string{},
+		CloseNotify:          closeNotify,
+		EventQueueSize:       DefaultEventQueueSize,
+		IntervalAgeThreshold: DefaultIntervalAgeThreshold,
+	}
+}
+
+func NewUsageRegistry(config UsageRegistryConfig) UsageRegistry {
+	if config.EventQueueSize < MinEventQueueSize {
+		config.EventQueueSize = MinEventQueueSize
+	}
+
+	if config.IntervalAgeThreshold <= 0 {
+		config.IntervalAgeThreshold = DefaultIntervalAgeThreshold
+	}
+
 	registry := &usageRegistryImpl{
 		registryImpl: registryImpl{
-			sourceId:  sourceId,
-			tags:      tags,
+			sourceId:  config.SourceId,
+			tags:      config.Tags,
 			metricMap: cmap.New[any](),
 		},
 		intervalMetrics: cmap.New[intervalMetric](),
-		eventChan:       make(chan func(), 16),
-		closeNotify:     closeNotify,
+		eventChan:       make(chan func(), config.EventQueueSize),
+		closeNotify:     config.CloseNotify,
 	}
 
 	return registry
-}
-
-const defaultIntervalAgeThreshold = 80 * time.Second
-
-var intervalAgeThreshold = defaultIntervalAgeThreshold
-
-func SetIntervalAgeThreshold(i time.Duration) {
-	intervalAgeThreshold = i
 }
 
 type bucketEvent struct {
@@ -60,16 +86,17 @@ type intervalMetric interface {
 
 type usageRegistryImpl struct {
 	registryImpl
-	intervalMetrics cmap.ConcurrentMap[string, intervalMetric]
-	eventChan       chan func()
-	intervalBuckets []*bucketEvent
-	usageBuckets    []*metrics_pb.MetricsMessage_UsageCounter
-	closeNotify     <-chan struct{}
-	lock            sync.Mutex
+	intervalMetrics      cmap.ConcurrentMap[string, intervalMetric]
+	eventChan            chan func()
+	intervalBuckets      []*bucketEvent
+	usageBuckets         []*metrics_pb.MetricsMessage_UsageCounter
+	closeNotify          <-chan struct{}
+	lock                 sync.Mutex
+	intervalAgeThreshold time.Duration
 }
 
 func (self *usageRegistryImpl) StartReporting(eventSink Handler, reportInterval time.Duration, msgQueueSize int) {
-	msgEvents := make(chan *metrics_pb.MetricsMessage, msgQueueSize)
+	msgEvents := make(chan *messageBuilder, msgQueueSize)
 	go self.run(reportInterval, msgEvents)
 	go self.sendMsgs(eventSink, msgEvents)
 }
@@ -93,7 +120,7 @@ func (self *usageRegistryImpl) IntervalCounter(name string, intervalSize time.Du
 		self.intervalMetrics.Remove(name)
 	}
 
-	intervalCounter := newIntervalCounter(name, intervalSize, intervalAgeThreshold, self.eventChan, self, disposeF)
+	intervalCounter := newIntervalCounter(name, intervalSize, self.intervalAgeThreshold, self.eventChan, self, disposeF)
 	self.metricMap.Set(name, intervalCounter)
 	self.intervalMetrics.Set(name, intervalCounter)
 	return intervalCounter
@@ -114,7 +141,7 @@ func (self *usageRegistryImpl) UsageCounter(name string, intervalSize time.Durat
 	}
 
 	disposeF := func() { self.dispose(name) }
-	usageCounter := newUsageCounter(name, intervalSize, intervalAgeThreshold, self, disposeF, self.eventChan)
+	usageCounter := newUsageCounter(name, intervalSize, self.intervalAgeThreshold, self, disposeF, self.eventChan)
 	self.metricMap.Set(name, usageCounter)
 	self.intervalMetrics.Set(name, usageCounter)
 	return usageCounter
@@ -183,7 +210,7 @@ func (self *usageRegistryImpl) reportUsage(intervalStartUTC int64, intervalLengt
 	self.usageBuckets = append(self.usageBuckets, counter)
 }
 
-func (self *usageRegistryImpl) run(reportInterval time.Duration, msgEvents chan *metrics_pb.MetricsMessage) {
+func (self *usageRegistryImpl) run(reportInterval time.Duration, msgEvents chan *messageBuilder) {
 	ticker := time.NewTicker(reportInterval)
 	defer ticker.Stop()
 
@@ -192,8 +219,10 @@ func (self *usageRegistryImpl) run(reportInterval time.Duration, msgEvents chan 
 		case event := <-self.eventChan:
 			event()
 		case <-ticker.C:
-			if msg := self.flushAndPoll(); msg != nil {
-				msgEvents <- msg
+			select {
+			case msgEvents <- self.flushAndPoll():
+			case <-self.closeNotify:
+				return
 			}
 		case <-self.closeNotify:
 			self.DisposeAll()
@@ -202,17 +231,62 @@ func (self *usageRegistryImpl) run(reportInterval time.Duration, msgEvents chan 
 	}
 }
 
-func (self *usageRegistryImpl) flushAndPoll() *metrics_pb.MetricsMessage {
+func (self *usageRegistryImpl) flushAndPoll() *messageBuilder {
 	for entry := range self.intervalMetrics.IterBuffered() {
 		entry.Val.flushIntervals()
 	}
-	return self.Poll()
+
+	builder := newMessageBuilder(self.sourceId, self.tags)
+
+	if len(self.intervalBuckets) > 0 {
+		builder.addIntervalBucketEvents(self.intervalBuckets)
+		self.intervalBuckets = nil
+	}
+
+	if len(self.usageBuckets) > 0 {
+		builder.UsageCounters = self.usageBuckets
+		self.usageBuckets = nil
+
+		sort.Slice(builder.UsageCounters, func(i, j int) bool {
+			return builder.UsageCounters[i].IntervalStartUTC < builder.UsageCounters[j].IntervalStartUTC
+		})
+	}
+
+	return builder
 }
 
-func (self *usageRegistryImpl) sendMsgs(eventSink Handler, msgEvents chan *metrics_pb.MetricsMessage) {
+func (registry *usageRegistryImpl) pollAppend(builder *messageBuilder) *metrics_pb.MetricsMessage {
+	if len(builder.IntervalCounters) == 0 && len(builder.UsageCounters) == 0 && registry.metricMap.Count() == 0 {
+		return nil
+	}
+
+	registry.EachMetric(func(name string, i Metric) {
+		switch metric := i.(type) {
+		case *gaugeImpl:
+			builder.addIntGauge(name, metric.Snapshot())
+		case *meterImpl:
+			builder.addMeter(name, metric.Snapshot())
+		case *histogramImpl:
+			builder.addHistogram(name, metric.Snapshot())
+		case *timerImpl:
+			builder.addTimer(name, metric.Snapshot())
+		case *intervalCounterImpl:
+		// ignore, handled below
+		case *usageCounterImpl:
+			// ignore, handled below
+		default:
+			pfxlog.Logger().Errorf("Unsupported metric type %v", reflect.TypeOf(i))
+		}
+	})
+
+	return (*metrics_pb.MetricsMessage)(builder)
+}
+
+func (self *usageRegistryImpl) sendMsgs(eventSink Handler, msgEvents chan *messageBuilder) {
 	for {
 		select {
-		case msg := <-msgEvents:
+		case builder := <-msgEvents:
+			msg := self.pollAppend(builder)
 			eventSink.AcceptMetrics(msg)
 		case <-self.closeNotify:
 			return
@@ -223,7 +297,9 @@ func (self *usageRegistryImpl) sendMsgs(eventSink Handler, msgEvents chan *metri
 func (self *usageRegistryImpl) FlushAndPoll() *metrics_pb.MetricsMessage {
 	msgC := make(chan *metrics_pb.MetricsMessage, 1)
 	self.eventChan <- func() {
-		msgC <- self.flushAndPoll()
+		builder := self.flushAndPoll()
+		msg := self.pollAppend(builder)
+		msgC <- msg
 	}
 	msg := <-msgC
 	return msg
