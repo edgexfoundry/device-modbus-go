@@ -59,8 +59,14 @@ type ClientExternalJWTSignerDetail struct {
 	// Required: true
 	Name *string `json:"name"`
 
+	// open Id configuration Url
+	OpenIDConfigurationURL string `json:"openIdConfigurationUrl,omitempty"`
+
 	// scopes
 	Scopes []string `json:"scopes"`
+
+	// target token
+	TargetToken *TargetToken `json:"targetToken,omitempty"`
 }
 
 // UnmarshalJSON unmarshals this object from a JSON structure
@@ -82,7 +88,11 @@ func (m *ClientExternalJWTSignerDetail) UnmarshalJSON(raw []byte) error {
 
 		Name *string `json:"name"`
 
+		OpenIDConfigurationURL string `json:"openIdConfigurationUrl,omitempty"`
+
 		Scopes []string `json:"scopes"`
+
+		TargetToken *TargetToken `json:"targetToken,omitempty"`
 	}
 	if err := swag.ReadJSON(raw, &dataAO1); err != nil {
 		return err
@@ -96,7 +106,11 @@ func (m *ClientExternalJWTSignerDetail) UnmarshalJSON(raw []byte) error {
 
 	m.Name = dataAO1.Name
 
+	m.OpenIDConfigurationURL = dataAO1.OpenIDConfigurationURL
+
 	m.Scopes = dataAO1.Scopes
+
+	m.TargetToken = dataAO1.TargetToken
 
 	return nil
 }
@@ -119,7 +133,11 @@ func (m ClientExternalJWTSignerDetail) MarshalJSON() ([]byte, error) {
 
 		Name *string `json:"name"`
 
+		OpenIDConfigurationURL string `json:"openIdConfigurationUrl,omitempty"`
+
 		Scopes []string `json:"scopes"`
+
+		TargetToken *TargetToken `json:"targetToken,omitempty"`
 	}
 
 	dataAO1.Audience = m.Audience
@@ -130,7 +148,11 @@ func (m ClientExternalJWTSignerDetail) MarshalJSON() ([]byte, error) {
 
 	dataAO1.Name = m.Name
 
+	dataAO1.OpenIDConfigurationURL = m.OpenIDConfigurationURL
+
 	dataAO1.Scopes = m.Scopes
+
+	dataAO1.TargetToken = m.TargetToken
 
 	jsonDataAO1, errAO1 := swag.WriteJSON(dataAO1)
 	if errAO1 != nil {
@@ -154,6 +176,10 @@ func (m *ClientExternalJWTSignerDetail) Validate(formats strfmt.Registry) error 
 	}
 
 	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTargetToken(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -181,6 +207,26 @@ func (m *ClientExternalJWTSignerDetail) validateName(formats strfmt.Registry) er
 	return nil
 }
 
+func (m *ClientExternalJWTSignerDetail) validateTargetToken(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.TargetToken) { // not required
+		return nil
+	}
+
+	if m.TargetToken != nil {
+		if err := m.TargetToken.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("targetToken")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("targetToken")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this client external Jwt signer detail based on the context it is used
 func (m *ClientExternalJWTSignerDetail) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -190,9 +236,29 @@ func (m *ClientExternalJWTSignerDetail) ContextValidate(ctx context.Context, for
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateTargetToken(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ClientExternalJWTSignerDetail) contextValidateTargetToken(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.TargetToken != nil {
+		if err := m.TargetToken.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("targetToken")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("targetToken")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

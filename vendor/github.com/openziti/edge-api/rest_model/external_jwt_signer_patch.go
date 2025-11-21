@@ -81,6 +81,9 @@ type ExternalJWTSignerPatch struct {
 	// tags
 	Tags *Tags `json:"tags,omitempty"`
 
+	// target token
+	TargetToken *TargetToken `json:"targetToken,omitempty"`
+
 	// use external Id
 	UseExternalID *bool `json:"useExternalId,omitempty"`
 }
@@ -94,6 +97,10 @@ func (m *ExternalJWTSignerPatch) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateTags(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTargetToken(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -134,11 +141,34 @@ func (m *ExternalJWTSignerPatch) validateTags(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ExternalJWTSignerPatch) validateTargetToken(formats strfmt.Registry) error {
+	if swag.IsZero(m.TargetToken) { // not required
+		return nil
+	}
+
+	if m.TargetToken != nil {
+		if err := m.TargetToken.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("targetToken")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("targetToken")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this external Jwt signer patch based on the context it is used
 func (m *ExternalJWTSignerPatch) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateTags(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTargetToken(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -156,6 +186,22 @@ func (m *ExternalJWTSignerPatch) contextValidateTags(ctx context.Context, format
 				return ve.ValidateName("tags")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("tags")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ExternalJWTSignerPatch) contextValidateTargetToken(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.TargetToken != nil {
+		if err := m.TargetToken.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("targetToken")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("targetToken")
 			}
 			return err
 		}

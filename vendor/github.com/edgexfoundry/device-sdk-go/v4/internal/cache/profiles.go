@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2020-2023 IOTech Ltd
+// Copyright (C) 2020-2025 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -67,7 +67,9 @@ func (p *profileCache) ForName(name string) (models.DeviceProfile, bool) {
 	if !ok {
 		return models.DeviceProfile{}, false
 	}
-	return *profile, ok
+	// As the cache profile contains pointer fields(map and slice), directly return profile may cause concurrent map read
+	// or write if the invoker spawn another goroutine to manipulate the profile, so returning the clone of profile here
+	return profile.Clone(), ok
 }
 
 // All returns the current list of profiles in the cache.
@@ -78,7 +80,7 @@ func (p *profileCache) All() []models.DeviceProfile {
 	i := 0
 	ps := make([]models.DeviceProfile, len(p.deviceProfileMap))
 	for _, profile := range p.deviceProfileMap {
-		ps[i] = *profile
+		ps[i] = profile.Clone()
 		i += 1
 	}
 	return ps

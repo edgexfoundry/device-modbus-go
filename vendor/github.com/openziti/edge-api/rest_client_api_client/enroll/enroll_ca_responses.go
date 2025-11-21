@@ -53,6 +53,12 @@ func (o *EnrollCaReader) ReadResponse(response runtime.ClientResponse, consumer 
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewEnrollCaBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewEnrollCaNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -99,6 +105,38 @@ func (o *EnrollCaOK) GetPayload() *rest_model.Empty {
 func (o *EnrollCaOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(rest_model.Empty)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewEnrollCaBadRequest creates a EnrollCaBadRequest with default headers values
+func NewEnrollCaBadRequest() *EnrollCaBadRequest {
+	return &EnrollCaBadRequest{}
+}
+
+/* EnrollCaBadRequest describes a response with status code 400, with default header values.
+
+The supplied request contains invalid fields or could not be parsed (json and non-json bodies). The error's code, message, and cause fields can be inspected for further information
+*/
+type EnrollCaBadRequest struct {
+	Payload *rest_model.APIErrorEnvelope
+}
+
+func (o *EnrollCaBadRequest) Error() string {
+	return fmt.Sprintf("[POST /enroll/ca][%d] enrollCaBadRequest  %+v", 400, o.Payload)
+}
+func (o *EnrollCaBadRequest) GetPayload() *rest_model.APIErrorEnvelope {
+	return o.Payload
+}
+
+func (o *EnrollCaBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(rest_model.APIErrorEnvelope)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

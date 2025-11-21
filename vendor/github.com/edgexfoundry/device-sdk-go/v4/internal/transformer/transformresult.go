@@ -1,6 +1,6 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
-// Copyright (C) 2019-2023 IOTech Ltd
+// Copyright (C) 2019-2025 IOTech Ltd
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -31,6 +31,8 @@ const (
 	NaN      = "NaN"
 )
 
+// TransformReadResult performs the data transformation on outgoing data
+// the outgoing data transformations order can refer to https://docs.edgexfoundry.org/4.0/design/adr/device-service/0011-DeviceService-Rest-API/#data-transformations
 func TransformReadResult(cv *sdkModels.CommandValue, pv models.ResourceProperties) errors.EdgeX {
 	if !isNumericValueType(cv) {
 		return nil
@@ -50,18 +52,14 @@ func TransformReadResult(cv *sdkModels.CommandValue, pv models.ResourcePropertie
 	newValue := value
 
 	if pv.Mask != nil && *pv.Mask != defaultMask &&
-		(cv.Type == common.ValueTypeUint8 || cv.Type == common.ValueTypeUint16 || cv.Type == common.ValueTypeUint32 || cv.Type == common.ValueTypeUint64) {
-		newValue, err = transformReadMask(newValue, *pv.Mask)
-		if err != nil {
-			return errors.NewCommonEdgeXWrapper(err)
-		}
+		(cv.Type == common.ValueTypeUint8 || cv.Type == common.ValueTypeUint16 || cv.Type == common.ValueTypeUint32 || cv.Type == common.ValueTypeUint64 ||
+			cv.Type == common.ValueTypeInt8 || cv.Type == common.ValueTypeInt16 || cv.Type == common.ValueTypeInt32 || cv.Type == common.ValueTypeInt64) {
+		newValue = transformMask(newValue, *pv.Mask)
 	}
 	if pv.Shift != nil && *pv.Shift != defaultShift &&
-		(cv.Type == common.ValueTypeUint8 || cv.Type == common.ValueTypeUint16 || cv.Type == common.ValueTypeUint32 || cv.Type == common.ValueTypeUint64) {
-		newValue, err = transformReadShift(newValue, *pv.Shift)
-		if err != nil {
-			return errors.NewCommonEdgeXWrapper(err)
-		}
+		(cv.Type == common.ValueTypeUint8 || cv.Type == common.ValueTypeUint16 || cv.Type == common.ValueTypeUint32 || cv.Type == common.ValueTypeUint64 ||
+			cv.Type == common.ValueTypeInt8 || cv.Type == common.ValueTypeInt16 || cv.Type == common.ValueTypeInt32 || cv.Type == common.ValueTypeInt64) {
+		newValue = transformShift(newValue, *pv.Shift)
 	}
 	if pv.Base != nil && *pv.Base != defaultBase {
 		newValue, err = transformBase(newValue, *pv.Base, true)
@@ -351,7 +349,7 @@ func transformOffset(value any, offset float64, read bool) (any, errors.EdgeX) {
 	return value, nil
 }
 
-func transformReadMask(value any, mask uint64) (any, errors.EdgeX) {
+func transformMask(value any, mask uint64) any {
 	switch v := value.(type) {
 	case uint8:
 		value = v & uint8(mask)
@@ -361,40 +359,73 @@ func transformReadMask(value any, mask uint64) (any, errors.EdgeX) {
 		value = v & uint32(mask)
 	case uint64:
 		value = v & mask
+	case int8:
+		value = v & int8(mask)
+	case int16:
+		value = v & int16(mask)
+	case int32:
+		value = v & int32(mask)
+	case int64:
+		value = v & int64(mask)
 	}
-
-	return value, nil
+	return value
 }
 
-func transformReadShift(value any, shift int64) (any, errors.EdgeX) {
+// transformShift returns the bit-shifted value
+// Positive values indicate right-shift, negative for left.
+func transformShift(value any, shift int64) any {
 	switch v := value.(type) {
 	case uint8:
 		if shift > 0 {
-			value = v << int8(shift)
+			value = v >> int8(shift)
 		} else {
-			value = v >> int8(-shift)
+			value = v << int8(-shift)
 		}
 	case uint16:
 		if shift > 0 {
-			value = v << int16(shift)
+			value = v >> int16(shift)
 		} else {
-			value = v >> int16(-shift)
+			value = v << int16(-shift)
 		}
 	case uint32:
 		if shift > 0 {
-			value = v << int32(shift)
+			value = v >> int32(shift)
 		} else {
-			value = v >> int32(-shift)
+			value = v << int32(-shift)
 		}
 	case uint64:
 		if shift > 0 {
-			value = v << shift
+			value = v >> shift
 		} else {
-			value = v >> (-shift)
+			value = v << (-shift)
+		}
+	case int8:
+		if shift > 0 {
+			value = v >> int8(shift)
+		} else {
+			value = v << int8(-shift)
+		}
+	case int16:
+		if shift > 0 {
+			value = v >> int16(shift)
+		} else {
+			value = v << int16(-shift)
+		}
+	case int32:
+		if shift > 0 {
+			value = v >> int32(shift)
+		} else {
+			value = v << int32(-shift)
+		}
+	case int64:
+		if shift > 0 {
+			value = v >> shift
+		} else {
+			value = v << (-shift)
 		}
 	}
 
-	return value, nil
+	return value
 }
 
 func commandValueForTransform(cv *sdkModels.CommandValue) (interface{}, errors.EdgeX) {

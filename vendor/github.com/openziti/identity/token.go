@@ -113,3 +113,7 @@ func NewClientTokenIdentityWithPool(clientCerts []*x509.Certificate, privateKey 
 
 	return NewIdentity(id)
 }
+
+func (id *TokenId) ValidFor(hostnameOrIp string) error {
+	return ValidFor(id, hostnameOrIp)
+}

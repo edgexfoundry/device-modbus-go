@@ -29,6 +29,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -41,21 +42,87 @@ const (
 )
 
 type Identity interface {
+
+	// Cert returns the current tls.Certificate linked to this identity's loaded certificates that is used for
+	// client connections. The first certificate is always the cert` value loaded.
 	Cert() *tls.Certificate
+
+	// ServerCert returns the current tls.Certificate linked to this identity's loaded certificates that is used
+	// to initiate server listeners. The first certificate is always the root `cert` or `serverCert` value loaded.
+	// Alternative server certs follow.
 	ServerCert() []*tls.Certificate
+
+	// CA returns the identities currently loaded x509.CertPool
 	CA() *x509.CertPool
+
+	// CaPool returns a more friendly version of x509.CertPool, useful for inspection
 	CaPool() *CaPool
+
+	// ServerTLSConfig returns a TSL config linked to this identity and its configuration and certificates. Mutations
+	// to the identity (i.e. reloads, updates) propagate to the returned tls.Config.
 	ServerTLSConfig() *tls.Config
+
+	// ClientTLSConfig returns a tls.Config linked to this identity and its configuration and certificates. Mutations
+	// to the identity (i.e. reloads, updates) propagate to the returned tls.Config.
 	ClientTLSConfig() *tls.Config
+
+	// Reload reloads the identity. All changes are propagated to tls.Configs returned by ClientTLSConfig and ServerTLSConfig.
 	Reload() error
 
+	// WatchFiles causes this identity to automatically watch its identity file and all referenced files for updates.
+	// File updates will call Reload.
 	WatchFiles() error
+
+	// StopWatchingFiles reversed WatchFiles.
 	StopWatchingFiles()
 
+	// SetCert updates the current client cert in use and saves it to the identity file.
 	SetCert(pem string) error
+
+	// SetServerCert update the current server cert in use and saves it to the identity file.
 	SetServerCert(pem string) error
 
+	// GetConfig returns the config used to generate this identity.
 	GetConfig() *Config
+
+	// GetX509ActiveClientCertChain returns the client certificate in use as a slice in order of [Leaf->Supporting Certs]
+	GetX509ActiveClientCertChain() []*x509.Certificate
+
+	// GetX509ActiveServerCertChains returns an array of arrays of x509.Certificates. Each sub-array is a
+	// chain ordered in [Leaf->Supporting Certs]. Each chain is either from the `server_cert` field if defined,
+	// otherwise `cert`, and all alternative server certs.
+	GetX509ActiveServerCertChains() [][]*x509.Certificate
+
+	// GetX509IdentityServerCertChain returns only the chain from the `server_cert` (if defined) else the chain
+	// from the `cert` field.
+	GetX509IdentityServerCertChain() []*x509.Certificate
+
+	// GetX509IdentityAltCertCertChains returns all of the chains from the `alt_server_cert` array
+	GetX509IdentityAltCertCertChains() [][]*x509.Certificate
+
+	// GetCaPool returns a clone of the current  CA pool
+	GetCaPool() *CaPool
+
+	// CheckServerCertSansForConflicts checks the current leaf server certificate for duplicate IP/DNS SANs, which
+	// cause ambiguous SNI lookups. Returns nil if no errors.
+	CheckServerCertSansForConflicts() []SanHostConflictError
+
+	// ValidFor checks a hostname or IP against all available server certificates and their SANs.
+	ValidFor(hostnameOrIp string) error
+}
+
+type SanHostConflictError struct {
+	HostOrIp     string
+	Certificates []*x509.Certificate
+}
+
+func (s SanHostConflictError) Error() string {
+	var certSubjects []string
+	for _, cert := range s.Certificates {
+		certSubjects = append(certSubjects, cert.Subject.String())
+	}
+
+	return fmt.Sprintf("the hostname/ip %s is handled by more than one certificate and should only be handled by one as it is ambiguous on which to use, certificate subjects: %s", s.HostOrIp, strings.Join(certSubjects, ", "))
 }
 
 var _ Identity = &ID{}
@@ -74,6 +141,126 @@ type ID struct {
 	watchCount  atomic.Int32
 }
 
+func (id *ID) GetX509IdentityServerCertChain() []*x509.Certificate {
+	id.certLock.Lock()
+	defer id.certLock.Unlock()
+
+	if id.Config.ServerCert != "" {
+		chain, _ := LoadCert(id.Config.ServerCert)
+		return chain
+	}
+
+	if id.Config.Cert != "" {
+		chain, _ := LoadCert(id.Config.Cert)
+		return chain
+	}
+
+	return nil
+}
+
+func (id *ID) GetX509ActiveClientCertChain() []*x509.Certificate {
+	tlsCert := id.Cert()
+
+	if len(tlsCert.Certificate) == 0 {
+		return nil
+	}
+
+	var chain []*x509.Certificate
+	for _, certDer := range tlsCert.Certificate {
+		cert, _ := x509.ParseCertificate(certDer)
+		chain = append(chain, cert)
+	}
+
+	return chain
+}
+
+func (id *ID) GetX509IdentityAltCertCertChains() [][]*x509.Certificate {
+	id.certLock.Lock()
+	defer id.certLock.Unlock()
+
+	var chains [][]*x509.Certificate
+	for _, keyPair := range id.Config.AltServerCerts {
+		chain, _ := LoadCert(keyPair.ServerCert)
+		chains = append(chains, chain)
+	}
+
+	return chains
+}
+
+func (id *ID) GetX509ActiveServerCertChains() [][]*x509.Certificate {
+	var result [][]*x509.Certificate
+
+	for _, rawChain := range id.ServerCert() {
+		var parsedChain []*x509.Certificate
+		for _, curCert := range rawChain.Certificate {
+			cert, _ := x509.ParseCertificate(curCert)
+			parsedChain = append(parsedChain, cert)
+		}
+
+		result = append(result, parsedChain)
+	}
+
+	return result
+}
+
+func (id *ID) GetCaPool() *CaPool {
+	id.certLock.Lock()
+	defer id.certLock.Unlock()
+
+	return id.caPool.Clone()
+}
+
+func (id *ID) CheckServerCertSansForConflicts() []SanHostConflictError {
+	var sanErrors []SanHostConflictError
+	hostnames := map[string][]*x509.Certificate{}
+	ipAddresses := map[string][]*x509.Certificate{}
+
+	chains := id.GetX509ActiveServerCertChains()
+	var certs []*x509.Certificate
+
+	for _, chain := range chains {
+		if len(chain) != 0 {
+			certs = append(certs, chain[0])
+		}
+	}
+
+	for _, cert := range certs {
+		for _, dnsName := range cert.DNSNames {
+			hostnames[dnsName] = append(hostnames[dnsName], cert)
+		}
+
+		for _, ip := range cert.IPAddresses {
+			ipAddresses[ip.String()] = append(ipAddresses[ip.String()], cert)
+		}
+	}
+
+	for ip, ipCerts := range ipAddresses {
+		if len(ipCerts) > 1 {
+			sanErrors = append(sanErrors, SanHostConflictError{
+				HostOrIp:     ip,
+				Certificates: ipCerts,
+			})
+		}
+	}
+
+	for hostname, hostnameCerts := range hostnames {
+		if len(hostnameCerts) > 1 {
+			sanErrors = append(sanErrors, SanHostConflictError{
+				HostOrIp:     hostname,
+				Certificates: hostnameCerts,
+			})
+		}
+	}
+
+	return sanErrors
+}
+
+func (id *ID) GetX509CaPool() *CaPool {
+	id.certLock.Lock()
+	defer id.certLock.Unlock()
+	return id.caPool.Clone()
+}
+
 func (id *ID) initCert(loadedCerts []*x509.Certificate) error {
 	chain := loadedCerts
 
@@ -90,36 +277,38 @@ func (id *ID) initCert(loadedCerts []*x509.Certificate) error {
 }
 
 // SetCert persists a new PEM as the ID's client certificate.
-func (id *ID) SetCert(pem string) error {
-	if certUrl, err := parseAddr(id.Config.Cert); err != nil {
+func (id *ID) SetCert(pemStr string) error {
+	certUrl, err := parseAddr(id.Config.Cert)
+
+	if err != nil {
 		return err
-	} else {
-		switch certUrl.Scheme {
-		case StoragePem:
-			id.Config.Cert = StoragePem + ":" + pem
-			return fmt.Errorf("could not save client certificate, location scheme not supported for saving (%s):\n%s", id.Config.Cert, pem)
-		case StorageFile, "":
-			f, err := os.OpenFile(id.Config.Cert, os.O_RDWR, 0664)
-			if err != nil {
-				return fmt.Errorf("could not update client certificate [%s]: %v", id.Config.Cert, err)
-			}
+	}
 
-			defer func() { _ = f.Close() }()
-
-			err = f.Truncate(0)
-
-			if err != nil {
-				return fmt.Errorf("could not truncate client certificate [%s]: %v", id.Config.Cert, err)
-			}
-
-			_, err = fmt.Fprint(f, pem)
-
-			if err != nil {
-				return fmt.Errorf("error writing new client certificate [%s]: %v", id.Config.Cert, err)
-			}
-		default:
-			return fmt.Errorf("could not save client certificate, location scheme not supported (%s) or address not defined (%s):\n%s", certUrl.Scheme, id.Config.Cert, pem)
+	switch certUrl.Scheme {
+	case StoragePem:
+		id.Config.Cert = StoragePem + ":" + pemStr
+		return fmt.Errorf("could not save client certificate, location scheme not supported for saving (%s):\n%s", id.Config.Cert, pemStr)
+	case StorageFile, "":
+		f, err := os.OpenFile(id.Config.Cert, os.O_RDWR, 0664)
+		if err != nil {
+			return fmt.Errorf("could not update client certificate [%s]: %v", id.Config.Cert, err)
 		}
+
+		defer func() { _ = f.Close() }()
+
+		err = f.Truncate(0)
+
+		if err != nil {
+			return fmt.Errorf("could not truncate client certificate [%s]: %v", id.Config.Cert, err)
+		}
+
+		_, err = fmt.Fprint(f, pemStr)
+
+		if err != nil {
+			return fmt.Errorf("error writing new client certificate [%s]: %v", id.Config.Cert, err)
+		}
+	default:
+		return fmt.Errorf("could not save client certificate, location scheme not supported (%s) or address not defined (%s):\n%s", certUrl.Scheme, id.Config.Cert, pemStr)
 	}
 
 	return nil
@@ -127,35 +316,36 @@ func (id *ID) SetCert(pem string) error {
 
 // SetServerCert persists a new PEM as the ID's server certificate.
 func (id *ID) SetServerCert(pem string) error {
-	if certUrl, err := parseAddr(id.Config.ServerCert); err != nil {
+	certUrl, err := parseAddr(id.Config.ServerCert)
+	if err != nil {
 		return err
-	} else {
-		switch certUrl.Scheme {
-		case StoragePem:
-			id.Config.ServerCert = StoragePem + ":" + pem
-			return fmt.Errorf("could not save client certificate, location scheme not supported for saving (%s): \n %s", id.Config.Cert, pem)
-		case StorageFile, "":
-			f, err := os.OpenFile(id.Config.ServerCert, os.O_RDWR, 0664)
-			if err != nil {
-				return fmt.Errorf("could not update server certificate [%s]: %v", id.Config.ServerCert, err)
-			}
+	}
 
-			defer func() { _ = f.Close() }()
-
-			err = f.Truncate(0)
-
-			if err != nil {
-				return fmt.Errorf("could not truncate server certificate [%s]: %v", id.Config.ServerCert, err)
-			}
-
-			_, err = fmt.Fprint(f, pem)
-
-			if err != nil {
-				return fmt.Errorf("error writing new server certificate [%s]: %v", id.Config.ServerCert, err)
-			}
-		default:
-			return fmt.Errorf("could not save server certificate, location scheme not supported (%s) or address not defined (%s):\n%s", certUrl.Scheme, id.Config.ServerCert, pem)
+	switch certUrl.Scheme {
+	case StoragePem:
+		id.Config.ServerCert = StoragePem + ":" + pem
+		return fmt.Errorf("could not save client certificate, location scheme not supported for saving (%s): \n %s", id.Config.Cert, pem)
+	case StorageFile, "":
+		f, err := os.OpenFile(id.Config.ServerCert, os.O_RDWR, 0664)
+		if err != nil {
+			return fmt.Errorf("could not update server certificate [%s]: %v", id.Config.ServerCert, err)
 		}
+
+		defer func() { _ = f.Close() }()
+
+		err = f.Truncate(0)
+
+		if err != nil {
+			return fmt.Errorf("could not truncate server certificate [%s]: %v", id.Config.ServerCert, err)
+		}
+
+		_, err = fmt.Fprint(f, pem)
+
+		if err != nil {
+			return fmt.Errorf("error writing new server certificate [%s]: %v", id.Config.ServerCert, err)
+		}
+	default:
+		return fmt.Errorf("could not save server certificate, location scheme not supported (%s) or address not defined (%s):\n%s", certUrl.Scheme, id.Config.ServerCert, pem)
 	}
 
 	return nil
@@ -545,7 +735,7 @@ func LoadKey(keyAddr string) (crypto.PrivateKey, error) {
 		case StorageFile, "":
 			return certtools.GetKey(nil, keyUrl.Path, "")
 		default:
-			// engine key format: "{engine_id}:{engine_opts} see specific engine for supported options
+			// engine key format: "{engine_id}:{engine_opts}" see specific engine for supported options
 			return certtools.GetKey(keyUrl, "", "")
 			//return nil, fmt.Errorf("could not load key, location scheme not supported (%s) or address not defined (%s)", keyUrl.Scheme, keyAddr)
 		}
@@ -569,6 +759,8 @@ func LoadCert(certAddr string) ([]*x509.Certificate, error) {
 		case StorageFile, "":
 			return certtools.LoadCertFromFile(certUrl.Path)
 		default:
+			//try to figure it out like the c-sdk
+
 			return nil, fmt.Errorf("could not load cert, location scheme not supported (%s) or address not defined (%s)", certUrl.Scheme, certAddr)
 		}
 	}
@@ -621,4 +813,88 @@ func loadCABundle(caAddr string) (*x509.CertPool, *CaPool, error) {
 
 		return pool, caPool, nil
 	}
+}
+
+func (id *ID) ValidFor(hostnameOrIp string) error {
+	return ValidFor(id, hostnameOrIp)
+}
+
+// Define base errors
+var (
+	// ErrInvalidAddressForIdentity is returned during ip/hostname SANs validation. It represents that the ip/hostname
+	// is not present as a SAN in any available server certificates.
+	ErrInvalidAddressForIdentity = errors.New("identity is not valid for provided host")
+)
+
+// AddressError is returned during ip/hostname SANs validation. It represents that the ip/hostname is not present as
+// a SAN in any available server certificates.
+type AddressError struct {
+	BaseErr  error
+	Host     string
+	ValidFor []string
+}
+
+func (e *AddressError) Error() string {
+	return fmt.Sprintf("%s: [%s]. is valid for: [%s]", e.BaseErr.Error(), e.Host, strings.Join(e.ValidFor, ", "))
+}
+
+func (e *AddressError) Unwrap() error {
+	return e.BaseErr
+}
+
+// ValidFor checks if the identity is valid for the given address
+func ValidFor(id Identity, hostnameOrIp string) error {
+	var err error
+	// Check server certificate
+	for _, c := range id.ServerCert() {
+		err = c.Leaf.VerifyHostname(hostnameOrIp)
+		if err == nil {
+			return nil
+		}
+	}
+
+	// Check client certificate if server cert validation fails
+	if err != nil && id.Cert() != nil && id.Cert().Leaf != nil {
+		err = id.Cert().Leaf.VerifyHostname(hostnameOrIp)
+	}
+
+	if err != nil {
+		return &AddressError{BaseErr: ErrInvalidAddressForIdentity, Host: hostnameOrIp, ValidFor: getUniqueAddresses(id)}
+	}
+	if len(id.ServerCert()) == 0 && id.Cert() == nil {
+		return &AddressError{BaseErr: ErrInvalidAddressForIdentity, Host: hostnameOrIp}
+	}
+
+	return nil
+}
+
+// getUniqueAddresses extracts unique DNS names and IP addresses from the identity's certificates
+func getUniqueAddresses(id Identity) []string {
+	addresses := make(map[string]struct{})
+
+	if certs := id.ServerCert(); len(certs) > 0 && certs[0].Leaf != nil {
+		for _, dns := range certs[0].Leaf.DNSNames {
+			addresses[dns] = struct{}{}
+		}
+		for _, ip := range certs[0].Leaf.IPAddresses {
+			addresses[ip.String()] = struct{}{}
+		}
+	}
+
+	if cert := id.Cert(); cert != nil && cert.Leaf != nil {
+		for _, dns := range cert.Leaf.DNSNames {
+			addresses[dns] = struct{}{}
+		}
+		for _, ip := range cert.Leaf.IPAddresses {
+			addresses[ip.String()] = struct{}{}
+		}
+	}
+
+	uniqueList := make([]string, 0, len(addresses))
+	for addr := range addresses {
+		uniqueList = append(uniqueList, addr)
+	}
+	sort.Strings(uniqueList) // Ensure consistent order, mostly for testing
+
+	return uniqueList
 }

@@ -120,7 +120,7 @@ func Listen(bindAddress string, name string, i *identity.TokenId, acceptF func(t
 			return nil, errors.Wrap(err, "load configuration")
 		}
 	}
-	logrus.Infof(cfg.Dump("ws.Config"))
+	logrus.Info(cfg.Dump("ws.Config"))
 
 	go startHttpServer(log.Entry, bindAddress, cfg, name, acceptF)
 

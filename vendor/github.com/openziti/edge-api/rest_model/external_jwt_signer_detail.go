@@ -108,6 +108,10 @@ type ExternalJWTSignerDetail struct {
 	// Required: true
 	Scopes []string `json:"scopes"`
 
+	// target token
+	// Required: true
+	TargetToken *TargetToken `json:"targetToken"`
+
 	// use external Id
 	// Required: true
 	UseExternalID *bool `json:"useExternalId"`
@@ -154,6 +158,8 @@ func (m *ExternalJWTSignerDetail) UnmarshalJSON(raw []byte) error {
 
 		Scopes []string `json:"scopes"`
 
+		TargetToken *TargetToken `json:"targetToken"`
+
 		UseExternalID *bool `json:"useExternalId"`
 	}
 	if err := swag.ReadJSON(raw, &dataAO1); err != nil {
@@ -189,6 +195,8 @@ func (m *ExternalJWTSignerDetail) UnmarshalJSON(raw []byte) error {
 	m.NotBefore = dataAO1.NotBefore
 
 	m.Scopes = dataAO1.Scopes
+
+	m.TargetToken = dataAO1.TargetToken
 
 	m.UseExternalID = dataAO1.UseExternalID
 
@@ -235,6 +243,8 @@ func (m ExternalJWTSignerDetail) MarshalJSON() ([]byte, error) {
 
 		Scopes []string `json:"scopes"`
 
+		TargetToken *TargetToken `json:"targetToken"`
+
 		UseExternalID *bool `json:"useExternalId"`
 	}
 
@@ -267,6 +277,8 @@ func (m ExternalJWTSignerDetail) MarshalJSON() ([]byte, error) {
 	dataAO1.NotBefore = m.NotBefore
 
 	dataAO1.Scopes = m.Scopes
+
+	dataAO1.TargetToken = m.TargetToken
 
 	dataAO1.UseExternalID = m.UseExternalID
 
@@ -344,6 +356,10 @@ func (m *ExternalJWTSignerDetail) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateScopes(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTargetToken(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -504,6 +520,30 @@ func (m *ExternalJWTSignerDetail) validateScopes(formats strfmt.Registry) error 
 	return nil
 }
 
+func (m *ExternalJWTSignerDetail) validateTargetToken(formats strfmt.Registry) error {
+
+	if err := validate.Required("targetToken", "body", m.TargetToken); err != nil {
+		return err
+	}
+
+	if err := validate.Required("targetToken", "body", m.TargetToken); err != nil {
+		return err
+	}
+
+	if m.TargetToken != nil {
+		if err := m.TargetToken.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("targetToken")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("targetToken")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *ExternalJWTSignerDetail) validateUseExternalID(formats strfmt.Registry) error {
 
 	if err := validate.Required("useExternalId", "body", m.UseExternalID); err != nil {
@@ -522,9 +562,29 @@ func (m *ExternalJWTSignerDetail) ContextValidate(ctx context.Context, formats s
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateTargetToken(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ExternalJWTSignerDetail) contextValidateTargetToken(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.TargetToken != nil {
+		if err := m.TargetToken.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("targetToken")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("targetToken")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

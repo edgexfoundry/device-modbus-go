@@ -27,32 +27,35 @@ import (
 )
 
 type ReconnectingDialerConfig struct {
-	Identity         *identity.TokenId
-	Endpoint         transport.Address
-	LocalBinding     string
-	Headers          map[int32][]byte
-	TransportConfig  transport.Configuration
-	ReconnectHandler func()
+	Identity          *identity.TokenId
+	Endpoint          transport.Address
+	LocalBinding      string
+	Headers           map[int32][]byte
+	TransportConfig   transport.Configuration
+	ReconnectHandler  func()
+	DisconnectHandler func()
 }
 
 type reconnectingDialer struct {
-	identity         *identity.TokenId
-	endpoint         transport.Address
-	localBinding     string
-	headers          map[int32][]byte
-	tcfg             transport.Configuration
-	reconnectLock    sync.Mutex
-	reconnectHandler func()
+	identity          *identity.TokenId
+	endpoint          transport.Address
+	localBinding      string
+	headers           map[int32][]byte
+	tcfg              transport.Configuration
+	reconnectLock     sync.Mutex
+	reconnectHandler  func()
+	disconnectHandler func()
 }
 
 func NewReconnectingDialer(config ReconnectingDialerConfig) UnderlayFactory {
 	return &reconnectingDialer{
-		identity:         config.Identity,
-		endpoint:         config.Endpoint,
-		headers:          config.Headers,
-		reconnectHandler: config.ReconnectHandler,
-		tcfg:             config.TransportConfig,
-		localBinding:     config.LocalBinding,
+		identity:          config.Identity,
+		endpoint:          config.Endpoint,
+		headers:           config.Headers,
+		reconnectHandler:  config.ReconnectHandler,
+		disconnectHandler: config.DisconnectHandler,
+		tcfg:              config.TransportConfig,
+		localBinding:      config.LocalBinding,
 	}
 }
 
@@ -101,6 +104,10 @@ func (dialer *reconnectingDialer) Reconnect(impl *reconnectingImpl) error {
 	}
 
 	impl.reconnecting.Store(true)
+	if dialer.disconnectHandler != nil {
+		dialer.disconnectHandler()
+	}
+
 	defer func() {
 		impl.reconnecting.Store(false)
 		if dialer.reconnectHandler != nil {

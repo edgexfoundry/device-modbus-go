@@ -92,7 +92,9 @@ func (d *deviceCache) ForName(name string) (models.Device, bool) {
 	if !ok {
 		return models.Device{}, false
 	}
-	return *device, ok
+	// As the cache device contains pointer fields(map and slice), directly return device may cause concurrent map read
+	// or write if the invoker spawn another goroutine to manipulate the device, so returning the clone of device here
+	return device.Clone(), ok
 }
 
 // All returns the current list of devices in the cache.
@@ -103,7 +105,7 @@ func (d *deviceCache) All() []models.Device {
 	i := 0
 	devices := make([]models.Device, len(d.deviceMap))
 	for _, device := range d.deviceMap {
-		devices[i] = *device
+		devices[i] = device.Clone()
 		i++
 	}
 	return devices

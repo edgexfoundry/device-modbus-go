@@ -39,7 +39,10 @@ const (
 )
 
 var noProtocol = ""
-var handlerKey = struct{}{}
+
+type handlerKeyType struct{}
+
+var handlerKey = handlerKeyType{}
 
 var handshakeTimeout concurrenz.AtomicValue[time.Duration]
 

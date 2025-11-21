@@ -287,7 +287,7 @@ func AddAddressParser(addressParser AddressParser) {
 
 // ParseAddress uses the globally-configured AddressParser instances to parse an address.
 func ParseAddress(addressString string) (Address, error) {
-	if addressParsers == nil || len(addressParsers) < 1 {
+	if len(addressParsers) == 0 {
 		return nil, errors.New("no configured address parsers")
 	}
 	for _, addressParser := range addressParsers {
