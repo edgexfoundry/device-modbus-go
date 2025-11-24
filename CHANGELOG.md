@@ -12,6 +12,15 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [4.0.1] Odessa 
+
+### ✨  Features
+- Support Modbus register bit decomposition for Odessa 4.0.0 ([#662](https://github.com/edgexfoundry/device-modbus-go/issues/662)) ([#f5d7f7d](https://github.com/edgexfoundry/device-modbus-go/commits/f5d7f7d))
+
+### 🐛 Bug Fixes 
+- Fix nil pointer error when sending command ([#0f29a34](https://github.com/edgexfoundry/device-modbus-go/commits/0f29a34))
+
+
 ## [4.0.0] Odessa - 2025-03-12 (Only compatible with the 4.x releases)
 
 ### ✨  Features
