@@ -263,3 +263,79 @@ func TestCreateTCPConnectionInfo_StringDuration(t *testing.T) {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
+
+func TestCreateTCPConnectionInfo_NoIdleTimeout(t *testing.T) {
+	address := "0.0.0.0"
+	port := 502
+	unitID := uint8(255)
+	timeout := "10s"
+
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolTCP: {
+			Address: address,
+			Port:    port,
+			UnitID:  unitID,
+			Timeout: timeout,
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+
+	expectedTimeout := 10 * time.Second
+	expectedIdleTimeout := 0 * time.Second
+
+	if connectionInfo.Protocol != ProtocolTCP || connectionInfo.Address != address ||
+		connectionInfo.Port != port || connectionInfo.UnitID != unitID ||
+		connectionInfo.Timeout != expectedTimeout || connectionInfo.IdleTimeout != expectedIdleTimeout {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+}
+
+func TestCreateTCPConnectionInfo_WithConnectionRecoverySettings(t *testing.T) {
+	address := "0.0.0.0"
+	port := 502
+	unitID := uint8(255)
+	timeout := "10s"
+	idleTimeout := "2m"
+	protocolRecoveryTimeout := "500ms"
+	linkRecoveryTimeout := "1s"
+	connectDelay := "200ms"
+
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolTCP: {
+			Address:                 address,
+			Port:                    port,
+			UnitID:                  unitID,
+			Timeout:                 timeout,
+			IdleTimeout:             idleTimeout,
+			ProtocolRecoveryTimeout: protocolRecoveryTimeout,
+			LinkRecoveryTimeout:     linkRecoveryTimeout,
+			ConnectDelay:            connectDelay,
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+
+	expectedTimeout := 10 * time.Second
+	expectedIdleTimeout := 2 * time.Minute
+	expectedProtocolRecoveryTimeout := 500 * time.Millisecond
+	expectedLinkRecoveryTimeout := 1 * time.Second
+	expectedConnectDelay := 200 * time.Millisecond
+
+	if connectionInfo.Protocol != ProtocolTCP || connectionInfo.Address != address ||
+		connectionInfo.Port != port || connectionInfo.UnitID != unitID ||
+		connectionInfo.Timeout != expectedTimeout || connectionInfo.IdleTimeout != expectedIdleTimeout ||
+		connectionInfo.ProtocolRecoveryTimeout != expectedProtocolRecoveryTimeout ||
+		connectionInfo.LinkRecoveryTimeout != expectedLinkRecoveryTimeout ||
+		connectionInfo.ConnectDelay != expectedConnectDelay {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+}
