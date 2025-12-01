@@ -101,6 +101,24 @@ func parseFloatValue(properties map[string]any, key string) (float64, error) {
 	return res, nil
 }
 
+func parseDurationValue(properties map[string]any, key string) (time.Duration, error) {
+	value, ok := properties[key]
+	if !ok {
+		return 0, fmt.Errorf("protocol config '%s' not exist", key)
+	}
+	// for straight number value, treat it as seconds
+	if v, err := parseFloatValue(properties, key); err == nil {
+		return time.Duration(v) * time.Second, nil
+	}
+
+	res, err := cast.ToDurationE(value)
+	if err != nil {
+		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to time.Duration, %v", key, value, err)
+	}
+
+	return res, nil
+}
+
 func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, err error) {
 	errorMessage := "unable to create RTU connection info, protocol config '%s' not exist"
 	value, ok := protocol[Address]
@@ -148,12 +166,12 @@ func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, 
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
-	timeout, err := parseFloatValue(protocol, Timeout)
+	timeout, err := parseDurationValue(protocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseFloatValue(protocol, IdleTimeout)
+	idleTimeout, err := parseDurationValue(protocol, IdleTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -165,8 +183,8 @@ func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, 
 		StopBits:    stopBits,
 		Parity:      parity,
 		UnitID:      byte(unitID),
-		Timeout:     time.Duration(timeout) * time.Second,
-		IdleTimeout: time.Duration(idleTimeout) * time.Second,
+		Timeout:     timeout,
+		IdleTimeout: idleTimeout,
 	}, nil
 }
 
@@ -235,12 +253,12 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
-	timeout, err := parseFloatValue(tcpProtocol, Timeout)
+	timeout, err := parseDurationValue(tcpProtocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseFloatValue(tcpProtocol, IdleTimeout)
+	idleTimeout, err := parseDurationValue(tcpProtocol, IdleTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +268,7 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		Address:     address,
 		Port:        int(port),
 		UnitID:      byte(unitID),
-		Timeout:     time.Duration(timeout) * time.Second,
-		IdleTimeout: time.Duration(idleTimeout) * time.Second,
+		Timeout:     timeout,
+		IdleTimeout: idleTimeout,
 	}, nil
 }
