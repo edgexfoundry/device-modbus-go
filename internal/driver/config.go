@@ -18,18 +18,16 @@ import (
 
 // ConnectionInfo is device connection info
 type ConnectionInfo struct {
-	Protocol string
-	Address  string
-	Port     int
-	BaudRate int
-	DataBits int
-	StopBits int
-	Parity   string
-	UnitID   uint8
-	// Connect & Read timeout(seconds)
-	Timeout time.Duration
-	// Idle timeout(seconds) to close the connection
-	IdleTimeout time.Duration
+	Protocol    string
+	Address     string
+	Port        int
+	BaudRate    int
+	DataBits    int
+	StopBits    int
+	Parity      string
+	UnitID      uint8
+	Timeout     time.Duration // Connect & Read / Write timeout
+	IdleTimeout time.Duration // Idle timeout to close the connection (use 0 to dial for each request and negative value to never close)
 }
 
 func (info *ConnectionInfo) String() string {
