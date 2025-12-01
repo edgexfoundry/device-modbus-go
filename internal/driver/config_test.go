@@ -9,6 +9,7 @@ package driver
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/models"
 )
@@ -42,7 +43,7 @@ func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	}
 	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
 		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
-		connectionInfo.Parity != parity || connectionInfo.Timeout != timeout || connectionInfo.IdleTimeout != idleTimeout {
+		connectionInfo.Parity != parity || 	connectionInfo.Timeout != time.Duration(timeout) * time.Second || connectionInfo.IdleTimeout != time.Duration(idleTimeout) * time.Second {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
@@ -76,7 +77,7 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 	}
 	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
 		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
-		connectionInfo.Parity != parity || connectionInfo.Timeout != timeout || connectionInfo.IdleTimeout != idleTimeout {
+		connectionInfo.Parity != parity || connectionInfo.Timeout != time.Duration(timeout) * time.Second || connectionInfo.IdleTimeout != time.Duration(idleTimeout) * time.Second {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }

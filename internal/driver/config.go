@@ -9,6 +9,7 @@ package driver
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/models"
 
@@ -26,9 +27,9 @@ type ConnectionInfo struct {
 	Parity   string
 	UnitID   uint8
 	// Connect & Read timeout(seconds)
-	Timeout int
+	Timeout time.Duration
 	// Idle timeout(seconds) to close the connection
-	IdleTimeout int
+	IdleTimeout time.Duration
 }
 
 func (info *ConnectionInfo) String() string {
@@ -152,8 +153,8 @@ func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, 
 		StopBits:    stopBits,
 		Parity:      parity,
 		UnitID:      byte(unitID),
-		Timeout:     timeout,
-		IdleTimeout: idleTimeout,
+		Timeout:     time.Duration(timeout) * time.Second,
+		IdleTimeout: time.Duration(idleTimeout) * time.Second,
 	}, nil
 }
 
@@ -237,7 +238,7 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		Address:     address,
 		Port:        int(port),
 		UnitID:      byte(unitID),
-		Timeout:     timeout,
-		IdleTimeout: idleTimeout,
+		Timeout:     time.Duration(timeout) * time.Second,
+		IdleTimeout: time.Duration(idleTimeout) * time.Second,
 	}, nil
 }
