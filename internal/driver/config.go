@@ -18,16 +18,19 @@ import (
 
 // ConnectionInfo is device connection info
 type ConnectionInfo struct {
-	Protocol    string
-	Address     string
-	Port        int
-	BaudRate    int
-	DataBits    int
-	StopBits    int
-	Parity      string
-	UnitID      uint8
-	Timeout     time.Duration // Connect & Read / Write timeout
-	IdleTimeout time.Duration // Idle timeout to close the connection (use 0 to dial for each request and negative value to never close)
+	Protocol                string
+	Address                 string
+	Port                    int
+	BaudRate                int
+	DataBits                int
+	StopBits                int
+	Parity                  string
+	UnitID                  uint8
+	Timeout                 time.Duration // Connect & Read / Write timeout
+	IdleTimeout             time.Duration // Idle timeout to close the connection (use 0 to dial for each request and negative value to never close)
+	LinkRecoveryTimeout     time.Duration // Recovery timeout if tcp communication misbehaves (TCP only)
+	ProtocolRecoveryTimeout time.Duration // Recovery timeout if the protocol is malformed, e.g. wrong transaction ID (TCP only)
+	ConnectDelay            time.Duration // Silent period after successful connection (TCP only)
 }
 
 func (info *ConnectionInfo) String() string {
@@ -260,15 +263,33 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 
 	idleTimeout, err := parseDurationValue(tcpProtocol, IdleTimeout)
 	if err != nil {
-		return nil, err
+		idleTimeout = 0 * time.Second // no idle timeout if not set
+	}
+
+	protocolRecoveryTimeout, err := parseDurationValue(tcpProtocol, ProtocolRecoveryTimeout)
+	if err != nil {
+		protocolRecoveryTimeout = 50 * time.Millisecond // default protocol recovery timeout 50ms
+	}
+
+	linkRecoveryTimeout, err := parseDurationValue(tcpProtocol, LinkRecoveryTimeout)
+	if err != nil {
+		linkRecoveryTimeout = 500 * time.Millisecond // default link recovery timeout 500ms
+	}
+
+	connectDelay, err := parseDurationValue(tcpProtocol, ConnectDelay)
+	if err != nil {
+		connectDelay = 0 * time.Millisecond // default no connect delay
 	}
 
 	return &ConnectionInfo{
-		Protocol:    ProtocolTCP,
-		Address:     address,
-		Port:        int(port),
-		UnitID:      byte(unitID),
-		Timeout:     timeout,
-		IdleTimeout: idleTimeout,
+		Protocol:                ProtocolTCP,
+		Address:                 address,
+		Port:                    int(port),
+		UnitID:                  byte(unitID),
+		Timeout:                 timeout,
+		IdleTimeout:             idleTimeout,
+		ProtocolRecoveryTimeout: protocolRecoveryTimeout,
+		LinkRecoveryTimeout:     linkRecoveryTimeout,
+		ConnectDelay:            connectDelay,
 	}, nil
 }
