@@ -13,7 +13,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	MODBUS "github.com/grid-x/modbus"
 )
@@ -157,15 +156,15 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	case ProtocolTCP:
 		client.TCPClientHandler = *MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
 		client.TCPClientHandler.SlaveID = byte(connectionInfo.UnitID)
-		client.TCPClientHandler.Timeout = time.Duration(connectionInfo.Timeout)
-		client.TCPClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout)
+		client.TCPClientHandler.Timeout = connectionInfo.Timeout
+		client.TCPClientHandler.IdleTimeout = connectionInfo.IdleTimeout
 		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	case ProtocolRTU:
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.RTUClientHandler = *MODBUS.NewRTUClientHandler(serialParams[0])
 		client.RTUClientHandler.SlaveID = byte(connectionInfo.UnitID)
-		client.RTUClientHandler.Timeout = time.Duration(connectionInfo.Timeout)
-		client.RTUClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout)
+		client.RTUClientHandler.Timeout = connectionInfo.Timeout
+		client.RTUClientHandler.IdleTimeout = connectionInfo.IdleTimeout
 		client.RTUClientHandler.BaudRate = connectionInfo.BaudRate
 		client.RTUClientHandler.DataBits = connectionInfo.DataBits
 		client.RTUClientHandler.StopBits = connectionInfo.StopBits
@@ -175,8 +174,8 @@ func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.ASCIIClientHandler = *MODBUS.NewASCIIClientHandler(serialParams[0])
 		client.ASCIIClientHandler.SlaveID = byte(connectionInfo.UnitID)
-		client.ASCIIClientHandler.Timeout = time.Duration(connectionInfo.Timeout)
-		client.ASCIIClientHandler.IdleTimeout = time.Duration(connectionInfo.IdleTimeout)
+		client.ASCIIClientHandler.Timeout = connectionInfo.Timeout
+		client.ASCIIClientHandler.IdleTimeout = connectionInfo.IdleTimeout
 		client.ASCIIClientHandler.BaudRate = connectionInfo.BaudRate
 		client.ASCIIClientHandler.DataBits = connectionInfo.DataBits
 		client.ASCIIClientHandler.StopBits = connectionInfo.StopBits
