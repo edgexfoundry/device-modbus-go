@@ -264,8 +264,8 @@ github.com/gorilla/securecookie v1.1.2 h1:YCIWL56dvtr73r6715mJs5ZvhtnY73hBvEF8kX
 github.com/gorilla/securecookie v1.1.2/go.mod h1:NfCASbcHqRSY+3a8tlWJwsQap2VX5pwzwo4h3eOamfo=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
-github.com/grid-x/modbus v0.0.0-20250714121349-f7cc8b80d85c h1:ciQbBeYcGjdLYanrFvFtCynsQUul1tmCCgZJ0ZRylno=
-github.com/grid-x/modbus v0.0.0-20250714121349-f7cc8b80d85c/go.mod h1:WpbUAyptAAi0VAriSRopZa6uhiJOJCTz7KFvgGtNRXc=
+github.com/grid-x/modbus v0.0.0-20251121133955-8a6c959be366 h1:UJPwVsTG6r4rngx/cT5+uMFBhYDxD1WfS/7kZUtkSA4=
+github.com/grid-x/modbus v0.0.0-20251121133955-8a6c959be366/go.mod h1:WpbUAyptAAi0VAriSRopZa6uhiJOJCTz7KFvgGtNRXc=
 github.com/grid-x/serial v0.0.0-20211107191517-583c7356b3aa h1:Rsn6ARgNkXrsXJIzhkE4vQr5Gbx2LvtEMv4BJOK4LyU=
 github.com/grid-x/serial v0.0.0-20211107191517-583c7356b3aa/go.mod h1:kdOd86/VGFWRrtkNwf1MPk0u1gIjc4Y7R2j7nhwc7Rk=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
