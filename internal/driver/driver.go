@@ -393,7 +393,7 @@ func aggregateReadRequests(reqs []sdkModel.CommandRequest) ([]ReqWithMeta, []Dev
 		}
 		return reqsMeta[i].dataType < reqsMeta[j].dataType
 	})
-	
+
 	// Grouping
 	groups := []DeviceAddressRange{}
 	i := 0
