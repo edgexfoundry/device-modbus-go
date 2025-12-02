@@ -9,6 +9,7 @@ package driver
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -162,34 +163,22 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 			d.removeDeviceClient(connectionInfo)
 			return responses, err
 		}
-		offset := uint16(0)
-		for k := g.startIdx; k <= g.endIdx; k++ {
-			meta := reqsMeta[k]
-			idx := meta.idx
-			cmdInfo, err := createCommandInfo(&meta.req)
+
+		// Split the grouped response data into individual responses
+		splitResults, err := splitGroupReadResponse(data, g, reqsMeta)
+		if err != nil {
+			driver.Logger.Errorf("Failed to split group read response: %v", err)
+			return responses, err
+		}
+
+		for _, split := range splitResults {
+			res, err := handleReadRequestAndTransformData(split.Request, split.Data)
 			if err != nil {
-				return responses, err
-			}
-			var byteLen uint16
-			if cmdInfo.PrimaryTable == "HOLDING_REGISTERS" || cmdInfo.PrimaryTable == "INPUT_REGISTERS" {
-				byteLen = cmdInfo.Length * 2
-			} else {
-				byteLen = cmdInfo.Length
-			}
-			dataStart := offset
-			dataEnd := offset + byteLen
-			if int(dataEnd) > len(data) {
-				return responses, fmt.Errorf("data out of range for split")
-			}
-			reqData := data[dataStart:dataEnd]
-			res, err := handleReadRequestAndTransformData(meta.req, reqData)
-			if err != nil {
-				driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", meta.req.DeviceResourceName, err)
+				driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", split.Request.DeviceResourceName, err)
 				d.removeDeviceClient(connectionInfo)
 				return responses, err
 			}
-			responses[idx] = res
-			offset += byteLen
+			responses[split.OriginalIdx] = res
 		}
 	}
 	driver.Logger.Debugf("get response %v", responses)
@@ -394,15 +383,17 @@ func aggregateReadRequests(reqs []sdkModel.CommandRequest) ([]ReqWithMeta, []Dev
 			length:      cmdInfo.Length,
 		}
 	}
-	// Sort by primaryType, valueType, startAddr
-	for i := 0; i < len(reqsMeta)-1; i++ {
-		for j := 0; j < len(reqsMeta)-i-1; j++ {
-			a, b := reqsMeta[j], reqsMeta[j+1]
-			if a.primaryType > b.primaryType || (a.primaryType == b.primaryType && (a.dataType > b.dataType || (a.dataType == b.dataType && a.startAddr > b.startAddr))) {
-				reqsMeta[j], reqsMeta[j+1] = reqsMeta[j+1], reqsMeta[j]
-			}
+	// Sort by startAddr, primaryType, valueType
+	sort.Slice(reqsMeta, func(i, j int) bool {
+		if reqsMeta[i].startAddr != reqsMeta[j].startAddr {
+			return reqsMeta[i].startAddr < reqsMeta[j].startAddr
 		}
-	}
+		if reqsMeta[i].primaryType != reqsMeta[j].primaryType {
+			return reqsMeta[i].primaryType < reqsMeta[j].primaryType
+		}
+		return reqsMeta[i].dataType < reqsMeta[j].dataType
+	})
+	
 	// Grouping
 	groups := []DeviceAddressRange{}
 	i := 0
@@ -433,4 +424,52 @@ func aggregateReadRequests(reqs []sdkModel.CommandRequest) ([]ReqWithMeta, []Dev
 		i = g.endIdx + 1
 	}
 	return reqsMeta, groups, nil
+}
+
+// SplitGroupResponse holds the result of splitting a group read response
+type SplitGroupResponse struct {
+	OriginalIdx int
+	Request     sdkModel.CommandRequest
+	Data        []byte
+}
+
+// splitGroupReadResponse splits raw data from a grouped read into individual data slices
+// for each request in the group. It returns an array of SplitGroupResponse containing
+// the original request index, the command request, and the corresponding data slice.
+func splitGroupReadResponse(data []byte, group DeviceAddressRange, reqsMeta []ReqWithMeta) ([]SplitGroupResponse, error) {
+	results := make([]SplitGroupResponse, 0, group.endIdx-group.startIdx+1)
+	offset := uint16(0)
+
+	for k := group.startIdx; k <= group.endIdx; k++ {
+		meta := reqsMeta[k]
+		cmdInfo, err := createCommandInfo(&meta.req)
+		if err != nil {
+			return nil, err
+		}
+
+		var byteLen uint16
+		if cmdInfo.PrimaryTable == HOLDING_REGISTERS || cmdInfo.PrimaryTable == INPUT_REGISTERS {
+			byteLen = cmdInfo.Length * 2
+		} else {
+			byteLen = cmdInfo.Length
+		}
+
+		dataStart := offset
+		dataEnd := offset + byteLen
+		if int(dataEnd) > len(data) {
+			return nil, fmt.Errorf("data out of range for split: need %d bytes but only have %d", dataEnd, len(data))
+		}
+
+		reqData := make([]byte, byteLen)
+		copy(reqData, data[dataStart:dataEnd])
+
+		results = append(results, SplitGroupResponse{
+			OriginalIdx: meta.idx,
+			Request:     meta.req,
+			Data:        reqData,
+		})
+		offset += byteLen
+	}
+
+	return results, nil
 }
