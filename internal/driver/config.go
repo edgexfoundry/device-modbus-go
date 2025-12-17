@@ -9,6 +9,7 @@ package driver
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/models"
 
@@ -17,18 +18,19 @@ import (
 
 // ConnectionInfo is device connection info
 type ConnectionInfo struct {
-	Protocol string
-	Address  string
-	Port     int
-	BaudRate int
-	DataBits int
-	StopBits int
-	Parity   string
-	UnitID   uint8
-	// Connect & Read timeout(seconds)
-	Timeout int
-	// Idle timeout(seconds) to close the connection
-	IdleTimeout int
+	Protocol                string
+	Address                 string
+	Port                    int
+	BaudRate                int
+	DataBits                int
+	StopBits                int
+	Parity                  string
+	UnitID                  uint8
+	Timeout                 time.Duration // Connect & Read / Write timeout
+	IdleTimeout             time.Duration // Idle timeout to close the connection (use 0 to dial for each request and negative value to never close)
+	LinkRecoveryTimeout     time.Duration // Recovery timeout if tcp communication misbehaves (TCP only)
+	ProtocolRecoveryTimeout time.Duration // Recovery timeout if the protocol is malformed, e.g. wrong transaction ID (TCP only)
+	ConnectDelay            time.Duration // Silent period after successful connection (TCP only)
 }
 
 func (info *ConnectionInfo) String() string {
@@ -88,6 +90,38 @@ func parseIntValue(properties map[string]any, key string) (int, error) {
 	return res, nil
 }
 
+func parseFloatValue(properties map[string]any, key string) (float64, error) {
+	value, ok := properties[key]
+	if !ok {
+		return 0, fmt.Errorf("protocol config '%s' not exist", key)
+	}
+
+	res, err := cast.ToFloat64E(value)
+	if err != nil {
+		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to float64, %v", key, value, err)
+	}
+
+	return res, nil
+}
+
+func parseDurationValue(properties map[string]any, key string) (time.Duration, error) {
+	value, ok := properties[key]
+	if !ok {
+		return 0, fmt.Errorf("protocol config '%s' not exist", key)
+	}
+	// for straight number value, treat it as seconds
+	if v, err := parseFloatValue(properties, key); err == nil {
+		return time.Duration(v) * time.Second, nil
+	}
+
+	res, err := cast.ToDurationE(value)
+	if err != nil {
+		return 0, fmt.Errorf("cannot transfrom protocol config %s value %v to time.Duration, %v", key, value, err)
+	}
+
+	return res, nil
+}
+
 func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, err error) {
 	errorMessage := "unable to create RTU connection info, protocol config '%s' not exist"
 	value, ok := protocol[Address]
@@ -135,12 +169,12 @@ func createSerialConnectionInfo(protocol map[string]any) (info *ConnectionInfo, 
 		return nil, fmt.Errorf("invalid parity value, it should be N(None) or O(Odd) or E(Even)")
 	}
 
-	timeout, err := parseIntValue(protocol, Timeout)
+	timeout, err := parseDurationValue(protocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseIntValue(protocol, IdleTimeout)
+	idleTimeout, err := parseDurationValue(protocol, IdleTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -222,22 +256,40 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		return nil, fmt.Errorf("uintID value out of range(0–255). Error: %v", err)
 	}
 
-	timeout, err := parseIntValue(tcpProtocol, Timeout)
+	timeout, err := parseDurationValue(tcpProtocol, Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	idleTimeout, err := parseIntValue(tcpProtocol, IdleTimeout)
+	idleTimeout, err := parseDurationValue(tcpProtocol, IdleTimeout)
 	if err != nil {
-		return nil, err
+		idleTimeout = 0 // default = dial for each request
+	}
+
+	protocolRecoveryTimeout, err := parseDurationValue(tcpProtocol, ProtocolRecoveryTimeout)
+	if err != nil {
+		protocolRecoveryTimeout = 0 // default = no protocol recovery
+	}
+
+	linkRecoveryTimeout, err := parseDurationValue(tcpProtocol, LinkRecoveryTimeout)
+	if err != nil {
+		linkRecoveryTimeout = 0 // default = no link recovery
+	}
+
+	connectDelay, err := parseDurationValue(tcpProtocol, ConnectDelay)
+	if err != nil {
+		connectDelay = 0 // default no connect delay
 	}
 
 	return &ConnectionInfo{
-		Protocol:    ProtocolTCP,
-		Address:     address,
-		Port:        int(port),
-		UnitID:      byte(unitID),
-		Timeout:     timeout,
-		IdleTimeout: idleTimeout,
+		Protocol:                ProtocolTCP,
+		Address:                 address,
+		Port:                    int(port),
+		UnitID:                  byte(unitID),
+		Timeout:                 timeout,
+		IdleTimeout:             idleTimeout,
+		ProtocolRecoveryTimeout: protocolRecoveryTimeout,
+		LinkRecoveryTimeout:     linkRecoveryTimeout,
+		ConnectDelay:            connectDelay,
 	}, nil
 }

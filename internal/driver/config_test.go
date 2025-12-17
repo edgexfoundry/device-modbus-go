@@ -9,6 +9,7 @@ package driver
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/models"
 )
@@ -42,7 +43,7 @@ func TestCreateRTUConnectionInfo_unitID255(t *testing.T) {
 	}
 	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
 		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
-		connectionInfo.Parity != parity || connectionInfo.Timeout != timeout || connectionInfo.IdleTimeout != idleTimeout {
+		connectionInfo.Parity != parity || connectionInfo.Timeout != time.Duration(timeout)*time.Second || connectionInfo.IdleTimeout != time.Duration(idleTimeout)*time.Second {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
@@ -76,7 +77,7 @@ func TestCreateConnectionInfo_unitID0(t *testing.T) {
 	}
 	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
 		connectionInfo.BaudRate != baudRate || connectionInfo.DataBits != dataBits || connectionInfo.StopBits != stopBits ||
-		connectionInfo.Parity != parity || connectionInfo.Timeout != timeout || connectionInfo.IdleTimeout != idleTimeout {
+		connectionInfo.Parity != parity || connectionInfo.Timeout != time.Duration(timeout)*time.Second || connectionInfo.IdleTimeout != time.Duration(idleTimeout)*time.Second {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
@@ -189,5 +190,152 @@ func TestCreateTCPConnectionInfo_portOutOfRange(t *testing.T) {
 
 	if err == nil || !strings.Contains(err.Error(), "value out of range") {
 		t.Fatalf("Unexpect test result, port %v should out of ranage, %v", port, err)
+	}
+}
+
+func TestCreateRTUConnectionInfo_FloatAndStringValues(t *testing.T) {
+	address := "/dev/USB0tty"
+	baudRate := 19200
+	dataBits := 8
+	stopBits := 1
+	parity := "N"
+	unitID := uint8(1)
+	timeout := "5s"
+	idleTimeout := "5s"
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolRTU: {
+			Address:     address,
+			UnitID:      unitID,
+			BaudRate:    baudRate,
+			DataBits:    dataBits,
+			StopBits:    stopBits,
+			Parity:      parity,
+			Timeout:     timeout,
+			IdleTimeout: idleTimeout,
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+
+	expectedTimeout := 5 * time.Second
+	expectedIdleTimeout := 5 * time.Second
+
+	if connectionInfo.Protocol != ProtocolRTU || connectionInfo.Address != address || connectionInfo.UnitID != unitID ||
+		connectionInfo.BaudRate != int(baudRate) || connectionInfo.DataBits != int(dataBits) || connectionInfo.StopBits != int(stopBits) ||
+		connectionInfo.Parity != parity || connectionInfo.Timeout != expectedTimeout || connectionInfo.IdleTimeout != expectedIdleTimeout {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+}
+
+func TestCreateTCPConnectionInfo_StringDuration(t *testing.T) {
+	address := "0.0.0.0"
+	port := 502
+	unitID := uint8(255)
+	timeout := "10s"
+	idleTimeout := "2m"
+
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolTCP: {
+			Address:     address,
+			Port:        port,
+			UnitID:      unitID,
+			Timeout:     timeout,
+			IdleTimeout: idleTimeout,
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+
+	expectedTimeout := 10 * time.Second
+	expectedIdleTimeout := 2 * time.Minute
+
+	if connectionInfo.Protocol != ProtocolTCP || connectionInfo.Address != address ||
+		connectionInfo.Port != port || connectionInfo.UnitID != unitID ||
+		connectionInfo.Timeout != expectedTimeout || connectionInfo.IdleTimeout != expectedIdleTimeout {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+}
+
+func TestCreateTCPConnectionInfo_NoIdleTimeout(t *testing.T) {
+	address := "0.0.0.0"
+	port := 502
+	unitID := uint8(255)
+	timeout := "10s"
+
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolTCP: {
+			Address: address,
+			Port:    port,
+			UnitID:  unitID,
+			Timeout: timeout,
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+
+	expectedTimeout := 10 * time.Second
+	expectedIdleTimeout := 0 * time.Second
+
+	if connectionInfo.Protocol != ProtocolTCP || connectionInfo.Address != address ||
+		connectionInfo.Port != port || connectionInfo.UnitID != unitID ||
+		connectionInfo.Timeout != expectedTimeout || connectionInfo.IdleTimeout != expectedIdleTimeout {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+}
+
+func TestCreateTCPConnectionInfo_WithConnectionRecoverySettings(t *testing.T) {
+	address := "0.0.0.0"
+	port := 502
+	unitID := uint8(255)
+	timeout := "10s"
+	idleTimeout := "2m"
+	protocolRecoveryTimeout := "500ms"
+	linkRecoveryTimeout := "1s"
+	connectDelay := "200ms"
+
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolTCP: {
+			Address:                 address,
+			Port:                    port,
+			UnitID:                  unitID,
+			Timeout:                 timeout,
+			IdleTimeout:             idleTimeout,
+			ProtocolRecoveryTimeout: protocolRecoveryTimeout,
+			LinkRecoveryTimeout:     linkRecoveryTimeout,
+			ConnectDelay:            connectDelay,
+		},
+	}
+
+	connectionInfo, err := createConnectionInfo(protocols)
+
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+
+	expectedTimeout := 10 * time.Second
+	expectedIdleTimeout := 2 * time.Minute
+	expectedProtocolRecoveryTimeout := 500 * time.Millisecond
+	expectedLinkRecoveryTimeout := 1 * time.Second
+	expectedConnectDelay := 200 * time.Millisecond
+
+	if connectionInfo.Protocol != ProtocolTCP || connectionInfo.Address != address ||
+		connectionInfo.Port != port || connectionInfo.UnitID != unitID ||
+		connectionInfo.Timeout != expectedTimeout || connectionInfo.IdleTimeout != expectedIdleTimeout ||
+		connectionInfo.ProtocolRecoveryTimeout != expectedProtocolRecoveryTimeout ||
+		connectionInfo.LinkRecoveryTimeout != expectedLinkRecoveryTimeout ||
+		connectionInfo.ConnectDelay != expectedConnectDelay {
+		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
 	}
 }
