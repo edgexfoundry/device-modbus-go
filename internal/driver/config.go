@@ -263,22 +263,22 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 
 	idleTimeout, err := parseDurationValue(tcpProtocol, IdleTimeout)
 	if err != nil {
-		idleTimeout = 0 * time.Second // no idle timeout if not set
+		idleTimeout = 0 // default = dial for each request
 	}
 
 	protocolRecoveryTimeout, err := parseDurationValue(tcpProtocol, ProtocolRecoveryTimeout)
 	if err != nil {
-		protocolRecoveryTimeout = 50 * time.Millisecond // default protocol recovery timeout 50ms
+		protocolRecoveryTimeout = 0 // default = no protocol recovery
 	}
 
 	linkRecoveryTimeout, err := parseDurationValue(tcpProtocol, LinkRecoveryTimeout)
 	if err != nil {
-		linkRecoveryTimeout = 500 * time.Millisecond // default link recovery timeout 500ms
+		linkRecoveryTimeout = 0 // default = no link recovery
 	}
 
 	connectDelay, err := parseDurationValue(tcpProtocol, ConnectDelay)
 	if err != nil {
-		connectDelay = 0 * time.Millisecond // default no connect delay
+		connectDelay = 0 // default no connect delay
 	}
 
 	return &ConnectionInfo{
