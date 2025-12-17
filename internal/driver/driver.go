@@ -9,6 +9,7 @@ package driver
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -119,6 +120,8 @@ func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 }
 
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
+	d.Logger.Debugf("HandleReadCommands called for device %s", deviceName)
+	d.Logger.Debugf("Read command requests: %+v", reqs)
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
 		driver.Logger.Errorf("Fail to create read command connection info. err:%v \n", err)
@@ -141,24 +144,49 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	}
 	driver.Logger.Debugf("key = %s,client = %+v", connectionInfo.String(), deviceClient)
 
-	// handle command requests
-	for i, req := range reqs {
-		res, err := handleReadCommandRequest(deviceClient, req)
+	reqsMeta, reqsAct, err := aggregateReadRequests(reqs)
+	if err != nil {
+		return responses, err
+	}
+	d.Logger.Infof("Actual Read requests: %+v", reqsAct)
+	// For each group, do a single read and split
+	for _, g := range reqsAct {
+		baseReq := reqsMeta[g.startIdx].req
+		baseCmdInfo, err := createCommandInfo(&baseReq)
 		if err != nil {
-			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", req.DeviceResourceName, err)
+			return responses, err
+		}
+		baseCmdInfo.Length = g.totalLen
+		data, err := deviceClient.GetValue(baseCmdInfo)
+		if err != nil {
+			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", baseReq.DeviceResourceName, err)
 			d.removeDeviceClient(connectionInfo)
 			return responses, err
 		}
 
-		responses[i] = res
+		// Split the grouped response data into individual responses
+		splitResults, err := splitGroupReadResponse(data, g, reqsMeta)
+		if err != nil {
+			driver.Logger.Errorf("Failed to split group read response: %v", err)
+			return responses, err
+		}
+
+		for _, split := range splitResults {
+			res, err := handleReadRequestAndTransformData(split.Request, split.Data)
+			if err != nil {
+				driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", split.Request.DeviceResourceName, err)
+				d.removeDeviceClient(connectionInfo)
+				return responses, err
+			}
+			responses[split.OriginalIdx] = res
+		}
 	}
 	driver.Logger.Debugf("get response %v", responses)
 	return responses, nil
 }
 
-func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest) (*sdkModel.CommandValue, error) {
-	var response []byte
-	var result = &sdkModel.CommandValue{}
+func handleReadRequestAndTransformData(req sdkModel.CommandRequest, data []byte) (*sdkModel.CommandValue, error) {
+	var result *sdkModel.CommandValue
 	var err error
 
 	commandInfo, err := createCommandInfo(&req)
@@ -166,12 +194,7 @@ func handleReadCommandRequest(deviceClient DeviceClient, req sdkModel.CommandReq
 		return nil, err
 	}
 
-	response, err = deviceClient.GetValue(commandInfo)
-	if err != nil {
-		return result, err
-	}
-
-	result, err = TransformDataBytesToResult(&req, response, commandInfo)
+	result, err = TransformDataBytesToResult(&req, data, commandInfo)
 
 	if err != nil {
 		return result, err
@@ -321,4 +344,132 @@ func NewProtocolDriver() interfaces.ProtocolDriver {
 		driver = new(Driver)
 	})
 	return driver
+}
+
+// ReqWithMeta holds metadata for grouping read requests
+type ReqWithMeta struct {
+	idx         int
+	req         sdkModel.CommandRequest
+	primaryType string
+	dataType    string
+	startAddr   uint16
+	length      uint16
+}
+
+// DeviceAddressRange represents a DeviceAddressRange of contiguous, compatible read requests
+type DeviceAddressRange struct {
+	startIdx    int
+	endIdx      int
+	primaryType string
+	rawType     string
+	startAddr   uint16
+	totalLen    uint16
+}
+
+// aggregateReadRequests groups read requests by register type, value type, and contiguous addresses
+func aggregateReadRequests(reqs []sdkModel.CommandRequest) ([]ReqWithMeta, []DeviceAddressRange, error) {
+	reqsMeta := make([]ReqWithMeta, len(reqs))
+	for i, r := range reqs {
+		cmdInfo, err := createCommandInfo(&r)
+		if err != nil {
+			return nil, nil, err
+		}
+		reqsMeta[i] = ReqWithMeta{
+			idx:         i,
+			req:         r,
+			primaryType: cmdInfo.PrimaryTable,
+			dataType:    cmdInfo.ValueType,
+			startAddr:   cmdInfo.StartingAddress,
+			length:      cmdInfo.Length,
+		}
+	}
+	// Sort by startAddr, primaryType, valueType
+	sort.Slice(reqsMeta, func(i, j int) bool {
+		if reqsMeta[i].startAddr != reqsMeta[j].startAddr {
+			return reqsMeta[i].startAddr < reqsMeta[j].startAddr
+		}
+		if reqsMeta[i].primaryType != reqsMeta[j].primaryType {
+			return reqsMeta[i].primaryType < reqsMeta[j].primaryType
+		}
+		return reqsMeta[i].dataType < reqsMeta[j].dataType
+	})
+
+	// Grouping
+	groups := []DeviceAddressRange{}
+	i := 0
+	for i < len(reqsMeta) {
+		g := DeviceAddressRange{
+			startIdx:    i,
+			endIdx:      i,
+			primaryType: reqsMeta[i].primaryType,
+			rawType:     reqsMeta[i].dataType,
+			startAddr:   reqsMeta[i].startAddr,
+			totalLen:    reqsMeta[i].length,
+		}
+		lastAddr := reqsMeta[i].startAddr
+		lastLen := reqsMeta[i].length
+		for j := i + 1; j < len(reqsMeta); j++ {
+			cur := reqsMeta[j]
+			// Only group if same register type, type, and contiguous
+			if cur.primaryType == g.primaryType && cur.dataType == g.rawType && cur.startAddr == lastAddr+lastLen {
+				g.endIdx = j
+				g.totalLen += cur.length
+				lastAddr = cur.startAddr
+				lastLen = cur.length
+			} else {
+				break
+			}
+		}
+		groups = append(groups, g)
+		i = g.endIdx + 1
+	}
+	return reqsMeta, groups, nil
+}
+
+// SplitGroupResponse holds the result of splitting a group read response
+type SplitGroupResponse struct {
+	OriginalIdx int
+	Request     sdkModel.CommandRequest
+	Data        []byte
+}
+
+// splitGroupReadResponse splits raw data from a grouped read into individual data slices
+// for each request in the group. It returns an array of SplitGroupResponse containing
+// the original request index, the command request, and the corresponding data slice.
+func splitGroupReadResponse(data []byte, group DeviceAddressRange, reqsMeta []ReqWithMeta) ([]SplitGroupResponse, error) {
+	results := make([]SplitGroupResponse, 0, group.endIdx-group.startIdx+1)
+	offset := uint16(0)
+
+	for k := group.startIdx; k <= group.endIdx; k++ {
+		meta := reqsMeta[k]
+		cmdInfo, err := createCommandInfo(&meta.req)
+		if err != nil {
+			return nil, err
+		}
+
+		var byteLen uint16
+		if cmdInfo.PrimaryTable == HOLDING_REGISTERS || cmdInfo.PrimaryTable == INPUT_REGISTERS {
+			byteLen = cmdInfo.Length * 2
+		} else {
+			byteLen = cmdInfo.Length
+		}
+
+		dataStart := offset
+		dataEnd := offset + byteLen
+		if int(dataEnd) > len(data) {
+			return nil, fmt.Errorf("data out of range for split: need %d bytes but only have %d", dataEnd, len(data))
+		}
+
+		reqData := make([]byte, byteLen)
+		copy(reqData, data[dataStart:dataEnd])
+
+		results = append(results, SplitGroupResponse{
+			OriginalIdx: meta.idx,
+			Request:     meta.req,
+			Data:        reqData,
+		})
+		offset += byteLen
+	}
+
+	return results, nil
 }
