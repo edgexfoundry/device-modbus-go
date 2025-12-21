@@ -27,6 +27,7 @@ type DeviceClient interface {
 	GetValue(commandInfo interface{}) ([]byte, error)
 	SetValue(commandInfo interface{}, value []byte) error
 	CloseConnection() error
+	SetSlaveID(unitID byte)
 }
 
 // CommandInfo is command info

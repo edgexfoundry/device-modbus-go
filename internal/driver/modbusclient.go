@@ -84,6 +84,17 @@ func (c *ModbusClient) CloseConnection() error {
 	return err
 }
 
+func (c *ModbusClient) SetSlaveID(unitID byte) {
+	switch c.ModbusType {
+	case ProtocolRTU:
+		c.RTUClientHandler.SetSlave(unitID)
+	case ProtocolASCII:
+		c.ASCIIClientHandler.SetSlave(unitID)
+	case ProtocolTCP:
+		c.TCPClientHandler.SetSlave(unitID)
+	}
+}
+
 func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
 	var modbusCommandInfo = commandInfo.(*CommandInfo)
 
