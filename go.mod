@@ -3,8 +3,8 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.25.0
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.49
-	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.21
+	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.51
+	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.25
 	github.com/grid-x/modbus v0.0.0-20251121133955-8a6c959be366
 	github.com/spf13/cast v1.10.0
 	github.com/stretchr/testify v1.11.1
@@ -17,16 +17,16 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.1 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.47 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.48 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v4 v4.1.0-dev.17 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v4 v4.1.0-dev.18 // indirect
 	github.com/edgexfoundry/go-mod-registry/v4 v4.1.0-dev.8 // indirect
-	github.com/edgexfoundry/go-mod-secrets/v4 v4.1.0-dev.7 // indirect
+	github.com/edgexfoundry/go-mod-secrets/v4 v4.1.0-dev.8 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.1 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/go-openapi/validate v0.25.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.28.0 // indirect
+	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/go-resty/resty/v2 v2.16.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
@@ -96,7 +96,7 @@ require (
 	github.com/openziti/secretstream v0.1.42 // indirect
 	github.com/openziti/transport/v2 v2.0.198 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
-	github.com/panjf2000/ants/v2 v2.11.3 // indirect
+	github.com/panjf2000/ants/v2 v2.11.4 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
