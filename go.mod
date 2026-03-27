@@ -3,7 +3,7 @@ module github.com/edgexfoundry/device-modbus-go
 go 1.25.0
 
 require (
-	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.58
+	github.com/edgexfoundry/device-sdk-go/v4 v4.1.0-dev.59
 	github.com/edgexfoundry/go-mod-core-contracts/v4 v4.1.0-dev.28
 	github.com/grid-x/modbus v0.0.0-20251121133955-8a6c959be366
 	github.com/spf13/cast v1.10.0
@@ -17,7 +17,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.1 // indirect
-	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.58 // indirect
+	github.com/edgexfoundry/go-mod-bootstrap/v4 v4.1.0-dev.59 // indirect
 	github.com/edgexfoundry/go-mod-configuration/v4 v4.1.0-dev.17 // indirect
 	github.com/edgexfoundry/go-mod-messaging/v4 v4.1.0-dev.18 // indirect
 	github.com/edgexfoundry/go-mod-registry/v4 v4.1.0-dev.8 // indirect
@@ -33,14 +33,14 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/go-openapi/analysis v0.24.1 // indirect
+	github.com/go-openapi/analysis v0.24.3 // indirect
 	github.com/go-openapi/errors v0.22.7 // indirect
 	github.com/go-openapi/jsonpointer v0.22.5 // indirect
 	github.com/go-openapi/jsonreference v0.21.5 // indirect
-	github.com/go-openapi/loads v0.23.2 // indirect
-	github.com/go-openapi/runtime v0.29.2 // indirect
+	github.com/go-openapi/loads v0.23.3 // indirect
+	github.com/go-openapi/runtime v0.29.3 // indirect
 	github.com/go-openapi/spec v0.22.4 // indirect
-	github.com/go-openapi/strfmt v0.25.0 // indirect
+	github.com/go-openapi/strfmt v0.26.0 // indirect
 	github.com/go-openapi/swag v0.25.5 // indirect
 	github.com/go-openapi/swag/cmdutils v0.25.5 // indirect
 	github.com/go-openapi/swag/conv v0.25.5 // indirect
@@ -53,7 +53,7 @@ require (
 	github.com/go-openapi/swag/stringutils v0.25.5 // indirect
 	github.com/go-openapi/swag/typeutils v0.25.5 // indirect
 	github.com/go-openapi/swag/yamlutils v0.25.5 // indirect
-	github.com/go-openapi/validate v0.25.1 // indirect
+	github.com/go-openapi/validate v0.25.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.30.1 // indirect
@@ -86,17 +86,17 @@ require (
 	github.com/nats-io/nats.go v1.47.0 // indirect
 	github.com/nats-io/nkeys v0.4.11 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/oklog/ulid v1.3.1 // indirect
-	github.com/openziti/channel/v4 v4.3.7 // indirect
-	github.com/openziti/edge-api v0.27.4 // indirect
-	github.com/openziti/foundation/v2 v2.0.88 // indirect
-	github.com/openziti/identity v1.0.126 // indirect
-	github.com/openziti/metrics v1.4.3 // indirect
-	github.com/openziti/sdk-golang v1.5.3 // indirect
-	github.com/openziti/secretstream v0.1.48 // indirect
-	github.com/openziti/transport/v2 v2.0.214 // indirect
+	github.com/oklog/ulid/v2 v2.1.1 // indirect
+	github.com/openziti/channel/v4 v4.3.9 // indirect
+	github.com/openziti/edge-api v0.27.5 // indirect
+	github.com/openziti/foundation/v2 v2.0.90 // indirect
+	github.com/openziti/identity v1.0.128 // indirect
+	github.com/openziti/metrics v1.4.5 // indirect
+	github.com/openziti/sdk-golang v1.5.4 // indirect
+	github.com/openziti/secretstream v0.1.49 // indirect
+	github.com/openziti/transport/v2 v2.0.215 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
-	github.com/panjf2000/ants/v2 v2.11.6 // indirect
+	github.com/panjf2000/ants/v2 v2.12.0 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -116,20 +116,19 @@ require (
 	github.com/zitadel/logging v0.7.0 // indirect
 	github.com/zitadel/oidc/v3 v3.45.5 // indirect
 	github.com/zitadel/schema v1.3.2 // indirect
-	go.mongodb.org/mongo-driver v1.17.9 // indirect
 	go.mozilla.org/pkcs7 v0.9.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.40.0 // indirect
-	go.opentelemetry.io/otel/metric v1.40.0 // indirect
-	go.opentelemetry.io/otel/trace v1.40.0 // indirect
+	go.opentelemetry.io/otel v1.41.0 // indirect
+	go.opentelemetry.io/otel/metric v1.41.0 // indirect
+	go.opentelemetry.io/otel/trace v1.41.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/net v0.51.0 // indirect
-	golang.org/x/oauth2 v0.35.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/term v0.40.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/crypto v0.49.0 // indirect
+	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/term v0.41.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/grpc v1.79.3 // indirect
