@@ -12,6 +12,24 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [4.0.2] - 2026-05-31
+
+### ✨ Features 
+- Add support for grouped read requests([#679](https://github.com/edgexfoundry/device-modbus-go/issues/679)) ([#4bb6575](https://github.com/edgexfoundry/device-modbus-go/commits/4bb6575))
+- Add support for Modbus register bit decomposition acquisition ([#b918fd3](https://github.com/edgexfoundry/device-modbus-go/commits/b918fd3))
+- Allow smaller device timing values and improve TCP connection recovery configuration ([#688](https://github.com/edgexfoundry/device-modbus-go/issues/688)) ([#53c7c8a](https://github.com/edgexfoundry/device-modbus-go/commits/53c7c8a))
+
+### 🐛 Bug Fixes 
+- Fix nil pointer error when sending commands ([#657](https://github.com/edgexfoundry/device-modbus-go/issues/657)) ([#ded4f4b](https://github.com/edgexfoundry/device-modbus-go/commits/ded4f4b))
+
+### ♻ Code Refactoring 
+- Replace the goburrow Modbus library with the Grid-X fork ([#640](https://github.com/edgexfoundry/device-modbus-go/issues/640)) ([#3b1e54a](https://github.com/edgexfoundry/device-modbus-go/commits/3b1e54a))
+ 
+### 👷 Build 
+- Update goVersion to 1.25 and golangci-lint to 2.5.0 ([#6acf89c](https://github.com/edgexfoundry/device-modbus-go/commits/6acf89c))
+
+
+
 ## [4.0.0] Odessa - 2025-03-12 (Only compatible with the 4.x releases)
 
 ### ✨  Features
