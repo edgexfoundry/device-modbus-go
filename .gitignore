@@ -14,7 +14,6 @@
 *.log
 
 .idea/
-vendor/
 cmd/device-modbus
 glide.lock
 VERSION
