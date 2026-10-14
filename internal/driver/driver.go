@@ -157,6 +157,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 			return responses, err
 		}
 		baseCmdInfo.Length = g.totalLen
+		deviceClient.SetSlaveID(byte(connectionInfo.UnitID))
 		data, err := deviceClient.GetValue(baseCmdInfo)
 		if err != nil {
 			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", baseReq.DeviceResourceName, err)
@@ -226,7 +227,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 
 	// handle command requests
 	for i, req := range reqs {
-		err = handleWriteCommandRequest(deviceClient, req, params[i])
+		err = handleWriteCommandRequest(deviceClient, connectionInfo, req, params[i])
 		if err != nil {
 			driver.Logger.Errorf("Write command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", req.DeviceResourceName, err)
 			d.removeDeviceClient(connectionInfo)
@@ -237,13 +238,15 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 	return err
 }
 
-func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
+func handleWriteCommandRequest(deviceClient DeviceClient, connectionInfo *ConnectionInfo, req sdkModel.CommandRequest, param *sdkModel.CommandValue) error {
 	var err error
 
 	commandInfo, err := createCommandInfo(&req)
 	if err != nil {
 		return err
 	}
+
+	deviceClient.SetSlaveID(byte(connectionInfo.UnitID))
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, param)
 	if err != nil {

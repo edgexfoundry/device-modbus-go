@@ -75,7 +75,7 @@ func TestDriver_createDeviceClient(t *testing.T) {
 				addressMap:          make(map[string]chan bool),
 				workingAddressCount: make(map[string]int),
 				clientMap: map[string]DeviceClient{
-					"modbus-tcp:172.0.0.1:502:1": &ModbusClient{},
+					"modbus-tcp:172.0.0.1:502": &ModbusClient{},
 				},
 			},
 			args: args{
@@ -102,7 +102,7 @@ func TestDriver_createDeviceClient(t *testing.T) {
 				addressMap:          make(map[string]chan bool),
 				workingAddressCount: make(map[string]int),
 				clientMap: map[string]DeviceClient{
-					"modbus-rtu:172.0.0.1:502:1:9600:8:1:N": &ModbusClient{},
+					"modbus-rtu:172.0.0.1:9600:8:1:N": &ModbusClient{},
 				},
 			},
 			args: args{
@@ -138,6 +138,82 @@ func TestDriver_createDeviceClient(t *testing.T) {
 				return
 			}
 			assert.Equalf(t, tt.want, got, "createDeviceClient(%v)", tt.args.info)
+		})
+	}
+}
+
+func TestDriver_SerialDevicesShareSameClient(t *testing.T) {
+	tests := []struct {
+		name  string
+		info1 *ConnectionInfo
+		info2 *ConnectionInfo
+	}{
+		{
+			name: "Serial devices on same port share same client key",
+			info1: &ConnectionInfo{
+				Protocol:    ProtocolRTU,
+				Address:     "/dev/pts/13",
+				BaudRate:    9600,
+				DataBits:    8,
+				StopBits:    1,
+				Parity:      "N",
+				UnitID:      1,
+				Timeout:     1000,
+				IdleTimeout: 5000,
+			},
+			info2: &ConnectionInfo{
+				Protocol:    ProtocolRTU,
+				Address:     "/dev/pts/13",
+				BaudRate:    9600,
+				DataBits:    8,
+				StopBits:    1,
+				Parity:      "N",
+				UnitID:      2,
+				Timeout:     1000,
+				IdleTimeout: 5000,
+			},
+		},
+		{
+			name: "Serial devices on different ports have different client keys",
+			info1: &ConnectionInfo{
+				Protocol:    ProtocolRTU,
+				Address:     "/dev/pts/13",
+				BaudRate:    9600,
+				DataBits:    8,
+				StopBits:    1,
+				Parity:      "N",
+				UnitID:      1,
+				Timeout:     1000,
+				IdleTimeout: 5000,
+			},
+			info2: &ConnectionInfo{
+				Protocol:    ProtocolRTU,
+				Address:     "/dev/pts/14",
+				BaudRate:    9600,
+				DataBits:    8,
+				StopBits:    1,
+				Parity:      "N",
+				UnitID:      1,
+				Timeout:     1000,
+				IdleTimeout: 5000,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			key1 := tt.info1.String()
+			key2 := tt.info2.String()
+
+			if tt.info1.Address == tt.info2.Address {
+				if key1 != key2 {
+					t.Errorf("Expected same client key for devices on same port, got %s and %s", key1, key2)
+				}
+			} else {
+				if key1 == key2 {
+					t.Errorf("Expected different client keys for devices on different ports, both got %s", key1)
+				}
+			}
 		})
 	}
 }
