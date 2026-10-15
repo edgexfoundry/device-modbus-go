@@ -36,17 +36,28 @@ type Driver struct {
 var concurrentCommandLimit = 100
 
 func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) {
-	d.clientMutex.Lock()
-	defer d.clientMutex.Unlock()
 	key := info.String()
+
+	d.clientMutex.Lock()
 	c, ok := d.clientMap[key]
+	d.clientMutex.Unlock()
 	if ok {
 		return c, nil
 	}
+
 	c, err := NewDeviceClient(info)
 	if err != nil {
 		driver.Logger.Errorf("create device client failed. err:%v \n", err)
 		return nil, err
+	}
+
+	d.clientMutex.Lock()
+	defer d.clientMutex.Unlock()
+	if existing, ok := d.clientMap[key]; ok {
+		if err = c.CloseConnection(); err != nil {
+			driver.Logger.Warnf("additional client for %s closed with error: %v", key, err)
+		}
+		return existing, nil
 	}
 	d.clientMap[key] = c
 	return c, nil
