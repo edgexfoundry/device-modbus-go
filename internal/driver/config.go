@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2019-2023 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -31,6 +32,7 @@ type ConnectionInfo struct {
 	LinkRecoveryTimeout     time.Duration // Recovery timeout if tcp communication misbehaves (TCP only)
 	ProtocolRecoveryTimeout time.Duration // Recovery timeout if the protocol is malformed, e.g. wrong transaction ID (TCP only)
 	ConnectDelay            time.Duration // Silent period after successful connection (TCP only)
+	SharedConnection        bool          // Share one TCP socket across UnitIDs of the same address and port
 }
 
 func (info *ConnectionInfo) String() string {
@@ -281,6 +283,14 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		connectDelay = 0 // default no connect delay
 	}
 
+	sharedConnection := false
+	if value, ok := tcpProtocol[SharedConnection]; ok {
+		sharedConnection, err = cast.ToBoolE(value)
+		if err != nil {
+			return nil, fmt.Errorf("cannot transform protocol config %s value %v to bool, %v", SharedConnection, value, err)
+		}
+	}
+
 	return &ConnectionInfo{
 		Protocol:                ProtocolTCP,
 		Address:                 address,
@@ -291,5 +301,6 @@ func createTcpConnectionInfo(tcpProtocol map[string]any) (info *ConnectionInfo, 
 		ProtocolRecoveryTimeout: protocolRecoveryTimeout,
 		LinkRecoveryTimeout:     linkRecoveryTimeout,
 		ConnectDelay:            connectDelay,
+		SharedConnection:        sharedConnection,
 	}, nil
 }

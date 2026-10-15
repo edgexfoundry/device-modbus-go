@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2019-2021 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -25,4 +26,7 @@ const (
 	ProtocolRecoveryTimeout = "ProtocolRecoveryTimeout"
 	LinkRecoveryTimeout     = "LinkRecoveryTimeout"
 	ConnectDelay            = "ConnectDelay"
+	// SharedConnection keeps one TCP socket for every UnitID on the same address and port.
+	// Missing or false preserves a separate TCP session per UnitID.
+	SharedConnection = "SharedConnection"
 )

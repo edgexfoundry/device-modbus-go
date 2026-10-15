@@ -12,6 +12,17 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [Unreleased]
+
+### ✨ Features
+
+- Optional `modbus-tcp` property `SharedConnection` (default false). When
+  true, Unit IDs on the same address and port keep separate packagers and
+  share one TCP transport. The client-cache key still includes the Unit ID.
+  A Modbus exception leaves the socket open. A transport error closes it
+  once. RTU and ASCII are unchanged. MBAP transaction IDs can repeat on the
+  shared socket. A persistent session still needs `IdleTimeout: -1`.
+
 ## [4.0.2] - 2026-05-31
 
 ### ✨ Features 
