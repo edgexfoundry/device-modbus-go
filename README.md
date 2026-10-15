@@ -10,6 +10,49 @@
 
 ## Overview
 Modbus Micro Service - device service for connecting Modbus devices to EdgeX.
+
+## SharedConnection
+
+`modbus-tcp` accepts an optional boolean `SharedConnection`. Missing or
+`false` keeps one TCP connection per Unit ID. `true` shares one TCP socket
+across every Unit ID on the same address and port.
+
+The client cache key stays `modbus-tcp:<address>:<port>:<unitID>`. Each Unit
+ID has its own packager and a fixed slave ID. Only the TCP transporter is
+shared, via `NewClient2(packager, transport)` from `github.com/grid-x/modbus`.
+The handler is stored as a pointer. RTU and ASCII are unchanged.
+
+Commands to one address and port are already serialized by `lockableAddress`.
+Timeout, IdleTimeout, link and protocol recovery, and ConnectDelay are taken
+from the first device that opens the session. A later device with different
+timings logs a warning and keeps the first handler.
+
+`IdleTimeout` follows grid-x: `0` dials for every request, a positive value
+closes after idle, a negative value keeps the socket open. A persistent
+shared session needs `IdleTimeout: -1` on every device of that server.
+`SharedConnection: true` alone does not change idle behaviour.
+
+Closing one Unit ID does not close the socket while another Unit ID still
+uses it. A Modbus exception leaves the socket up. A connection error closes
+it; the next send dials once, and the other Unit ID clients stay cached.
+Service stop closes every shared transport.
+
+Each packager has its own MBAP transaction-id counter, so identifiers repeat
+on the shared socket. With one request in flight, `Verify` checks the frame
+just sent. The transporter's numeric recovery heuristic can mis-classify a
+late frame.
+
+```yaml
+protocols:
+  modbus-tcp:
+    Address: "192.0.2.10"
+    Port: 502
+    UnitID: 1
+    Timeout: 5
+    IdleTimeout: -1
+    SharedConnection: true
+```
+
 ## Build with NATS Messaging
 Currently, the NATS Messaging capability (NATS MessageBus) is opt-in at build time.
 This means that the published Docker images do not include the NATS messaging capability.

@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2019-2023 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -337,5 +338,48 @@ func TestCreateTCPConnectionInfo_WithConnectionRecoverySettings(t *testing.T) {
 		connectionInfo.LinkRecoveryTimeout != expectedLinkRecoveryTimeout ||
 		connectionInfo.ConnectDelay != expectedConnectDelay {
 		t.Fatalf("Unexpect test result. %v should match to %v ", connectionInfo, protocols)
+	}
+	if connectionInfo.SharedConnection {
+		t.Fatal("missing SharedConnection must stay false")
+	}
+}
+
+func TestCreateTCPConnectionInfo_SharedConnection(t *testing.T) {
+	protocols := map[string]models.ProtocolProperties{
+		ProtocolTCP: {
+			Address:          "192.0.2.10",
+			Port:             502,
+			UnitID:           2,
+			Timeout:          "1s",
+			IdleTimeout:      "-1s",
+			SharedConnection: true,
+		},
+	}
+	connectionInfo, err := createConnectionInfo(protocols)
+	if err != nil {
+		t.Fatalf("Fail to create connectionInfo. Error: %v", err)
+	}
+	if !connectionInfo.SharedConnection {
+		t.Fatal("SharedConnection true was not stored")
+	}
+	if connectionInfo.String() != "modbus-tcp:192.0.2.10:502:2" {
+		t.Fatalf("client cache key must still include the UnitID, got %s", connectionInfo.String())
+	}
+	if tcpTransportKey(connectionInfo) != "modbus-tcp:192.0.2.10:502" {
+		t.Fatalf("transport key must omit the UnitID, got %s", tcpTransportKey(connectionInfo))
+	}
+
+	protocols[ProtocolTCP][SharedConnection] = "true"
+	connectionInfo, err = createConnectionInfo(protocols)
+	if err != nil {
+		t.Fatalf("string true was rejected: %v", err)
+	}
+	if !connectionInfo.SharedConnection {
+		t.Fatal("SharedConnection string true was not stored")
+	}
+
+	protocols[ProtocolTCP][SharedConnection] = "not-a-bool"
+	if _, err = createConnectionInfo(protocols); err == nil {
+		t.Fatal("invalid SharedConnection must fail")
 	}
 }

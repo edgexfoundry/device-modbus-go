@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2018-2025 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,6 +18,8 @@ import (
 	sdkModel "github.com/edgexfoundry/device-sdk-go/v4/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/clients/logger"
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/models"
+
+	MODBUS "github.com/grid-x/modbus"
 )
 
 var once sync.Once
@@ -31,6 +34,10 @@ type Driver struct {
 	stopped             bool
 	clientMutex         sync.Mutex
 	clientMap           map[string]DeviceClient
+	transportMutex      sync.Mutex
+	tcpTransports       map[string]*tcpTransportSlot
+	tcpDial             MODBUS.DialFunc
+	deviceEndpoints     map[string]deviceEndpoint
 }
 
 var concurrentCommandLimit = 100
@@ -43,7 +50,7 @@ func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) 
 	if ok {
 		return c, nil
 	}
-	c, err := NewDeviceClient(info)
+	c, err := d.newDeviceClient(info)
 	if err != nil {
 		driver.Logger.Errorf("create device client failed. err:%v \n", err)
 		return nil, err
@@ -54,17 +61,23 @@ func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) 
 
 func (d *Driver) removeDeviceClient(info *ConnectionInfo) {
 	d.clientMutex.Lock()
-	defer d.clientMutex.Unlock()
 	key := info.String()
-	if _, ok := d.clientMap[key]; ok {
-		client := d.clientMap[key]
-		err := client.CloseConnection()
-		if err != nil {
-			driver.Logger.Errorf("Device client close error, client key = %s, err = %v", key, err)
-		} else {
-			driver.Logger.Infof("device client closed,client key = %s", key)
-		}
+	client, ok := d.clientMap[key]
+	if ok {
 		delete(d.clientMap, key)
+	}
+	d.clientMutex.Unlock()
+	if !ok {
+		return
+	}
+	err := client.CloseConnection()
+	if err != nil {
+		driver.Logger.Errorf("Device client close error, client key = %s, err = %v", key, err)
+	} else {
+		driver.Logger.Infof("device client closed,client key = %s", key)
+	}
+	if info.Protocol == ProtocolTCP && info.SharedConnection {
+		d.releaseSharedTransport(tcpTransportKey(info))
 	}
 }
 
@@ -160,7 +173,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 		data, err := deviceClient.GetValue(baseCmdInfo)
 		if err != nil {
 			driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", baseReq.DeviceResourceName, err)
-			d.removeDeviceClient(connectionInfo)
+			d.noteCommandError(connectionInfo, err)
 			return responses, err
 		}
 
@@ -175,7 +188,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 			res, err := handleReadRequestAndTransformData(split.Request, split.Data)
 			if err != nil {
 				driver.Logger.Errorf("Read command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", split.Request.DeviceResourceName, err)
-				d.removeDeviceClient(connectionInfo)
+				d.noteCommandError(connectionInfo, err)
 				return responses, err
 			}
 			responses[split.OriginalIdx] = res
@@ -229,7 +242,7 @@ func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]mod
 		err = handleWriteCommandRequest(deviceClient, req, params[i])
 		if err != nil {
 			driver.Logger.Errorf("Write command failed, remove the Modbus client from the cache to allow re-establish connection next time. Cmd: %v err:%v", req.DeviceResourceName, err)
-			d.removeDeviceClient(connectionInfo)
+			d.noteCommandError(connectionInfo, err)
 			break
 		}
 	}
@@ -265,6 +278,8 @@ func (d *Driver) Initialize(sdk interfaces.DeviceServiceSDK) error {
 	d.addressMap = make(map[string]chan bool)
 	d.workingAddressCount = make(map[string]int)
 	d.clientMap = make(map[string]DeviceClient)
+	d.tcpTransports = make(map[string]*tcpTransportSlot)
+	d.deviceEndpoints = make(map[string]deviceEndpoint)
 	return nil
 }
 
@@ -281,6 +296,7 @@ func (d *Driver) Stop(force bool) error {
 		}
 	}
 	d.clientMutex.Unlock()
+	d.closeSharedTransports()
 	d.stopped = true
 	if !force {
 		d.waitAllCommandsToFinish()
@@ -306,13 +322,39 @@ loop:
 	}
 }
 
+type deviceEndpoint struct {
+	clientKey string
+	info      ConnectionInfo
+}
+
 func (d *Driver) AddDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
 	d.Logger.Debugf("Device %s is added", deviceName)
-	return nil
+	return d.trackDevice(deviceName, protocols)
 }
 
 func (d *Driver) UpdateDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
 	d.Logger.Debugf("Device %s is updated", deviceName)
+	return d.trackDevice(deviceName, protocols)
+}
+
+func (d *Driver) trackDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
+	info, err := createConnectionInfo(protocols)
+	if err != nil {
+		return err
+	}
+	if d.deviceEndpoints == nil {
+		d.deviceEndpoints = make(map[string]deviceEndpoint)
+	}
+	nextKey := info.String()
+	if prev, ok := d.deviceEndpoints[deviceName]; ok && prev.clientKey != nextKey {
+		old := prev.info
+		if err := d.lockAddress(d.lockableAddress(&old)); err != nil {
+			return err
+		}
+		d.removeDeviceClient(&old)
+		d.unlockAddress(d.lockableAddress(&old))
+	}
+	d.deviceEndpoints[deviceName] = deviceEndpoint{clientKey: nextKey, info: *info}
 	return nil
 }
 
@@ -322,7 +364,12 @@ func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.Pro
 		driver.Logger.Errorf("Fail to create remove device connection info. err:%v \n", err)
 		return err
 	}
+	if err := d.lockAddress(d.lockableAddress(connectionInfo)); err != nil {
+		return err
+	}
 	d.removeDeviceClient(connectionInfo)
+	d.unlockAddress(d.lockableAddress(connectionInfo))
+	delete(d.deviceEndpoints, deviceName)
 	d.Logger.Debugf("Device %s is removed", deviceName)
 	return nil
 }

@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2018-2025 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -23,7 +24,11 @@ type ModbusClient struct {
 	ModbusType string
 	// TCPClientHandler is used for holding device TCP connection
 	TCPClientHandler MODBUS.TCPClientHandler
-	// TCPClientHandler is used for holding device RTU connection
+	// sharedTCP uses a per-UnitID packager and a socket owned by the driver pool.
+	sharedTCP    bool
+	tcpPackager  *MODBUS.TCPClientHandler
+	tcpTransport *MODBUS.TCPClientHandler
+	// RTUClientHandler is used for holding device RTU connection
 	RTUClientHandler MODBUS.RTUClientHandler
 	// ASCIIClientHandler is used for holding device ASCII connection
 	ASCIIClientHandler MODBUS.ASCIIClientHandler
@@ -37,6 +42,12 @@ func (c *ModbusClient) OpenConnection() error {
 	var newClient MODBUS.Client
 	switch c.ModbusType {
 	case ProtocolTCP:
+		if c.sharedTCP {
+			// The pool already dialed the shared transport. Connecting the packager would open a second socket.
+			c.client = MODBUS.NewClient2(c.tcpPackager, c.tcpTransport)
+			driver.Logger.Info("Modbus client uses shared TCP transport.")
+			return nil
+		}
 		err := c.TCPClientHandler.Connect(c.ctx)
 		if err != nil {
 			driver.Logger.Errorf("client %+v failed to connect to Modbus device: %v", &c, err)
@@ -69,6 +80,10 @@ func (c *ModbusClient) OpenConnection() error {
 }
 
 func (c *ModbusClient) CloseConnection() error {
+	if c.sharedTCP {
+		// The driver closes the shared socket when the last UnitID on this endpoint is gone.
+		return nil
+	}
 	var err error
 	switch c.ModbusType {
 	case ProtocolTCP:
@@ -149,19 +164,30 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 }
 
 func NewDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
+	return driver.newDeviceClient(connectionInfo)
+}
+
+func (d *Driver) newDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient, error) {
 	client := new(ModbusClient)
 	client.ctx = context.Background()
 	client.ModbusType = connectionInfo.Protocol
 	switch client.ModbusType {
 	case ProtocolTCP:
-		client.TCPClientHandler = *MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
+		if connectionInfo.SharedConnection {
+			transport, err := d.getSharedTCPTransport(connectionInfo)
+			if err != nil {
+				driver.Logger.Errorf("shared TCP transport failed, err:%v", err)
+				return nil, err
+			}
+			packager := MODBUS.NewTCPClientHandler(fmt.Sprintf("%s:%d", connectionInfo.Address, connectionInfo.Port))
+			packager.SlaveID = byte(connectionInfo.UnitID)
+			client.sharedTCP = true
+			client.tcpPackager = packager
+			client.tcpTransport = transport
+			break
+		}
+		client.TCPClientHandler = *d.newTCPHandler(connectionInfo)
 		client.TCPClientHandler.SlaveID = byte(connectionInfo.UnitID)
-		client.TCPClientHandler.Timeout = connectionInfo.Timeout
-		client.TCPClientHandler.IdleTimeout = connectionInfo.IdleTimeout
-		client.TCPClientHandler.ProtocolRecoveryTimeout = connectionInfo.ProtocolRecoveryTimeout
-		client.TCPClientHandler.LinkRecoveryTimeout = connectionInfo.LinkRecoveryTimeout
-		client.TCPClientHandler.ConnectDelay = connectionInfo.ConnectDelay
-		client.TCPClientHandler.Logger = log.New(os.Stdout, "", log.LstdFlags)
 	case ProtocolRTU:
 		serialParams := strings.Split(connectionInfo.Address, ",")
 		client.RTUClientHandler = *MODBUS.NewRTUClientHandler(serialParams[0])
