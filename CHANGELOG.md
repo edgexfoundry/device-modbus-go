@@ -12,6 +12,16 @@
 - [go-mod-secrets](https://github.com/edgexfoundry/go-mod-secrets/blob/main/CHANGELOG.md) (indirect dependency)
 - [go-mod-configuration](https://github.com/edgexfoundry/go-mod-configuration/blob/main/CHANGELOG.md) (indirect dependency)
 
+## [Unreleased]
+
+### ✨ Features
+
+- Accept `rawType` `Uint32` and `Uint64` with `valueType` `Float64`.
+  Uint32 uses the existing 32-bit swap. Uint64 is big-endian and ignores
+  `isByteSwap` and `isWordSwap`, like Int64 and Float64. `swap32BitDataBytes`
+  rewrites only the first four bytes, so it is not applied to eight-byte
+  values. Float64 keeps integers exact only through 2^53.
+
 ## [4.0.2] - 2026-05-31
 
 ### ✨ Features 
