@@ -2,6 +2,7 @@
 //
 // Copyright (C) 2021 IOTech Ltd
 // Copyright (C) 2022 Schneider Electric
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -33,6 +34,10 @@ func normalizeRawType(rawType string) (normalized string, err errors.EdgeX) {
 		normalized = common.ValueTypeInt16
 	case INT32:
 		normalized = common.ValueTypeInt32
+	case UINT32:
+		normalized = common.ValueTypeUint32
+	case UINT64:
+		normalized = common.ValueTypeUint64
 	default:
 		return "", errors.NewCommonEdgeX(errors.KindContractInvalid, fmt.Sprintf("the raw type %s is not supported", rawType), nil)
 	}

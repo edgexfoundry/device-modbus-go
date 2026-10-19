@@ -22,6 +22,11 @@
   A Modbus exception leaves the socket open. A transport error closes it
   once. RTU and ASCII are unchanged. MBAP transaction IDs can repeat on the
   shared socket. A persistent session still needs `IdleTimeout: -1`.
+- Accept `rawType` `Uint32` and `Uint64` with `valueType` `Float64`.
+  Uint32 uses the existing 32-bit swap. Uint64 is big-endian and ignores
+  `isByteSwap` and `isWordSwap`, like Int64 and Float64. `swap32BitDataBytes`
+  rewrites only the first four bytes, so it is not applied to eight-byte
+  values. Float64 keeps integers exact only through 2^53.
 
 ## [4.0.2] - 2026-05-31
 
