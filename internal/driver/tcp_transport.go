@@ -197,7 +197,7 @@ func (d *Driver) closeSharedTransports() {
 func (d *Driver) noteCommandError(info *ConnectionInfo, err error) {
 	if info != nil && info.Protocol == ProtocolTCP && info.SharedConnection {
 		var requestErr *modbusRequestError
-		if errors.As(err, &requestErr) && isTransportError(requestErr.err) {
+		if errors.As(err, &requestErr) && isTransportErrorForRequest(requestErr.err, requestErr.functionCode) {
 			d.dropSharedConnection(info)
 		}
 		return
@@ -215,5 +215,20 @@ func isTransportError(err error) bool {
 	}
 	// Only called for errors from a library request, never local transformations.
 	// Unrecognized protocol errors also require a fresh TCP stream.
+	return true
+}
+
+func isTransportErrorForRequest(err error, functionCode byte) bool {
+	if err == nil {
+		return false
+	}
+	var exception *MODBUS.Error
+	if errors.As(err, &exception) &&
+		functionCode != 0 &&
+		exception.FunctionCode&0x80 != 0 &&
+		exception.ExceptionCode != 0 &&
+		exception.FunctionCode == functionCode|0x80 {
+		return false
+	}
 	return true
 }

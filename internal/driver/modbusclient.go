@@ -34,6 +34,7 @@ type ModbusClient struct {
 	closeOnce    sync.Once
 	closeErr     error
 	closed       atomic.Bool
+	ioMutex      sync.Mutex
 	// RTUClientHandler is used for holding device RTU connection
 	RTUClientHandler MODBUS.RTUClientHandler
 	// ASCIIClientHandler is used for holding device ASCII connection
@@ -94,6 +95,8 @@ func (c *ModbusClient) OpenConnection() error {
 func (c *ModbusClient) CloseConnection() error {
 	c.closeOnce.Do(func() {
 		c.closed.Store(true)
+		c.ioMutex.Lock()
+		defer c.ioMutex.Unlock()
 		c.closeErr = c.closeConnection()
 	})
 	return c.closeErr
@@ -120,6 +123,8 @@ func (c *ModbusClient) closeConnection() error {
 }
 
 func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
+	c.ioMutex.Lock()
+	defer c.ioMutex.Unlock()
 	if c.closed.Load() {
 		return nil, fmt.Errorf("Modbus client is closed")
 	}
@@ -151,7 +156,11 @@ func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
 		if transport != nil && !transport.sent {
 			return response, err
 		}
-		return response, &modbusRequestError{err}
+		var functionCode byte
+		if transport != nil {
+			functionCode = transport.functionCode
+		}
+		return response, &modbusRequestError{err: err, functionCode: functionCode}
 	}
 
 	driver.Logger.Tracef("Modbus client GetValue's results %v", response)
@@ -160,6 +169,8 @@ func (c *ModbusClient) GetValue(commandInfo interface{}) ([]byte, error) {
 }
 
 func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
+	c.ioMutex.Lock()
+	defer c.ioMutex.Unlock()
 	if c.closed.Load() {
 		return fmt.Errorf("Modbus client is closed")
 	}
@@ -196,7 +207,11 @@ func (c *ModbusClient) SetValue(commandInfo interface{}, value []byte) error {
 		if transport != nil && !transport.sent {
 			return err
 		}
-		return &modbusRequestError{err}
+		var functionCode byte
+		if transport != nil {
+			functionCode = transport.functionCode
+		}
+		return &modbusRequestError{err: err, functionCode: functionCode}
 	}
 	driver.Logger.Tracef("Modbus client SetValue successful, results: %v", result)
 
@@ -273,7 +288,8 @@ func (d *Driver) newDeviceClient(connectionInfo *ConnectionInfo) (*ModbusClient,
 // Preserve the cause while distinguishing device requests from local validation
 // and transformation errors, which must not reset another unit's connection.
 type modbusRequestError struct {
-	err error
+	err          error
+	functionCode byte
 }
 
 func (e *modbusRequestError) Error() string { return e.err.Error() }
@@ -284,11 +300,15 @@ func (e *modbusRequestError) Unwrap() error { return e.err }
 // library's validation rules. Unit clients keep their own packager/counter.
 type requestTransport struct {
 	MODBUS.Transporter
-	sent bool
+	sent         bool
+	functionCode byte
 }
 
 func (t *requestTransport) Send(ctx context.Context, request []byte) ([]byte, error) {
 	t.sent = true
+	if len(request) > 7 {
+		t.functionCode = request[7]
+	}
 	response, err := t.Transporter.Send(ctx, request)
 	if err != nil {
 		var exception *MODBUS.Error

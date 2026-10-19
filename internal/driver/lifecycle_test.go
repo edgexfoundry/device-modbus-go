@@ -136,6 +136,47 @@ func TestSharedTCPClientReleasesOnlyItsOwnLease(t *testing.T) {
 	}
 }
 
+func TestClientCloseWaitsForInFlightRequest(t *testing.T) {
+	d, srv := startShareTest(t)
+	if err := readUnitErr(d, srv, 1, false); err != nil {
+		t.Fatal(err)
+	}
+	client := d.clientMap["modbus-tcp:"+srv.host+"1"].(*ModbusClient)
+
+	entered, release := make(chan struct{}), make(chan struct{})
+	srv.mu.Lock()
+	srv.respond = func(response []byte) []byte {
+		close(entered)
+		<-release
+		return response
+	}
+	srv.mu.Unlock()
+
+	requestDone := make(chan error, 1)
+	go func() {
+		_, err := client.GetValue(&CommandInfo{PrimaryTable: HOLDING_REGISTERS, Length: 1})
+		requestDone <- err
+	}()
+	awaitResult(t, entered)
+
+	closeDone := make(chan error, 1)
+	go func() { closeDone <- client.CloseConnection() }()
+	awaitState(t, client.closed.Load)
+	select {
+	case err := <-closeDone:
+		t.Fatalf("CloseConnection returned before the in-flight request: %v", err)
+	default:
+	}
+
+	close(release)
+	if err := awaitResult(t, requestDone); err != nil {
+		t.Fatalf("in-flight request failed while closing: %v", err)
+	}
+	if err := awaitResult(t, closeDone); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestUpdateDeviceChangesSharedConnection(t *testing.T) {
 	for _, initial := range []bool{false, true} {
 		t.Run(fmt.Sprintf("initial=%t", initial), func(t *testing.T) {

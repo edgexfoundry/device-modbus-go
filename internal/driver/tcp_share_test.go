@@ -42,6 +42,12 @@ func TestIsTransportError(t *testing.T) {
 	if !isTransportError(MODBUS.ErrTCPHeaderLength(0)) {
 		t.Fatal("a malformed Modbus header requires a new connection")
 	}
+	if isTransportErrorForRequest(&MODBUS.Error{FunctionCode: 0x83, ExceptionCode: 2}, MODBUS.FuncCodeReadHoldingRegisters) {
+		t.Fatal("a valid exception for the requested function must preserve the connection")
+	}
+	if !isTransportErrorForRequest(&MODBUS.Error{FunctionCode: 0x84, ExceptionCode: 2}, MODBUS.FuncCodeReadHoldingRegisters) {
+		t.Fatal("an exception for a different function must reset the connection")
+	}
 }
 
 func TestSharedTCPOneAcceptTwoUnitIDs(t *testing.T) {
