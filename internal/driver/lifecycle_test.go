@@ -49,6 +49,18 @@ func awaitState(t *testing.T, ready func() bool) {
 	}
 }
 
+type closeSignalClient struct {
+	closed chan struct{}
+}
+
+func (c *closeSignalClient) OpenConnection() error                { return nil }
+func (c *closeSignalClient) GetValue(interface{}) ([]byte, error) { return nil, nil }
+func (c *closeSignalClient) SetValue(interface{}, []byte) error   { return nil }
+func (c *closeSignalClient) CloseConnection() error {
+	close(c.closed)
+	return nil
+}
+
 func TestSharedTCPShutdownDuringDial(t *testing.T) {
 	d, srv := startShareTest(t)
 	entered, release := make(chan struct{}), make(chan struct{})
@@ -94,6 +106,37 @@ func TestSharedTCPShutdownDuringDial(t *testing.T) {
 		if !slot.closed || slot.handler != nil || slot.refs != 0 {
 			t.Fatal("shutdown left a live transport")
 		}
+	}
+}
+
+func TestForcedStopWaitsForAdmittedOperationsBeforeClosingClients(t *testing.T) {
+	d, _ := startShareTest(t)
+	if err := d.beginOperation(); err != nil {
+		t.Fatal(err)
+	}
+	client := &closeSignalClient{closed: make(chan struct{})}
+	d.clientMap["client"] = client
+
+	stopped := make(chan error, 1)
+	go func() { stopped <- d.Stop(true) }()
+	awaitResult(t, d.commandContext().Done())
+
+	select {
+	case <-client.closed:
+		t.Fatal("forced stop closed a client before admitted work drained")
+	case err := <-stopped:
+		t.Fatalf("forced stop returned before admitted work drained: %v", err)
+	default:
+	}
+
+	d.operations.Done()
+	if err := awaitResult(t, stopped); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-client.closed:
+	default:
+		t.Fatal("forced stop did not close the client after work drained")
 	}
 }
 

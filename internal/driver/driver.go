@@ -353,9 +353,7 @@ func (d *Driver) Stop(force bool) error {
 		d.cancelOperations()
 	}
 	d.lifecycleMutex.Unlock()
-	if !force {
-		d.waitAllCommandsToFinish()
-	}
+	d.waitAllCommandsToFinish()
 	d.closeSharedTransports()
 	d.clientMutex.Lock()
 	clients := d.clientMap
