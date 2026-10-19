@@ -10,13 +10,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"net"
 	"os"
-	"strings"
 	"sync"
-	"syscall"
 
 	MODBUS "github.com/grid-x/modbus"
 )
@@ -27,6 +23,44 @@ type tcpTransportSlot struct {
 	mu      sync.Mutex
 	handler *MODBUS.TCPClientHandler
 	refs    int
+	closed  bool
+	ctx     context.Context
+}
+
+var errTransportClosed = errors.New("shared TCP transport is closed")
+
+// Send is the only path from a unit client to the shared handler. Close on the
+// library handler alone is insufficient: its next Send would reconnect.
+func (slot *tcpTransportSlot) Send(ctx context.Context, request []byte) ([]byte, error) {
+	slot.mu.Lock()
+	defer slot.mu.Unlock()
+	if slot.closed || slot.ctx.Err() != nil || slot.handler == nil {
+		return nil, errTransportClosed
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	response, err := slot.handler.Send(ctx, request)
+	if err != nil {
+		// Send errors are transport/protocol errors, before Modbus exceptions
+		// are decoded. Keep the handler and leases for a later reconnect.
+		_ = slot.handler.Close()
+	}
+	return response, err
+}
+
+func (slot *tcpTransportSlot) release() error {
+	slot.mu.Lock()
+	defer slot.mu.Unlock()
+	if slot.refs > 0 {
+		slot.refs--
+	}
+	if slot.refs == 0 && slot.handler != nil {
+		err := slot.handler.Close()
+		slot.handler = nil
+		return err
+	}
+	return nil
 }
 
 // tcpTransportKey identifies a TCP endpoint without the UnitID.
@@ -49,38 +83,55 @@ func (d *Driver) newTCPHandler(info *ConnectionInfo) *MODBUS.TCPClientHandler {
 	return handler
 }
 
-// getSharedTCPTransport returns the shared handler for this endpoint and counts one more unit client.
+// getSharedTCPTransport returns the shared slot for this endpoint and counts one more unit client.
 // The first caller dials. Later callers receive the same pointer.
-func (d *Driver) getSharedTCPTransport(info *ConnectionInfo) (*MODBUS.TCPClientHandler, error) {
+func (d *Driver) getSharedTCPTransport(info *ConnectionInfo) (*tcpTransportSlot, error) {
 	key := tcpTransportKey(info)
 
 	d.transportMutex.Lock()
+	if d.transportClosed {
+		d.transportMutex.Unlock()
+		return nil, errTransportClosed
+	}
+	if d.transportContext == nil {
+		d.transportContext, d.cancelTransports = context.WithCancel(d.commandContext())
+	}
 	if d.tcpTransports == nil {
 		d.tcpTransports = make(map[string]*tcpTransportSlot)
 	}
 	slot, ok := d.tcpTransports[key]
 	if !ok {
-		slot = &tcpTransportSlot{}
+		slot = &tcpTransportSlot{ctx: d.transportContext}
 		d.tcpTransports[key] = slot
 	}
 	d.transportMutex.Unlock()
 
 	slot.mu.Lock()
 	defer slot.mu.Unlock()
+	if slot.closed || slot.ctx.Err() != nil {
+		return nil, errTransportClosed
+	}
 
 	if slot.handler != nil {
 		d.warnIfTCPTimingsDiffer(key, slot.handler, info)
 		slot.refs++
-		return slot.handler, nil
+		return slot, nil
 	}
 
 	handler := d.newTCPHandler(info)
-	if err := handler.Connect(context.Background()); err != nil {
+	if err := handler.Connect(slot.ctx); err != nil {
+		_ = handler.Close()
 		return nil, err
+	}
+	// Shutdown can begin while Connect is blocked, even with a custom dialer
+	// which does not honor cancellation. Never publish its late connection.
+	if slot.ctx.Err() != nil {
+		_ = handler.Close()
+		return nil, errTransportClosed
 	}
 	slot.handler = handler
 	slot.refs++
-	return handler, nil
+	return slot, nil
 }
 
 func (d *Driver) warnIfTCPTimingsDiffer(key string, handler *MODBUS.TCPClientHandler, info *ConnectionInfo) {
@@ -97,38 +148,9 @@ func (d *Driver) warnIfTCPTimingsDiffer(key string, handler *MODBUS.TCPClientHan
 	d.Logger.Warnf("shared TCP transport %s keeps the timings of the first device; UnitID %d requested different Timeout, IdleTimeout, recovery timeouts, or ConnectDelay", key, info.UnitID)
 }
 
-// releaseSharedTransport drops one unit client. The socket closes when the last client is gone.
-// The pool slot stays so a later UnitID reuses it and dials again, without racing a map delete.
-func (d *Driver) releaseSharedTransport(key string) {
-	if d.tcpTransports == nil {
-		return
-	}
-	d.transportMutex.Lock()
-	slot := d.tcpTransports[key]
-	d.transportMutex.Unlock()
-	if slot == nil {
-		return
-	}
-
-	slot.mu.Lock()
-	defer slot.mu.Unlock()
-	if slot.refs > 0 {
-		slot.refs--
-	}
-	if slot.refs == 0 && slot.handler != nil {
-		if err := slot.handler.Close(); err != nil && d.Logger != nil {
-			d.Logger.Errorf("shared TCP transport close error, key = %s, err = %v", key, err)
-		}
-		slot.handler = nil
-	}
-}
-
 // dropSharedConnection closes the socket and leaves the pool entry and unit clients in place.
 // The next Send dials once.
 func (d *Driver) dropSharedConnection(info *ConnectionInfo) {
-	if d.tcpTransports == nil {
-		return
-	}
 	key := tcpTransportKey(info)
 	d.transportMutex.Lock()
 	slot := d.tcpTransports[key]
@@ -148,11 +170,19 @@ func (d *Driver) dropSharedConnection(info *ConnectionInfo) {
 
 func (d *Driver) closeSharedTransports() {
 	d.transportMutex.Lock()
-	slots := d.tcpTransports
-	d.tcpTransports = make(map[string]*tcpTransportSlot)
+	d.transportClosed = true
+	if d.cancelTransports != nil {
+		d.cancelTransports()
+	}
+	// Snapshot while locked; no slot can be added after transportClosed is set.
+	slots := make(map[string]*tcpTransportSlot, len(d.tcpTransports))
+	for key, slot := range d.tcpTransports {
+		slots[key] = slot
+	}
 	d.transportMutex.Unlock()
 	for key, slot := range slots {
 		slot.mu.Lock()
+		slot.closed = true
 		if slot.handler != nil {
 			if err := slot.handler.Close(); err != nil && d.Logger != nil {
 				d.Logger.Errorf("shared TCP transport shutdown close error, key = %s, err = %v", key, err)
@@ -168,7 +198,8 @@ func (d *Driver) closeSharedTransports() {
 // A broken TCP connection is closed once so the next command dials again, without dropping other UnitIDs.
 func (d *Driver) noteCommandError(info *ConnectionInfo, err error) {
 	if info != nil && info.Protocol == ProtocolTCP && info.SharedConnection {
-		if isTransportError(err) {
+		var requestErr *modbusRequestError
+		if errors.As(err, &requestErr) && isTransportError(requestErr.err) {
 			d.dropSharedConnection(info)
 		}
 		return
@@ -180,31 +211,11 @@ func isTransportError(err error) bool {
 	if err == nil {
 		return false
 	}
-	var netErr net.Error
-	if errors.As(err, &netErr) {
-		return true
-	}
-	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) || errors.Is(err, syscall.ECONNRESET) || errors.Is(err, syscall.EPIPE) || errors.Is(err, syscall.ECONNABORTED) {
-		return true
-	}
-	msg := strings.ToLower(err.Error())
-	if strings.Contains(msg, "modbus:") {
+	var exception *MODBUS.Error
+	if errors.As(err, &exception) && exception.FunctionCode&0x80 != 0 && exception.ExceptionCode != 0 {
 		return false
 	}
-	for _, part := range []string{
-		"eof",
-		"timeout",
-		"connection reset",
-		"broken pipe",
-		"connection refused",
-		"forcibly closed",
-		"use of closed network connection",
-		"wsarecv",
-		"wsasend",
-	} {
-		if strings.Contains(msg, part) {
-			return true
-		}
-	}
-	return false
+	// Only called for errors from a library request, never local transformations.
+	// Unrecognized protocol errors also require a fresh TCP stream.
+	return true
 }

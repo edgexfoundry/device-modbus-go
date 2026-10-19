@@ -9,10 +9,10 @@
 package driver
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"sync"
-	"time"
 
 	"github.com/edgexfoundry/device-sdk-go/v4/pkg/interfaces"
 	sdkModel "github.com/edgexfoundry/device-sdk-go/v4/pkg/models"
@@ -31,13 +31,22 @@ type Driver struct {
 	addressMutex        sync.Mutex
 	addressMap          map[string]chan bool
 	workingAddressCount map[string]int
+	lifecycleMutex      sync.Mutex
 	stopped             bool
+	operationContext    context.Context
+	cancelOperations    context.CancelFunc
+	operations          sync.WaitGroup
+	stopMutex           sync.Mutex
 	clientMutex         sync.Mutex
 	clientMap           map[string]DeviceClient
 	transportMutex      sync.Mutex
 	tcpTransports       map[string]*tcpTransportSlot
 	tcpDial             MODBUS.DialFunc
-	deviceEndpoints     map[string]deviceEndpoint
+	transportClosed     bool
+	transportContext    context.Context
+	cancelTransports    context.CancelFunc
+	endpointMutex       sync.Mutex
+	deviceEndpoints     map[string]*deviceEndpoint
 }
 
 var concurrentCommandLimit = 100
@@ -45,10 +54,21 @@ var concurrentCommandLimit = 100
 func (d *Driver) createDeviceClient(info *ConnectionInfo) (DeviceClient, error) {
 	d.clientMutex.Lock()
 	defer d.clientMutex.Unlock()
+	if err := d.commandContext().Err(); err != nil {
+		return nil, err
+	}
 	key := info.String()
 	c, ok := d.clientMap[key]
 	if ok {
-		return c, nil
+		if modbusClient, ok := c.(*ModbusClient); !ok || modbusClient.sharedTCP == info.SharedConnection {
+			return c, nil
+		}
+		// Use the cached client's lease when its mode differs, even if no
+		// lifecycle callback has yet reported the configuration change.
+		delete(d.clientMap, key)
+		if err := c.CloseConnection(); err != nil {
+			d.Logger.Errorf("close previous Modbus client %s: %v", key, err)
+		}
 	}
 	c, err := d.newDeviceClient(info)
 	if err != nil {
@@ -76,15 +96,13 @@ func (d *Driver) removeDeviceClient(info *ConnectionInfo) {
 	} else {
 		driver.Logger.Infof("device client closed,client key = %s", key)
 	}
-	if info.Protocol == ProtocolTCP && info.SharedConnection {
-		d.releaseSharedTransport(tcpTransportKey(info))
-	}
 }
 
 // lockAddress mark address is unavailable because real device handle one request at a time
 func (d *Driver) lockAddress(address string) error {
-	if d.stopped {
-		return fmt.Errorf("service attempts to stop and unable to handle new request")
+	ctx := d.commandContext()
+	if err := ctx.Err(); err != nil {
+		return err
 	}
 	d.addressMutex.Lock()
 	lock, ok := d.addressMap[address]
@@ -107,9 +125,19 @@ func (d *Driver) lockAddress(address string) error {
 	}
 
 	d.addressMutex.Unlock()
-	lock <- true
-
-	return nil
+	select {
+	case lock <- true:
+		if err := ctx.Err(); err != nil {
+			d.unlockAddress(address)
+			return err
+		}
+		return nil
+	case <-ctx.Done():
+		d.addressMutex.Lock()
+		d.workingAddressCount[address]--
+		d.addressMutex.Unlock()
+		return ctx.Err()
+	}
 }
 
 // unlockAddress remove token after command finish
@@ -133,6 +161,10 @@ func (d *Driver) lockableAddress(info *ConnectionInfo) string {
 }
 
 func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest) (responses []*sdkModel.CommandValue, err error) {
+	if err = d.beginOperation(); err != nil {
+		return nil, err
+	}
+	defer d.operations.Done()
 	d.Logger.Debugf("HandleReadCommands called for device %s", deviceName)
 	d.Logger.Debugf("Read command requests: %+v", reqs)
 	connectionInfo, err := createConnectionInfo(protocols)
@@ -140,6 +172,11 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 		driver.Logger.Errorf("Fail to create read command connection info. err:%v \n", err)
 		return responses, err
 	}
+	unlockDevice, err := d.lockDeviceCommand(deviceName, connectionInfo)
+	if err != nil {
+		return nil, err
+	}
+	defer unlockDevice()
 
 	err = d.lockAddress(d.lockableAddress(connectionInfo))
 	if err != nil {
@@ -155,7 +192,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 		driver.Logger.Errorf("Read command OpenConnection failed. err:%v \n", err)
 		return responses, err
 	}
-	driver.Logger.Debugf("key = %s,client = %+v", connectionInfo.String(), deviceClient)
+	driver.Logger.Debugf("client key = %s", connectionInfo.String())
 
 	reqsMeta, reqsAct, err := aggregateReadRequests(reqs)
 	if err != nil {
@@ -219,11 +256,20 @@ func handleReadRequestAndTransformData(req sdkModel.CommandRequest, data []byte)
 }
 
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []sdkModel.CommandRequest, params []*sdkModel.CommandValue) error {
+	if err := d.beginOperation(); err != nil {
+		return err
+	}
+	defer d.operations.Done()
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
 		driver.Logger.Errorf("Fail to create write command connection info. err:%v \n", err)
 		return err
 	}
+	unlockDevice, err := d.lockDeviceCommand(deviceName, connectionInfo)
+	if err != nil {
+		return err
+	}
+	defer unlockDevice()
 
 	err = d.lockAddress(d.lockableAddress(connectionInfo))
 	if err != nil {
@@ -260,12 +306,12 @@ func handleWriteCommandRequest(deviceClient DeviceClient, req sdkModel.CommandRe
 
 	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, param)
 	if err != nil {
-		return fmt.Errorf("transform command value failed, err: %v", err)
+		return fmt.Errorf("transform command value failed, err: %w", err)
 	}
 
 	err = deviceClient.SetValue(commandInfo, dataBytes)
 	if err != nil {
-		return fmt.Errorf("handle write command request failed, err: %v", err)
+		return fmt.Errorf("handle write command request failed, err: %w", err)
 	}
 
 	driver.Logger.Tracef("Write command finished. Cmd:%v \n", req.DeviceResourceName)
@@ -279,7 +325,13 @@ func (d *Driver) Initialize(sdk interfaces.DeviceServiceSDK) error {
 	d.workingAddressCount = make(map[string]int)
 	d.clientMap = make(map[string]DeviceClient)
 	d.tcpTransports = make(map[string]*tcpTransportSlot)
-	d.deviceEndpoints = make(map[string]deviceEndpoint)
+	d.deviceEndpoints = make(map[string]*deviceEndpoint)
+	// Existing metadata devices do not necessarily generate AddDevice callbacks.
+	for _, device := range sdk.Devices() {
+		if err := d.trackDevice(device.Name, device.Protocols); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -288,43 +340,40 @@ func (d *Driver) Start() error {
 }
 
 func (d *Driver) Stop(force bool) error {
+	d.stopMutex.Lock()
+	defer d.stopMutex.Unlock()
+	d.lifecycleMutex.Lock()
+	if d.stopped {
+		d.lifecycleMutex.Unlock()
+		return nil
+	}
+	d.initOperationContext()
+	d.stopped = true
+	if force {
+		d.cancelOperations()
+	}
+	d.lifecycleMutex.Unlock()
+	if !force {
+		d.waitAllCommandsToFinish()
+	}
+	d.closeSharedTransports()
 	d.clientMutex.Lock()
-	for key, client := range d.clientMap {
+	clients := d.clientMap
+	d.clientMap = make(map[string]DeviceClient)
+	d.clientMutex.Unlock()
+	for key, client := range clients {
 		err := client.CloseConnection()
 		if err != nil {
 			d.Logger.Errorf("device client closed,client key = %s,err = %v", key, err)
 		}
 	}
-	d.clientMutex.Unlock()
-	d.closeSharedTransports()
-	d.stopped = true
-	if !force {
-		d.waitAllCommandsToFinish()
-	}
-	for _, locked := range d.addressMap {
-		close(locked)
-	}
+	d.cancelOperations()
 	return nil
 }
 
 // waitAllCommandsToFinish used to check and wait for the unfinished job
 func (d *Driver) waitAllCommandsToFinish() {
-loop:
-	for {
-		for _, count := range d.workingAddressCount {
-			if count != 0 {
-				// wait a moment and check again
-				time.Sleep(time.Second * SERVICE_STOP_WAIT_TIME)
-				continue loop
-			}
-		}
-		break loop
-	}
-}
-
-type deviceEndpoint struct {
-	clientKey string
-	info      ConnectionInfo
+	d.operations.Wait()
 }
 
 func (d *Driver) AddDevice(deviceName string, protocols map[string]models.ProtocolProperties, adminState models.AdminState) error {
@@ -342,34 +391,57 @@ func (d *Driver) trackDevice(deviceName string, protocols map[string]models.Prot
 	if err != nil {
 		return err
 	}
-	if d.deviceEndpoints == nil {
-		d.deviceEndpoints = make(map[string]deviceEndpoint)
+	if err := d.beginOperation(); err != nil {
+		return err
 	}
-	nextKey := info.String()
-	if prev, ok := d.deviceEndpoints[deviceName]; ok && (prev.clientKey != nextKey || prev.info.SharedConnection != info.SharedConnection) {
-		old := prev.info
+	defer d.operations.Done()
+	endpoint := d.deviceEndpoint(deviceName)
+	endpoint.mu.Lock()
+	defer endpoint.mu.Unlock()
+	if err := d.commandContext().Err(); err != nil {
+		return err
+	}
+	if endpoint.known && !endpoint.removed && endpoint.info != *info {
+		old := endpoint.info
 		if err := d.lockAddress(d.lockableAddress(&old)); err != nil {
 			return err
 		}
 		d.removeDeviceClient(&old)
 		d.unlockAddress(d.lockableAddress(&old))
 	}
-	d.deviceEndpoints[deviceName] = deviceEndpoint{clientKey: nextKey, info: *info}
+	endpoint.info, endpoint.known, endpoint.removed = *info, true, false
 	return nil
 }
 
 func (d *Driver) RemoveDevice(deviceName string, protocols map[string]models.ProtocolProperties) error {
+	if err := d.beginOperation(); err != nil {
+		return err
+	}
+	defer d.operations.Done()
 	connectionInfo, err := createConnectionInfo(protocols)
 	if err != nil {
 		driver.Logger.Errorf("Fail to create remove device connection info. err:%v \n", err)
 		return err
+	}
+	endpoint := d.deviceEndpoint(deviceName)
+	endpoint.mu.Lock()
+	defer endpoint.mu.Unlock()
+	if err := d.commandContext().Err(); err != nil {
+		return err
+	}
+	if endpoint.removed {
+		return nil
+	}
+	if endpoint.known {
+		connectionInfo = &endpoint.info
 	}
 	if err := d.lockAddress(d.lockableAddress(connectionInfo)); err != nil {
 		return err
 	}
 	d.removeDeviceClient(connectionInfo)
 	d.unlockAddress(d.lockableAddress(connectionInfo))
-	delete(d.deviceEndpoints, deviceName)
+	// Retain a tombstone: commands already holding this entry must not recreate it.
+	endpoint.known, endpoint.removed = true, true
 	d.Logger.Debugf("Device %s is removed", deviceName)
 	return nil
 }

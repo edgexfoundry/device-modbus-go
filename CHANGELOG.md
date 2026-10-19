@@ -19,14 +19,30 @@
 - Optional `modbus-tcp` property `SharedConnection` (default false). When
   true, Unit IDs on the same address and port keep separate packagers and
   share one TCP transport. The client-cache key still includes the Unit ID.
-  A Modbus exception leaves the socket open. A transport error closes it
-  once. RTU and ASCII are unchanged. MBAP transaction IDs can repeat on the
-  shared socket. A persistent session still needs `IdleTimeout: -1`.
+  Connection sharing applies to Modbus TCP only. Timing settings come from
+  the first device that opens the transport. MBAP transaction IDs can repeat
+  on the shared socket. A persistent session still needs `IdleTimeout: -1`.
+  ([#722](https://github.com/edgexfoundry/device-modbus-go/pull/722))
 - Accept `rawType` `Uint32` and `Uint64` with `valueType` `Float64`.
   Uint32 uses the existing 32-bit swap. Uint64 is big-endian and ignores
   `isByteSwap` and `isWordSwap`, like Int64 and Float64. `swap32BitDataBytes`
   rewrites only the first four bytes, so it is not applied to eight-byte
   values. Float64 keeps integers exact only through 2^53.
+
+### 🐛 Bug Fixes
+
+- Synchronize device endpoint tracking, updates, and removals with active
+  commands. Track devices already present in metadata during initialization.
+- Rebuild device clients when their endpoint or `SharedConnection` setting
+  changes, and reject commands using stale connection settings or removed devices.
+- Release each shared transport reference exactly once, keeping the connection
+  open while other unit clients still use it.
+- Prevent transport acquisition and reconnection after shutdown. Graceful stop
+  drains admitted operations; forced stop cancels queued commands and connection
+  attempts. An in-flight network operation may still run until its timeout.
+- Reset shared sockets after transport failures or malformed protocol responses.
+  Preserve connections for valid Modbus exceptions and local validation or
+  value transformation errors.
 
 ## [4.0.2] - 2026-05-31
 

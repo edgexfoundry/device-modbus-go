@@ -35,7 +35,17 @@ shared session needs `IdleTimeout: -1` on every device of that server.
 Closing one Unit ID does not close the socket while another Unit ID still
 uses it. A Modbus exception leaves the socket up. A connection error closes
 it; the next send dials once, and the other Unit ID clients stay cached.
-Service stop closes every shared transport.
+Malformed protocol responses also reset the socket. Local validation and
+transformation errors leave a shared connection intact.
+
+Changing a device's endpoint or `SharedConnection` setting closes its old
+client before using the new configuration. Commands using stale connection
+settings, or targeting a removed device, are rejected.
+
+Graceful service stop rejects new commands and device changes, waits for
+admitted operations to finish, and closes every transport. Forced stop cancels
+queued commands and connection attempts. An in-flight network operation may
+still run until its timeout. Closed shared transports cannot reconnect.
 
 Each packager has its own MBAP transaction-id counter, so identifiers repeat
 on the shared socket. With one request in flight, `Verify` checks the frame

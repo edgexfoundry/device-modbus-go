@@ -10,12 +10,15 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	MODBUS "github.com/grid-x/modbus"
 
 	sdkModel "github.com/edgexfoundry/device-sdk-go/v4/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/v4/clients/logger"
@@ -27,7 +30,7 @@ func TestIsTransportError(t *testing.T) {
 	if isTransportError(nil) {
 		t.Fatal("nil is not a transport error")
 	}
-	if isTransportError(errors.New("modbus: exception '2' function '3'")) {
+	if isTransportError(fmt.Errorf("wrapped: %w", &MODBUS.Error{FunctionCode: 0x83, ExceptionCode: 2})) {
 		t.Fatal("a Modbus exception must keep the shared socket")
 	}
 	if !isTransportError(io.EOF) {
@@ -35,6 +38,9 @@ func TestIsTransportError(t *testing.T) {
 	}
 	if !isTransportError(errors.New("read tcp 127.0.0.1:1000: i/o timeout")) {
 		t.Fatal("timeout text is a transport error")
+	}
+	if !isTransportError(MODBUS.ErrTCPHeaderLength(0)) {
+		t.Fatal("a malformed Modbus header requires a new connection")
 	}
 }
 
@@ -142,6 +148,12 @@ func TestRemoveOneUnitKeepsSharedSocket(t *testing.T) {
 	if slot.handler != nil || slot.refs != 0 {
 		t.Fatal("removing the last UnitID left the shared socket open")
 	}
+	if err := readUnitErr(d, srv, 2, true); err == nil {
+		t.Fatal("a stale command recreated a removed device")
+	}
+	if err := d.AddDevice("unit-2", tcpProtocols(srv, 2, true), models.Unlocked); err != nil {
+		t.Fatal(err)
+	}
 	readUnit(t, d, srv, 2, true)
 	if got := srv.accepts.Load(); got != 2 {
 		t.Fatalf("read after the last removal opened %d sessions, want one new dial", got)
@@ -157,6 +169,7 @@ type shareServer struct {
 	mu      sync.Mutex
 	seen    []byte
 	conns   []net.Conn
+	respond func([]byte) []byte
 }
 
 func startShareTest(t *testing.T) (*Driver, *shareServer) {
@@ -176,7 +189,7 @@ func startShareTest(t *testing.T) (*Driver, *shareServer) {
 		workingAddressCount: make(map[string]int),
 		clientMap:           make(map[string]DeviceClient),
 		tcpTransports:       make(map[string]*tcpTransportSlot),
-		deviceEndpoints:     make(map[string]deviceEndpoint),
+		deviceEndpoints:     make(map[string]*deviceEndpoint),
 	}
 	d.tcpDial = func(ctx context.Context, network, address string) (net.Conn, error) {
 		var dialer net.Dialer
@@ -186,10 +199,10 @@ func startShareTest(t *testing.T) (*Driver, *shareServer) {
 
 	go srv.acceptLoop()
 	t.Cleanup(func() {
-		if !d.stopped {
-			_ = d.Stop(true)
-		}
+		_ = d.Stop(true)
+		d.operations.Wait()
 		_ = ln.Close()
+		srv.closeClients()
 		driver = prev
 	})
 	return d, srv
@@ -210,6 +223,7 @@ func (s *shareServer) acceptLoop() {
 }
 
 func (s *shareServer) serve(conn net.Conn) {
+	defer conn.Close()
 	for {
 		header := make([]byte, 7)
 		if _, err := io.ReadFull(conn, header); err != nil {
@@ -228,11 +242,20 @@ func (s *shareServer) serve(conn net.Conn) {
 		s.mu.Unlock()
 
 		pdu := []byte{rest[0], 2, 0x00, 0x2A}
+		if rest[0] == MODBUS.FuncCodeWriteSingleRegister {
+			pdu = rest
+		}
 		resp := make([]byte, 7+len(pdu))
 		copy(resp[:4], header[:4])
 		binary.BigEndian.PutUint16(resp[4:], uint16(1+len(pdu)))
 		resp[6] = header[6]
 		copy(resp[7:], pdu)
+		s.mu.Lock()
+		respond := s.respond
+		s.mu.Unlock()
+		if respond != nil {
+			resp = respond(resp)
+		}
 		if _, err := conn.Write(resp); err != nil {
 			return
 		}
@@ -285,7 +308,7 @@ func readUnitErr(d *Driver, srv *shareServer, unit byte, shared bool) error {
 			STARTING_ADDRESS: 0,
 		},
 	}
-	_, err := d.HandleReadCommands("meter", tcpProtocols(srv, unit, shared), []sdkModel.CommandRequest{req})
+	_, err := d.HandleReadCommands(fmt.Sprintf("unit-%d", unit), tcpProtocols(srv, unit, shared), []sdkModel.CommandRequest{req})
 	return err
 }
 
