@@ -346,7 +346,7 @@ func (d *Driver) trackDevice(deviceName string, protocols map[string]models.Prot
 		d.deviceEndpoints = make(map[string]deviceEndpoint)
 	}
 	nextKey := info.String()
-	if prev, ok := d.deviceEndpoints[deviceName]; ok && prev.clientKey != nextKey {
+	if prev, ok := d.deviceEndpoints[deviceName]; ok && (prev.clientKey != nextKey || prev.info.SharedConnection != info.SharedConnection) {
 		old := prev.info
 		if err := d.lockAddress(d.lockableAddress(&old)); err != nil {
 			return err
