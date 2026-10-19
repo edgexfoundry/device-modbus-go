@@ -42,7 +42,9 @@
   attempts. An in-flight network operation may still run until its timeout.
 - Reset shared sockets after transport failures or malformed protocol responses.
   Preserve connections for valid Modbus exceptions and local validation or
-  value transformation errors.
+  value transformation errors. Validate exception function codes and payloads
+  before deciding whether to keep the connection, and recover command errors
+  in one place to avoid duplicate handler close calls.
 
 ## [4.0.2] - 2026-05-31
 

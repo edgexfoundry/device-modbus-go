@@ -40,13 +40,9 @@ func (slot *tcpTransportSlot) Send(ctx context.Context, request []byte) ([]byte,
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	response, err := slot.handler.Send(ctx, request)
-	if err != nil {
-		// Send errors are transport/protocol errors, before Modbus exceptions
-		// are decoded. Keep the handler and leases for a later reconnect.
-		_ = slot.handler.Close()
-	}
-	return response, err
+	// Classify the completed request in noteCommandError before resetting the
+	// socket. Recovering here as well would close it twice for the same error.
+	return slot.handler.Send(ctx, request)
 }
 
 func (slot *tcpTransportSlot) release() error {
@@ -195,7 +191,9 @@ func (d *Driver) closeSharedTransports() {
 }
 
 // noteCommandError keeps a shared socket across Modbus exceptions.
-// A broken TCP connection is closed once so the next command dials again, without dropping other UnitIDs.
+// It owns command-error recovery after response validation and exception decoding.
+// The caller still holds the address lock, so another unit cannot send between
+// the failed request and its socket reset. Unit clients and leases stay cached.
 func (d *Driver) noteCommandError(info *ConnectionInfo, err error) {
 	if info != nil && info.Protocol == ProtocolTCP && info.SharedConnection {
 		var requestErr *modbusRequestError

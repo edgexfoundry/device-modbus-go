@@ -244,6 +244,10 @@ func (s *shareServer) serve(conn net.Conn) {
 		pdu := []byte{rest[0], 2, 0x00, 0x2A}
 		if rest[0] == MODBUS.FuncCodeWriteSingleRegister {
 			pdu = rest
+		} else if rest[0] == MODBUS.FuncCodeWriteMultipleRegisters || rest[0] == MODBUS.FuncCodeWriteMultipleCoils {
+			pdu = rest[:5]
+		} else if rest[0] == MODBUS.FuncCodeReadCoils || rest[0] == MODBUS.FuncCodeReadDiscreteInputs {
+			pdu = []byte{rest[0], 1, 1}
 		}
 		resp := make([]byte, 7+len(pdu))
 		copy(resp[:4], header[:4])

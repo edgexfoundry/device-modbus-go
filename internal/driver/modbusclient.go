@@ -10,6 +10,7 @@ package driver
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -289,12 +290,25 @@ type requestTransport struct {
 func (t *requestTransport) Send(ctx context.Context, request []byte) ([]byte, error) {
 	t.sent = true
 	response, err := t.Transporter.Send(ctx, request)
+	if err != nil {
+		var exception *MODBUS.Error
+		if errors.As(err, &exception) && (len(request) <= 7 || exception.FunctionCode != request[7]|0x80 || exception.ExceptionCode == 0) {
+			return nil, fmt.Errorf("modbus: exception does not match the requested function or has no exception code")
+		}
+		return response, err
+	}
+	if len(request) <= 7 || len(response) <= 7 {
+		return nil, fmt.Errorf("modbus: missing function code in TCP request or response")
+	}
 	// The library represents any differing function code as *MODBUS.Error.
 	// Only the requested function with its exception bit set is an exception.
-	if err == nil && len(request) > 7 && len(response) > 7 && response[7] != request[7] && response[7] != request[7]|0x80 {
+	if response[7] != request[7] && response[7] != request[7]|0x80 {
 		return nil, fmt.Errorf("modbus: response function '%d' does not match request '%d'", response[7], request[7])
 	}
-	return response, err
+	if response[7] == request[7]|0x80 && (len(response) != 9 || response[8] == 0) {
+		return nil, fmt.Errorf("modbus: exception response must contain exactly one nonzero exception code")
+	}
+	return response, nil
 }
 
 func (c *ModbusClient) requestClient() (MODBUS.Client, *requestTransport) {
