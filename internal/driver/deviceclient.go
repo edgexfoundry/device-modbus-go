@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2018-2021 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -194,6 +195,17 @@ func TransformDataBytesToResult(req *models.CommandRequest, dataBytes []byte, co
 			raw := int32(binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))) // #nosec G115
 			res = float64(raw)
 			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", INT32, FLOAT64, res, result.ValueToString())
+		case common.ValueTypeUint32:
+			raw := binary.BigEndian.Uint32(swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap))
+			res = float64(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT32, FLOAT64, res, result.ValueToString())
+		case common.ValueTypeUint64:
+			// swap32BitDataBytes rewrites only the first four bytes and would zero the rest.
+			// Uint64 is big-endian, like Int64 and Float64. isByteSwap and isWordSwap are ignored.
+			// Float64 keeps integers exact only through 2^53.
+			raw := binary.BigEndian.Uint64(dataBytes)
+			res = float64(raw)
+			driver.Logger.Debugf("According to the rawType %s and the value type %s, convert integer %d to float %v ", UINT64, FLOAT64, res, result.ValueToString())
 		}
 	case common.ValueTypeBool:
 		res = false
@@ -283,6 +295,17 @@ func TransformCommandValueToDataBytes(commandInfo *CommandInfo, value *models.Co
 			}
 		case common.ValueTypeUint16:
 			dataBytes, err = getBinaryData(uint16(val))
+			if err != nil {
+				return dataBytes, err
+			}
+		case common.ValueTypeUint32:
+			dataBytes, err = getBinaryData(uint32(val))
+			if err != nil {
+				return dataBytes, err
+			}
+			dataBytes = swap32BitDataBytes(dataBytes, commandInfo.IsByteSwap, commandInfo.IsWordSwap)
+		case common.ValueTypeUint64:
+			dataBytes, err = getBinaryData(uint64(val))
 			if err != nil {
 				return dataBytes, err
 			}

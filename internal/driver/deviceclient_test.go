@@ -1,6 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 //
 // Copyright (C) 2018-2021 IOTech Ltd
+// Copyright (C) 2026 encentive GmbH
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -395,6 +396,118 @@ func TestTransformDataBytesToResult_RawType_INT32_ValueType_FLOAT64(t *testing.T
 
 	assert.Equal(t, expected, result)
 }
+
+func TestTransformDataBytesToResult_RawType_UINT32_ValueType_FLOAT64(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeFloat64,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    INPUT_REGISTERS,
+			STARTING_ADDRESS: 10,
+			RAW_TYPE:         UINT32,
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	require.NoError(t, err)
+
+	cases := []struct {
+		name      string
+		dataBytes []byte
+		expected  float64
+	}{
+		{name: "sign bit stays positive", dataBytes: []byte{0x80, 0x00, 0x00, 0x00}, expected: 2147483648.0},
+		{name: "above 2^31", dataBytes: []byte{0xB2, 0xD0, 0x5E, 0x00}, expected: 3000000000.0},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			commandValue, err := TransformDataBytesToResult(&req, tt.dataBytes, commandInfo)
+			require.NoError(t, err)
+			result, err := commandValue.Float64Value()
+			require.NoError(t, err)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestTransformDataBytesToResult_RawType_UINT32_ValueType_FLOAT64_Swaps(t *testing.T) {
+	cases := []struct {
+		name       string
+		attributes map[string]interface{}
+		dataBytes  []byte
+	}{
+		{
+			name: "byte swap",
+			attributes: map[string]interface{}{
+				PRIMARY_TABLE:    INPUT_REGISTERS,
+				STARTING_ADDRESS: 10,
+				RAW_TYPE:         UINT32,
+				IS_BYTE_SWAP:     true,
+			},
+			dataBytes: []byte{0, 0, 11, 1},
+		},
+		{
+			name: "word swap",
+			attributes: map[string]interface{}{
+				PRIMARY_TABLE:    INPUT_REGISTERS,
+				STARTING_ADDRESS: 10,
+				RAW_TYPE:         UINT32,
+				IS_WORD_SWAP:     true,
+			},
+			dataBytes: []byte{1, 11, 0, 0},
+		},
+		{
+			name: "byte and word swap",
+			attributes: map[string]interface{}{
+				PRIMARY_TABLE:    INPUT_REGISTERS,
+				STARTING_ADDRESS: 10,
+				RAW_TYPE:         UINT32,
+				IS_BYTE_SWAP:     true,
+				IS_WORD_SWAP:     true,
+			},
+			dataBytes: []byte{11, 1, 0, 0},
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			req := models.CommandRequest{
+				DeviceResourceName: "light",
+				Type:               common.ValueTypeFloat64,
+				Attributes:         tt.attributes,
+			}
+			commandInfo, err := createCommandInfo(&req)
+			require.NoError(t, err)
+			commandValue, err := TransformDataBytesToResult(&req, tt.dataBytes, commandInfo)
+			require.NoError(t, err)
+			result, err := commandValue.Float64Value()
+			require.NoError(t, err)
+			assert.Equal(t, float64(267), result)
+		})
+	}
+}
+
+func TestTransformDataBytesToResult_RawType_UINT64_ValueType_FLOAT64(t *testing.T) {
+	attributes := map[string]interface{}{
+		PRIMARY_TABLE:    INPUT_REGISTERS,
+		STARTING_ADDRESS: 10,
+		RAW_TYPE:         UINT64,
+		IS_BYTE_SWAP:     true,
+		IS_WORD_SWAP:     true,
+	}
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeFloat64,
+		Attributes:         attributes,
+	}
+	commandInfo, err := createCommandInfo(&req)
+	require.NoError(t, err)
+	dataBytes := []byte{0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00}
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	require.NoError(t, err)
+	result, err := commandValue.Float64Value()
+	require.NoError(t, err)
+	assert.Equal(t, float64(4294967296), result)
+}
+
 func TestTransformCommandValueToDataBytes_INT16(t *testing.T) {
 	req := models.CommandRequest{
 		DeviceResourceName: "light",
@@ -696,6 +809,59 @@ func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT16(t *te
 	require.NoError(t, err)
 
 	assert.ElementsMatch(t, expected, dataBytes)
+}
+
+func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT32_WordSwap(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeFloat64,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: 10,
+			RAW_TYPE:         UINT32,
+			IS_WORD_SWAP:     true,
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	require.NoError(t, err)
+	val, err := models.NewCommandValue(req.DeviceResourceName, common.ValueTypeFloat64, float64(267))
+	require.NoError(t, err)
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+	require.NoError(t, err)
+	assert.Equal(t, []byte{1, 11, 0, 0}, dataBytes)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	require.NoError(t, err)
+	result, err := commandValue.Float64Value()
+	require.NoError(t, err)
+	assert.Equal(t, float64(267), result)
+}
+
+func TestTransformCommandValueToDataBytes_ValueType_FLOAT64_RawType_UINT64_IgnoresSwap(t *testing.T) {
+	req := models.CommandRequest{
+		DeviceResourceName: "light",
+		Type:               common.ValueTypeFloat64,
+		Attributes: map[string]interface{}{
+			PRIMARY_TABLE:    HOLDING_REGISTERS,
+			STARTING_ADDRESS: 10,
+			RAW_TYPE:         UINT64,
+			IS_BYTE_SWAP:     true,
+			IS_WORD_SWAP:     true,
+		},
+	}
+	commandInfo, err := createCommandInfo(&req)
+	require.NoError(t, err)
+	val, err := models.NewCommandValue(req.DeviceResourceName, common.ValueTypeFloat64, float64(4294967296))
+	require.NoError(t, err)
+	dataBytes, err := TransformCommandValueToDataBytes(commandInfo, val)
+	require.NoError(t, err)
+	assert.Equal(t, []byte{0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00}, dataBytes)
+
+	commandValue, err := TransformDataBytesToResult(&req, dataBytes, commandInfo)
+	require.NoError(t, err)
+	result, err := commandValue.Float64Value()
+	require.NoError(t, err)
+	assert.Equal(t, float64(4294967296), result)
 }
 
 // Test swap operation for read command
